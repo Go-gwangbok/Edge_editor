@@ -14,8 +14,6 @@ class Text extends CI_Controller {
 		if($this->session->userdata('is_login')){
 			$data['cate'] = 'todolist';
 			$this->load->view('head',$data);
-			//$usr_id = $this->session->userdata('id');
-
 			$datas = $this->all_list->getEssay($essay_id,$type);				
 
 			$data['time'] = $datas->time;
@@ -33,49 +31,11 @@ class Text extends CI_Controller {
 			$data['type'] = $datas->type;
 			$data['conf'] = false;
 			$data['error_chk'] = $datas->chk;
-			$classify = $this->session->userdata('classify');
-			
-			$data['cate'] = 'todo';
-			
+			$classify = $this->session->userdata('classify');			
+			$data['cate'] = 'todo';			
 			$data['discuss'] = $datas->discuss;
 			$this->load->view('editor',$data);		
 			$this->load->view('footer');					
-
-			// $classify = $this->session->userdata('classify');
-			// if($classify == 1){
-			// 	$data['cate'] = 'todolist';
-			// 	$this->load->view('head',$data);
-			// 	$usr_id = $this->session->userdata('id');
-
-			// 	$datas = $this->all_list->getEssay($usr_id,$essay_id,$type);				
-			// 	$data['time'] = $datas->time;
-			// 	$data['title'] = str_replace('"', '', $datas->prompt);
-			// 	$writing = preg_replace("/[\n\r]/","<br>", $datas->raw_txt);
-			// 	$data['writing'] = str_replace('"', '', $writing);
-
-			// 	$raw_sen = $datas->raw_txt;
-			// 	$convert = str_replace('"', '', $raw_sen); 
-			// 	$data['re_raw_writing'] = preg_replace("/[\n\r]/","<br>", $convert);
-
-			// 	$data['id'] = $datas->essay_id;
-			// 	$data['token'] = '';
-			// 	$data['kind'] = ''; // ex) toefl, essay, toeic
-			// 	$data['type'] = $datas->type;
-			// 	$data['conf'] = false;
-			// 	$data['cate'] = 'todo';
-			// 	$this->load->view('editor',$data);		
-			// 	$this->load->view('footer');					
-			// }else{				
-			// 	$this->load->view('head');
-			// 	//echo 'instruct';
-			// 	$data['cate'] = 'status';
-			// 	$data['list'] = $this->all_list->new_getList();
-			// 	$data['count'] = $this->all_list->count();
-
-			// 	$this->load->view('essay_list',$data);		
-			// 	$this->load->view('footer');					
-			// }	
-
 		}else{
 			redirect('/');
 		}
@@ -275,13 +235,7 @@ class Text extends CI_Controller {
 			$data['raw_writing'] = $rows->raw_txt;
 			$data['re_raw_writing'] = '';			
 			
-			$tagging = str_replace('"','',preg_replace("/[\n\r]/","<br>", $rows->tagging));
-			// $patterns = array("(<IN>)","(<TR>)","(<TS>)","(<BO1>)","(<BO2>)","(<BO3>)","(<BO4>)","(<SI1>)","(<SI2>)","(<SI3>)","(<SI4>)","(<EX>)","(<CO>)","(<MI1>)","(<MI2>)","(<MI3>)","(<MI4>)",
-			// 					"(</IN>)","(</TR>)","(</TS>)","(</BO1>)","(</BO2>)","(</BO3>)","(</BO4>)","(</SI1>)","(</SI2>)","(</SI3>)","(</SI4>)","(</EX>)","(</CO>)","(</MI1>)","(</MI2>)","(</MI3>)","(</MI4>)");
-			// $replace = array("<span class='in' tag='IN'>&lt;IN&gt;","&lt;TR&gt;","&lt;TS&gt;","&lt;BO1&gt;","&lt;BO2&gt;","&lt;BO3&gt;","&lt;BO4&gt;","&lt;SI1&gt;","&lt;SI2&gt;","&lt;SI3&gt;","&lt;SI4&gt;","&lt;EX&gt;","&lt;CO&gt;","&lt;MI1&gt;","&lt;MI2&gt;","&lt;MI3&gt;","&lt;MI4&gt;",
-			// 					"&lt;/IN&gt;</span>","&lt;/TR&gt;","&lt;/TS&gt;","&lt;/BO1&gt;","&lt;/BO2&gt;","&lt;/BO3&gt;","&lt;/BO4&gt;","&lt;/SI1&gt;","&lt;/SI2&gt;","&lt;/SI3&gt;","&lt;/SI4&gt;","&lt;/EX&gt;","&lt;/CO&gt;","&lt;/MI1&gt;","&lt;/MI2&gt;","&lt;/MI3&gt;","&lt;/MI4&gt;");
-
-			// $data['tagging'] = preg_replace($patterns, $replace, $tagging);
+			$tagging = str_replace('"','',preg_replace("/[\n\r]/","<br>", $rows->tagging));			
 			$data['tagging'] = $tagging;
 			
 			$data['writing'] = '';
@@ -335,24 +289,28 @@ class Text extends CI_Controller {
 			$data['cate'] = 'writing';
 			$this->load->view('head',$data);
 
+			/** todolist_viewㅇ에서 form으로 전송된값 **/
 			$token = $this->input->post('token');
 			$w_id = $this->input->post('w_id');
 			$title = $this->input->post('title');
-			$writing = $this->input->post('writing');
+			$writing = str_replace('"','', $this->input->post('writing'));
 			$critique = $this->input->post('critique');		
 			$kind = $this->input->post('kind');
 
 			$data['title'] = str_replace('"', '', $title);
-			$data['writing'] = str_replace('"', '', $writing);
-
-			$convert = str_replace('"', '', $writing); 
-			$data['re_raw_writing'] = preg_replace("/[\n\r]/","<br>", $convert);
+			
+			$data['writing'] = $writing;			
+			$data['re_raw_writing'] = preg_replace("/[\n\r]/","<br>", $writing);
 			$data['token'] = $token;
 			$data['id'] = $w_id;
 			$data['critique'] = $critique;
 			$data['kind'] = $kind;
 			$data['type'] = '';
 			$data['conf'] = true;
+			$data['error_chk'] = '';
+			$data['submit'] = '';
+			$data['discuss'] = '';
+			$data['time'] = 0;
 
 			$this->load->view('editor',$data);		
 			$this->load->view('footer');					
@@ -553,8 +511,6 @@ class Text extends CI_Controller {
 				}										
 			}
 
-
-
 			$data['error_list'] = $error_list;
 			$data['editing'] = $editing;
 			$data['cate'] = 'error';
@@ -565,8 +521,7 @@ class Text extends CI_Controller {
 			$this->load->view('footer');					
 		}else{
 			redirect('/');
-		}
-		
+		}		
 	}
 }
 

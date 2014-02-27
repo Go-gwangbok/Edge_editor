@@ -70,8 +70,7 @@ function ajaxPost(url,data){
 
 			$('tbody#list tr#'+i).last().append('<td class="text-center"><a href="/text/admin_eachdone/'+history_list[i]['editor_id']+'/'+essay_id+'/'+task+'" class="no-uline"><button type="button" class="btn btn-primary btn-sm">&nbsp;&nbsp;&nbsp;Error&nbsp;&nbsp;&nbsp;</button></a></td><td class="text-center"><button class="btn btn-sm btn-danger" id="confirm" essay_id="'+essay_id+'">Yes</button> <button class="btn btn-sm btn-danger" id="noterror" essay_id="'+essay_id+'">Return</button></td>');
 			num++;
-		}
-				
+		}				
 		//console.log(page,list,history_totalcount);
 		$('div#pageblock').children().remove();
 		

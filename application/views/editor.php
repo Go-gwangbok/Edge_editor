@@ -14,7 +14,7 @@
     <li><a href="#scoring" data-toggle="tab">Scoring</a></li>    
     <div id="stopwatch" class="btn btn-default pull-right" disabled>Timer : 00:00</div>
     <?
-    if($this->session->userdata('classify') == 1){ // Editor
+    if($this->session->userdata('classify') == 1 && $cate != 'writing') { // Editor 하지만, Edge Writing에서 넘어온것은 표시안함!
       if($error_chk == 1 && $submit != 1){
       ?>
         <button class="btn btn-danger pull-right" id="errorlist" style="margin-right:10px;" disabled>Return</button>
@@ -126,18 +126,15 @@
       </div>
       
     </div>
+      <? } ?>      
+    <div id="editor">          
       <?
-      }
-      ?>      
-
-    <div id="editor">      
-      
-      <?
+        // Draft essay
         if($cate == 'mydone' || $cate == 'draft' || $cate == 'admin' || $cate == 'pj_draft'){          
           echo nl2br(trim($edit_writing));
-        }else{                  
+        }else{ // New essay          
           echo trim($writing); 
-       }
+        }
       ?>      
     </div>
 
@@ -162,10 +159,7 @@
                 }else{
                 ?>
                   <textarea class="border text_box" id="critique" style="width:100%;" rows="7"></textarea>           
-                <?
-                }
-                ?>                
-
+                <? } ?>   
               </div>
             </div>            
           </div>           
@@ -257,6 +251,7 @@
               <div class="col-md-12 ">                         
                 <div class="col-md-12 ">  
                 <?
+                // New Essay
                 if($cate == 'todo' || $cate == 'writing'){
                 ?>
 
@@ -323,7 +318,7 @@
                     </div>
                   </div> 
                  
-                  <? }else{ ?> 
+                  <? }else{ // Draft ?> 
                  
                   <div class="row" style="margin-bottom:10px;">  
                     <label for="inputEmail3" class="col-md-2 ">I/B/C</label>
@@ -387,9 +382,7 @@
                       <input type="text" class="form-control" id="usage" placeholder="0" value="<?=$usage;?>">
                     </div>
                   </div>
-
                   <? } ?>                  
-
                 </div>
               </div>
             </div>
@@ -426,6 +419,7 @@
 // Timer
 var cate = '<?=$cate;?>';
 var draft_time = <?=$time;?>;
+//var draft_time = 0;
 console.log(cate);
 console.log(draft_time);
 function formatTime(time) {
@@ -455,25 +449,27 @@ var Example1 = new (function() {
 
     if(cate == 'draft'){
       var currentTime = draft_time; // Current time in hundredths of a second 100 == 1  
-          incrementTime = 70; // Timer speed in milliseconds       
+          incrementTime = 70; // Timer speed in milliseconds      
     }else if(cate == 'admin' || cate == 'mydone'){
       var currentTime = draft_time; // Current time in hundredths of a second 100 == 1  
       var incrementTime = 0; // Timer speed in milliseconds       
-    }else{
+    }else{      
       var currentTime = 0; // Current time in hundredths of a second 100 == 1  
+      incrementTime = 70; // Timer speed in milliseconds      
     }    
 
-    var $stopwatch, // Stopwatch element on the page        
-        updateTimer = function() {
+
+    var $stopwatch, // Stopwatch element on the page            
+        updateTimer = function() {            
             $stopwatch.html('Timer : ' + formatTime(currentTime));
             currentTime += incrementTime / 10;
         },
         init = function() {
+            console.log(draft_time);
             $stopwatch = $('#stopwatch');
             Example1.Timer = $.timer(updateTimer, incrementTime, true);
         };
-    this.resetStopwatch = function() {
-        //currentTime = 0;
+    this.resetStopwatch = function() {          
         this.Timer.stop().once();
     };      
     $(init);          
@@ -489,52 +485,49 @@ var mi_count = 1;
 var si_count = 1;
 var bo_count = 1;
 $('button#tag').click(function(){          
-      var tag = $(this).attr('tag');
-      var mytext = $.selection('html');
-      console.log(mytext);
-      
-      //var convert = mytext.replace(/\n/g,"<br>");
-      //console.log(convert);
-      var div = $("div#tagging_box");  
-      var data = div.html();
-      console.log(data);
-      switch(tag)
-      {
-      case 'IN': color = "in"; break;
-      case 'BO': 
-                tag = 'BO'+bo_count;
-                color = "bo"; 
-                bo_count++;
-                break;
-      case 'CO': color = "co"; break;
-      case 'TS': color = "ts"; break;
-      case 'MI': 
-                tag =  'MI'+mi_count;
-                color = "mi"; 
-                mi_count++;
-                break;
-      case 'SI': 
-                tag =  'SI'+si_count;
-                color = "si";
-                si_count++;
-                break;
-      case 'TR': color = "tr"; break;
-      case 'Ohter': color = "ohter"; break;
-      case 'TP': color = "tp"; break;
-      case 'TQ': color = "tq"; break;
-      case 'EX': color = "ex"; break;          
-      default: alert('selection Error');
-      }   
-      var undo_div_box = $("div#tagging_box").html();
-      undo_div.push(undo_div_box);          
+  var tag = $(this).attr('tag');
+  var mytext = $.selection('html');
+  //console.log(mytext);  
+  
+  var div = $("div#tagging_box");  
+  var data = div.html();
+  console.log(data);
+  switch(tag)
+  {
+  case 'IN': color = "in"; break;
+  case 'BO': 
+            tag = 'BO'+bo_count;
+            color = "bo"; 
+            bo_count++;
+            break;
+  case 'CO': color = "co"; break;
+  case 'TS': color = "ts"; break;
+  case 'MI': 
+            tag =  'MI'+mi_count;
+            color = "mi"; 
+            mi_count++;
+            break;
+  case 'SI': 
+            tag =  'SI'+si_count;
+            color = "si";
+            si_count++;
+            break;
+  case 'TR': color = "tr"; break;
+  case 'Ohter': color = "ohter"; break;
+  case 'TP': color = "tp"; break;
+  case 'TQ': color = "tq"; break;
+  case 'EX': color = "ex"; break;          
+  default: alert('selection Error');
+  }   
+  var undo_div_box = $("div#tagging_box").html();
+  undo_div.push(undo_div_box);          
 
-      div.html(data.replace(mytext,'<span class="'+color+'" id = "action'+i+'" tag = "'+tag+'">&#60'+ tag +'&#62' + mytext + '&#60/' + tag + '&#62 </span>'));                     
-      
-      var div_tagging_box = $("div#tagging_box").html();          
-      tagging_div.push(div_tagging_box);
-      i++;
-      count++;
-      
+  div.html(data.replace(mytext,'<span class="'+color+'" id = "action'+i+'" tag = "'+tag+'">&#60'+ tag +'&#62' + mytext + '&#60/' + tag + '&#62 </span>'));                     
+  
+  var div_tagging_box = $("div#tagging_box").html();          
+  tagging_div.push(div_tagging_box);
+  i++;
+  count++;     
 });
   
 $("button#undo").click(function(){          
@@ -545,8 +538,7 @@ $("button#undo").click(function(){
       $("div#tagging_box").remove();
       
       $("div#hrline").append('<div class="divtagging_box" id="tagging_box">'+undo_tagging_div+'</div>');          
-      i--;
-      
+      i--;      
     }
 });      
 
@@ -579,9 +571,7 @@ $("button#all").click(function(){
     $("div#tagging_box").html(clear_storage);
     $(this).attr('click','clear');
     $(this).html('<span class="glyphicon glyphicon-refresh"></span> Clear All</button>');
-  }       
-  
-  
+  } 
 });
 
 var classify_in = true;  
@@ -717,13 +707,8 @@ $('button#draft').click(function(){
 
   min = min * 6000;
   second = second * 100;
-  var total_time = min+second;
-  console.log(time);
-  console.log(min);
-  console.log(second);
-  console.log(total_time);
-
-
+  var total_time = min+second;  
+  // console.log(total_time);
   var data = {            
     essay_id: <?=$id;?>,            
     editing: editing,
@@ -792,11 +777,8 @@ $('button#submit').click(function()
 
   min = min * 6000;
   second = second * 100;
-  var total_time = min+second;
-  console.log(time);
-  console.log(min);
-  console.log(second);
-  console.log(total_time);
+  var total_time = min+second;  
+  //console.log(total_time);
 
   var data = {            
     essay_id: <?=$id;?>,            
@@ -815,8 +797,7 @@ $('button#submit').click(function()
     usage: usage,
     time : total_time
   }
-  console.log(data);
-  
+  //console.log(data);  
   $.ajax(
   {
     url: '/text/submit', // 포스트 보낼 주소
@@ -873,7 +854,7 @@ $('button#editSubmit').click(function()
     style: style,
     usage: usage
   }
-  console.log(data);
+  //console.log(data);
   
   $.ajax(
   {
@@ -944,12 +925,8 @@ $("button#w_submit").click(function(){
 
   min = min * 6000;
   second = second * 100;
-  var total_time = min+second;
-  console.log(time);
-  console.log(min);
-  console.log(second);
-  console.log(total_time);
-
+  var total_time = min+second;  
+  //console.log(total_time);
 
   var submit_data = {
     token: token,
@@ -971,9 +948,8 @@ $("button#w_submit").click(function(){
     usage: usage,
     time : total_time
   };
-  console.log(submit_data); 
-  $.ajax({
-    //url:"http://192.168.0.22:8888/editor/editing/done",
+  //console.log(submit_data); 
+  $.ajax({    
     url: '/writing/submit',
     type: 'POST',         
     data: submit_data,
@@ -1004,7 +980,6 @@ $('button#errorlist').click(function(){
       console.log(json['result']);
       if(json['result']){
           window.location = "/todo";
-
       }else{
         alert('DB Error --> error_proc');
       }
@@ -1019,8 +994,7 @@ $('button#discuss').click(function(){
     essay_id: <?=$id;?>  
   }
   //console.log(data);
-  $.post('/project/discuss',data,function(json){      
-    //console.log(json['result']);
+  $.post('/project/discuss',data,function(json){          
     if(json['result']){
         window.location = "/todo";
     }else{

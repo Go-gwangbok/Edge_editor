@@ -68,13 +68,6 @@ var w_id = '';
 var writing = '';
 var critique = '';
 var kind = '';
-
-//var cate = '<?=$cate;?>';
-//var pj_id = '<?=$pj_id;?>';
-// var list_count = '';
-// var holistic_list_count = '';
-// var jj = 0;
-
 var page = '<?=$page;?>';
 var list = '<?=$list;?>';
 var editor_id = '<?=$editor_id;?>';
@@ -84,30 +77,20 @@ var url = '';
 var cate = 'edi_todo';
 
 $(document).ready(function(){		
-
-	var secret = 'isdyf3584MjAI419BPuJ5V6X3YT3rU3C';
-	var email = '<?=$this->session->userdata('email');?>';
-	
-	var secret_data = {
-		secret : secret,
+	var email = "<?=$this->session->userdata('email');?>";	
+	var secret_data = {	
 		email : email		
 	};
 	//console.log(secret_data);	
-	$.ajax({
-		//url: "http://ec2-54-199-4-169.ap-northeast-1.compute.amazonaws.com/editor/auth",		
+
+	$.ajax({		
 		url: '/writing/get_list',		
 		type: 'post',		
 		data: secret_data,
 		dataType: 'json',
 		success: function(json){						
 			result = JSON.parse(json['result']);						
-			access = JSON.parse(json['access']); //delegate에서 data token 필요하기 때문에 access 필요!		
-			//holistic_list_count = json['list_count'].length;			
-
-			// var tagging_list = json['tagging_list']; // 10개만 가지고옴! 첫화면에 10개만 보요주기위함!
-			// var tagging_list_length = tagging_list.length;
-			//console.log(json['tagging_list']);						
-			//console.log(holistic_list_count);
+			access = JSON.parse(json['access']); //delegate에서 data token 필요하기 때문에 access 필요!				
 			
 			if(result['status']){				
 				//num = 1; // No. 번호
@@ -159,15 +142,14 @@ $(document).ready(function(){
 					$("tr#trow").append('<td class="text-center"><button class="btn btn-danger btn-sm" id="adjust">&nbsp;&nbsp;&nbsp;Revise&nbsp;&nbsp;&nbsp;</button></td>');
 				}
 			}else{ // 새로운 내용이 없을때				
-				console.log(access['status']);
+				//console.log(access['status']);
 				if(!access['status']){
 					$("<tr id='trow'>").appendTo('tbody#writing');
 					$("tr#trow").append('<td class="text-center" colspan="6">No authorization for Edge writing service!</td>');					
 				}else{
 					$("<tr id='trow'>").appendTo('tbody#writing');
 					$("tr#trow").append('<td class="text-center" colspan="6">No new posts!</td>');					
-				}
-				
+				}				
 			}						
 		}
 	})// ajax End		
@@ -185,9 +167,8 @@ $(document).ready(function(){
 			token: token,
 			w_id: w_id
 		};
-		console.log(title);
-		$.ajax({
-				//url: 'http://192.168.0.22:8888/editor/editing/start',
+		
+		$.ajax({				
 				url:"/writing/write",
 				type: 'POST',		
 				data: data,
@@ -231,7 +212,7 @@ $(document).ready(function(){
 					+history_list[i]['start_date']+'</td><td>'
 					+history_list[i]['type']+'</td>');
 
-				if(history_list[i]['draft'] == 0){ // new
+				if(history_list[i]['draft'] == 0){
 					if(json['classify'] == 1){
 						$('tbody#list tr#'+i).append('<td><a href="/text/todo/'+essay_id+'/'+task+'" class="no-uline"><button type="button" class="btn btn-default btn-sm">&nbsp;&nbsp;Revise&nbsp;&nbsp;</button></a></td></tr>');
 					}else{
@@ -317,7 +298,6 @@ $(document).ready(function(){
 	url = '/status/page_list';
 	
 	ajaxPost(url,data);	//page list.
-
 
 	$('div#pageblock').delegate('button#p_button', 'click', function(){	
 		var page_num = $(this).attr('page_num');

@@ -13,17 +13,11 @@ class Writing extends CI_Controller {
 	public function get_list()
 	{
 		$secret = 'isdyf3584MjAI419BPuJ5V6X3YT3rU3C';
-		$email = $this->session->userdata('email');
-		//$pj_id = $this->input->post('pj_id');
-		//$classify_cate = $this->input->post('cate');
-
-		//$secret = $this->input->post('secret');
-		//$email = $this->input->post('email');		
-		
+		$email = $this->session->userdata('email');		
 		$access = $this->curl->simple_post('http://ec2-54-199-4-169.ap-northeast-1.compute.amazonaws.com/editor/auth', array('secret'=>$secret,'email'=>$email));
 
 		// $access = '{
-		// 		    "status": false,
+		// 		    "status": true,
 		// 		    "data": {
 		// 		        "token": "~~~"
 		// 		    }
@@ -40,7 +34,7 @@ class Writing extends CI_Controller {
 			$result_data = $this->curl->simple_post('http://ec2-54-199-4-169.ap-northeast-1.compute.amazonaws.com/editor/get', array('token'=>$token));
 
 
-			//"is_24hr":"1" == true  "0" == 'false'   "is_critique":"1" == true  "0" == 'false' 
+			/** "is_24hr":"1" == true  "0" == 'false'   "is_critique":"1" == true  "0" == 'false' **/
 			
 			// $result_data = '{
 			// 			    "status": true,
@@ -48,11 +42,11 @@ class Writing extends CI_Controller {
 			// 		        {
 			// 		            "id": 1,
 			// 		            "kind": "essay",
-			// 		            "is_24hr":"0",
+			// 		            "is_24hr":"1",
 			// 		            "is_critique": "0",
 			// 		            "title": "Which is better for children to grow up in the countryside or in a big city.",
 			// 		            "writing": " personally disagree with the former idea since children in the urban area can acquire the better educational conditions as well as improve their capability through positive competition",					            
-			// 		            "date": "2013-11-12 10:11:03"
+			// 		            "date": "2014-02-28 10:11:03"
 			// 		        }						   
 			// 			}';		
 			
@@ -125,13 +119,15 @@ class Writing extends CI_Controller {
 		// 		    }
 		// 		}';		
 
-		$conform = json_decode($access,true);		
+		$json['result'] = $access;						
+		// $conform = json_decode($access,true);		
 		
-		if($conform['status']){
-			$json['result'] = $access;						
-		}else{			
-			$json['result'] = $access;			
-		}
+		// if($conform['status']){
+		//	$json['result'] = $access;						
+		// }else{			
+		// 	$json['result'] = $access;			
+		// }
+
 		$this->output->set_content_type('application/json')->set_output(json_encode($json));
 	}
 

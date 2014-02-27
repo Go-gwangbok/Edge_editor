@@ -368,8 +368,7 @@ $('button#sorting').click(function(){
 
 });
 
-$('div#error').delegate('button#errorbtn', 'click', function(){		
-	//console.log('aaa');
+$('div#error').delegate('button#errorbtn', 'click', function(){			
 	data = {
 		page : page,
 		list : list,
@@ -377,7 +376,7 @@ $('div#error').delegate('button#errorbtn', 'click', function(){
 		editor_id : error_id,
 		cate : 'error_export'
 	}
-	console.log(data);
+	//console.log(data);
 	url = '/project/page_list';
 
 	ajaxPost(url,data);	//page list.
@@ -389,7 +388,7 @@ $('button#allexport').click(function(){
 		done : done_id,
 		pj_name : pj_name
 	}
-	//console.log(data);
+	
 	var download_url  = '/project/all_export?done='+ done_id +'&pj_name='+pj_name;
 	$.post('/project/all_export',data,function(json){
 		console.log(json['result']);
