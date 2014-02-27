@@ -610,7 +610,7 @@ class Project extends CI_Controller {
 
 			$update = true;
 			$all_id = $this->all_list->all_essayid($pj_id); // 완료된 모든 에세이를 가지고 온다!
-			// $aa = 11063;
+			// $aa = 10766;
 			// $all_id = $this->all_list->memchkExportget_essay($aa); // 완료된 모든 에세이를 가지고 온다!
 
 			foreach ($all_id as $values) {
@@ -643,10 +643,9 @@ class Project extends CI_Controller {
 					array_push($err_id, $id);					
 				}							
 				
-				if($ex_editing == ''){ //DB에 ex_editing 이 없다면 confirm 한다!
+				if($ex_editing == ''){ //DB에 ex_editing 이 없다면 confirm 한다!					
 					$editing = eregi_replace('</?(span)[^>]*>','',$editing); //span 테그 제거!
 					$editing = eregi_replace('</?(font)[^>]*>','',$editing); //font 테그 제거!							
-
 					$int = preg_match_all('/\/\//', $editing, $matches); //  '//' count			
 					$content = $this->getTextBetweenTags('cou','u', $editing); // <u>태그</u> 사이에 있는 값 가져오기!									
 					

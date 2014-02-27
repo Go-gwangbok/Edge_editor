@@ -235,11 +235,11 @@ $(document).ready(function(){
 	}
 	console.log(members);	
 	$.post('/project/member_list',members,function(json){
-		console.log(json['result']);	
+		//console.log(json['result']);	
 		console.log(json['error']);
-		console.log('error_id : ' + json['error_id']);				
+		//console.log('error_id : ' + json['error_id']);						
 		// console.log('done_id : ' + json['done_id']);				
-		console.log('error_slash : '+json['int']);
+		//console.log('error_slash : '+json['int']);
 		if(json['error'] > 0){ // Error			
 			$('div#error').append('<button class="btn btn-danger" id="errorbtn" style="margin-top:-15px; margin-right:15px;">Error List<span class="badge" style="background-color:transparent;">'+json['error']+'</span></button>');			
 			error_id = json['error_id'].toString();			

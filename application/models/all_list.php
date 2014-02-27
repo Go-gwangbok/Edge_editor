@@ -1231,7 +1231,7 @@ class All_list extends CI_Model{
    		return $result;      
    	}
 
-   	public public function all_essayid($pj_id) {
+   	public function all_essayid($pj_id) {
    		return $this->db->query("SELECT * FROM tag_essay WHERE pj_id = '$pj_id' and submit = 1 and pj_active = 0 and active = 0 and discuss = 'Y'")->result();
    	}
 
