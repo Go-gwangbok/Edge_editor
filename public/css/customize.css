@@ -12,8 +12,16 @@
   background-color: rgba(255,255,255,0.0);
 }
 
+.line-radius {
+  border-radius: 5px;
+}
+
 .line-test{
 	border: solid #f00 2px;
+}
+
+.line{
+  border: solid #D5D5D5 1px;
 }
 
 .div-box-line {
@@ -234,3 +242,56 @@ a.no-uline { text-decoration:none }
 
 /* 마우스 지나갈 때만 삭제 + 강제로 없애기 */
 a.noul:hover { text-decoration:none !important }
+
+.akacolor {
+  color:#f15e22; 
+}
+
+.circle1{
+  background-color:#f15e22;
+  width:80px;
+  height:80px;
+  -webkit-border-radius:100px;
+  -moz-border-radius:100px;
+}
+
+.circle2{
+  /*a72525*/
+  background-color:#fff;
+  border: 2px #f15e22 solid;
+  width:80px;
+  height:80px;
+  -webkit-border-radius:100px;
+  -moz-border-radius:100px;
+}
+
+.circle3{
+  /*a72525*/
+  background-color:#fff;
+  border: 2px #BDBDBD solid;
+  width:80px;
+  height:80px;
+  -webkit-border-radius:100px;
+  -moz-border-radius:100px;
+}
+
+.parent
+{
+    position:relative;    
+}
+
+.child
+{
+    position: absolute;
+    top: 50%;
+    /* adjust top up half the height of a single line */
+    margin-top: -0.5em;
+    /* force content to always be a single line */
+    overflow: hidden;
+    white-space: nowrap;
+    width: 90%;    
+    text-overflow: ellipsis;
+}
+
+
+

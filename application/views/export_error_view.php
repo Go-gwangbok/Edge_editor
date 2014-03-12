@@ -1,8 +1,15 @@
 <div class="container">
 	<div id = "error">
 		<?		
+		$i = 0;
 		foreach ($error_list as $value) {
-			echo $value."<br>";
+			if($i > 1){
+		?>
+		<font color="red"><span>Error message : </span></font>
+		<?			
+			}	
+			echo  $value."<br>";
+		$i++;
 		}
 		?>
 	</div>
@@ -23,18 +30,20 @@ $("#submit").click(function(){
 	}
 	console.log(data);
 	$.post('/text/error_chk',data,function(json){		
+		console.log(json['update']);		
 		console.log(json['result']);		
 		console.log(json['essay_id']);		
 		var result = json['result'].length;
 		console.log(result);		
 		if(result > 0){ // Error
 			$('#error').children().remove()
-			for(var i = 0; i < result; i++){
-				$('#error').append("<span>"+json['result'][i]+"</span><br>");
-			}			
+			
+				//$('#error').children().remove();
+				$('#error').append('<br><span><font color="red">Error message : '+json['result']+'</span><br>');
+			
 		}else{ // Done
-			if(json['update']){
-				window.location = '/project/export/'+pj_id;		
+			if(json['update']){				
+				window.location = '/project/error_list/'+pj_id;						
 			}else{
 				alert('DB update Error --> editing_update');
 			}			

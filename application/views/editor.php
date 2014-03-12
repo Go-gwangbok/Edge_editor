@@ -1,5 +1,43 @@
-<div class="container">
-    <h2 style="margin-top:-10px;">Title</h2> 
+<div class="container" style="margin-top:-15px;">
+  <div class="row">   
+    <ol class="breadcrumb" style="background:white;">
+          <li><a href="/">Home</a></li>                   
+          <?
+            if($cate == 'writing'){
+          ?>
+            <li><a href="/service">Service</a></li>                         
+            <li class="akacolor">Writing</li>
+          <?
+            }elseif($cate == 'todo' || $cate == 'draft'){
+          ?>
+            <li><a href="/musedata/project/">Project</a></li>   
+            <li><a href="/musedata/project/board/<?=$cate;?>/<?=$pj_id?>/<?=$this->session->userdata('id');?>"><?=$pjname;?></a></li>   
+            <li class="akacolor">Todo</li>                         
+          <?
+            }elseif($cate == 'com'){
+          ?>
+            <li><a href="/musedata/project/">Project</a></li>   
+            <li><a href="/musedata/project/board/<?=$cate;?>/<?=$pj_id?>/<?=$this->session->userdata('id');?>"><?=$pjname;?></a></li>   
+            <li class="akacolor">Completed</li>                         
+          <?
+            }elseif($cate == 'tbd'){
+          ?>             
+            <li><a href="/musedata/project/">Project</a></li>   
+            <li><a href="/musedata/project/board/<?=$cate;?>/<?=$pj_id?>/<?=$this->session->userdata('id');?>"><?=$pjname;?></a></li>    
+            <li class="akacolor">T.B.D</li>                         
+          <?
+            }elseif($cate == 'history'){
+          ?>
+            <li><a href="/musedata/project/">Project</a></li>   
+            <li><a href="/musedata/project/board/<?=$cate;?>/<?=$pj_id?>/<?=$this->session->userdata('id');?>"><?=$pjname;?></a></li>   
+            <li class="akacolor">History</li>
+          <?
+            }                          
+          ?>            
+      </ol> <!-- Navi end -->
+  </div>  
+
+    <!-- <h2 style="margin-top:-10px;">Title</h2>  -->
   <div class="div-box-line-promp">
     <dl>
         <dt style="margin:0 10px 0 10px">Prompt</dt>              
@@ -9,12 +47,13 @@
   <br>
 
   <ul class="nav nav-tabs" id="myTab">    
-    <li class="active"><a href="#error" data-toggle="tab">Error detecting</a></li>
+    <li class="active"><a href="#orig" data-toggle="tab">Original</a></li>
+    <li><a href="#error" data-toggle="tab">Error detecting</a></li>
     <li><a href="#tagging" data-toggle="tab">Tagging</a></li>    
     <li><a href="#scoring" data-toggle="tab">Scoring</a></li>    
     <div id="stopwatch" class="btn btn-default pull-right" disabled>Timer : 00:00</div>
     <?
-    if($this->session->userdata('classify') == 1 && $cate != 'writing') { // Editor 하지만, Edge Writing에서 넘어온것은 표시안함!
+    if($cate != 'writing') { // Editor 하지만, Edge Writing에서 넘어온것은 표시안함!
       if($error_chk == 1 && $submit != 1){
       ?>
         <button class="btn btn-danger pull-right" id="errorlist" style="margin-right:10px;" disabled>Return</button>
@@ -34,184 +73,126 @@
   </ul>
   <br>
 <div class="tab-content">
+  <!-- Error Original -->
+   <div class="tab-pane div-box-line active" id="orig">
+      <div class="col-md-12" style="margin-top:15px;">                
+        
+        <div>          
+          <?
+            echo trim($re_raw_writing); 
+            // Draft essay
+            // if($cate == 'com' || $cate == 'draft' || $cate == 'pj_draft' || $cate == 'tbd'){          
+            //   echo nl2br(trim($edit_writing));
+            // }else{ // New essay or T.B.D          
+            //   echo trim($writing); 
+            // }
+          ?>      
+        </div> 
+        <br>      
+      </div>  <!-- col-md-12 -->
+    </div> <!-- tab-pane -->
 
-    <div class="tab-pane div-box-line active" id="error">
+    <!-- Error detecting -->
+    <div class="tab-pane div-box-line" id="error">
       <div class="col-md-12" style="margin-top:15px;">   
-    <!-- Editor -->
-    
-    <div class="btn-toolbar" data-role="editor-toolbar" data-target="#editor" style="margin-bottom:20px;">
-      <?
-      if($this->session->userdata('classify') == 0 && $cate == 'admin'){        
-      ?>
-      <div class="btn-group">
-        <a class="btn dropdown-toggle" data-toggle="dropdown" title="Font" disabled><i class="icon-font"></i><b class="caret"></b></a>
-        <ul class="dropdown-menu">
-        </ul>
-      </div>
+        
+        <div class="btn-toolbar" data-role="editor-toolbar" data-target="#editor" style="margin-bottom:20px;">
+          <div class="btn-group">
+            <a class="btn" data-edit="strikethrough" title="Strikethrough"><span class="glyphicon glyphicon-trash"></span> DEL</a>        
+            <a class="btn" data-edit="underline" title="Underline (Ctrl/Cmd+U)"><span class="glyphicon glyphicon-refresh"></span> MOD</a>
+            <a class="btn" data-edit="bold" title="Bold (Ctrl/Cmd+B)"><span class="glyphicon glyphicon-pencil"></span> INS</a>
+            <!--<a class="btn" data-edit="italic" title="Italic (Ctrl/Cmd+I)"><span class="glyphicon glyphicon-refresh"></span> TYPO</a>-->
+          </div>
 
-      <div class="btn-group">
-        <a class="btn dropdown-toggle" data-toggle="dropdown" title="Font Size" disabled><i class="icon-text-height"></i>&nbsp;<b class="caret"></b></a>
-          <ul class="dropdown-menu">
-          <li><a data-edit="fontSize 5"><font size="5">Huge</font></a></li>
-          <li><a data-edit="fontSize 3"><font size="3">Normal</font></a></li>
-          <li><a data-edit="fontSize 1"><font size="1">Small</font></a></li>
-          </ul>
-      </div>
+          <div class="btn-group">
+            <a class="btn" data-edit="insertunorderedlist" title="Bullet list"><i class="icon-list-ul"></i></a>
+            <a class="btn" data-edit="insertorderedlist" title="Number list"><i class="icon-list-ol"></i></a>
+            <a class="btn" data-edit="outdent" title="Reduce indent (Shift+Tab)"><i class="icon-indent-left"></i></a>
+            <a class="btn" data-edit="indent" title="Indent (Tab)"><i class="icon-indent-right"></i></a>
+          </div>
 
-      <div class="btn-group">
-        <a class="btn" data-edit="strikethrough" title="Strikethrough" disabled><span class="glyphicon glyphicon-trash"></span> DEL</a>                
-        <a class="btn" data-edit="underline" title="Underline (Ctrl/Cmd+U)" disabled><span class="glyphicon glyphicon-refresh"></span> MOD</a>        
-        <a class="btn" data-edit="bold" title="Bold (Ctrl/Cmd+B)" disabled><span class="glyphicon glyphicon-pencil"></span> INS</a>
-        <!--<a class="btn" data-edit="italic" title="Italic (Ctrl/Cmd+I)"><span class="glyphicon glyphicon-refresh"></span> TYPO</a>-->
-      </div>
-      <div class="btn-group">
-        <a class="btn" data-edit="insertunorderedlist" title="Bullet list" disabled><i class="icon-list-ul"></i></a>
-        <a class="btn" data-edit="insertorderedlist" title="Number list" disabled><i class="icon-list-ol"></i></a>
-        <a class="btn" data-edit="outdent" title="Reduce indent (Shift+Tab)" disabled><i class="icon-indent-left"></i></a>
-        <a class="btn" data-edit="indent" title="Indent (Tab)" disabled><i class="icon-indent-right"></i></a>
-      </div>
-      <div class="btn-group">
-        <a class="btn" data-edit="justifyleft" title="Align Left (Ctrl/Cmd+L)" disabled><i class="icon-align-left"></i></a>
-        <a class="btn" data-edit="justifycenter" title="Center (Ctrl/Cmd+E)" disabled><i class="icon-align-center"></i></a>
-        <a class="btn" data-edit="justifyright" title="Align Right (Ctrl/Cmd+R)" disabled><i class="icon-align-right"></i></a>
-        <a class="btn" data-edit="justifyfull" title="Justify (Ctrl/Cmd+J)" disabled><i class="icon-align-justify"></i></a>
-      </div>    
-      
-      <div class="btn-group pull-right">
-        <a class="btn" data-edit="undo" title="Undo (Ctrl/Cmd+Z)" disabled><i class="icon-undo"></i></a>
-        <a class="btn" data-edit="redo" title="Redo (Ctrl/Cmd+Y)" disabled><i class="icon-repeat"></i></a>
-      </div>
-      <!--<input type="text" data-edit="inserttext" id="voiceBtn" x-webkit-speech="">-->
-    </div>
-      <?
-      }else{ // Editor
-      ?>
-      <div class="btn-group">
-        <a class="btn dropdown-toggle" data-toggle="dropdown" title="Font"><i class="icon-font"></i><b class="caret"></b></a>
-        <ul class="dropdown-menu">
-        </ul>
-      </div>
-
-      <div class="btn-group">
-        <a class="btn dropdown-toggle" data-toggle="dropdown" title="Font Size"><i class="icon-text-height"></i>&nbsp;<b class="caret"></b></a>
-          <ul class="dropdown-menu">
-          <li><a data-edit="fontSize 5"><font size="5">Huge</font></a></li>
-          <li><a data-edit="fontSize 3"><font size="3">Normal</font></a></li>
-          <li><a data-edit="fontSize 1"><font size="1">Small</font></a></li>
-          </ul>
-      </div>
-
-      <div class="btn-group">
-        <a class="btn" data-edit="strikethrough" title="Strikethrough"><span class="glyphicon glyphicon-trash"></span> DEL</a>        
-        <a class="btn" data-edit="underline" title="Underline (Ctrl/Cmd+U)"><span class="glyphicon glyphicon-refresh"></span> MOD</a>
-        <a class="btn" data-edit="bold" title="Bold (Ctrl/Cmd+B)"><span class="glyphicon glyphicon-pencil"></span> INS</a>
-        <!--<a class="btn" data-edit="italic" title="Italic (Ctrl/Cmd+I)"><span class="glyphicon glyphicon-refresh"></span> TYPO</a>-->
-      </div>
-      <div class="btn-group">
-        <a class="btn" data-edit="insertunorderedlist" title="Bullet list"><i class="icon-list-ul"></i></a>
-        <a class="btn" data-edit="insertorderedlist" title="Number list"><i class="icon-list-ol"></i></a>
-        <a class="btn" data-edit="outdent" title="Reduce indent (Shift+Tab)"><i class="icon-indent-left"></i></a>
-        <a class="btn" data-edit="indent" title="Indent (Tab)"><i class="icon-indent-right"></i></a>
-      </div>
-      <div class="btn-group">
-        <a class="btn" data-edit="justifyleft" title="Align Left (Ctrl/Cmd+L)"><i class="icon-align-left"></i></a>
-        <a class="btn" data-edit="justifycenter" title="Center (Ctrl/Cmd+E)"><i class="icon-align-center"></i></a>
-        <a class="btn" data-edit="justifyright" title="Align Right (Ctrl/Cmd+R)"><i class="icon-align-right"></i></a>
-        <a class="btn" data-edit="justifyfull" title="Justify (Ctrl/Cmd+J)"><i class="icon-align-justify"></i></a>
-      </div>     
-            
-      <div class="btn-group pull-right">
-        <a class="btn" data-edit="undo" title="Undo (Ctrl/Cmd+Z)"><i class="icon-undo"></i></a>
-        <a class="btn" data-edit="redo" title="Redo (Ctrl/Cmd+Y)"><i class="icon-repeat"></i></a>
-      </div>
-      
-    </div>
-      <? } ?>      
-    <div id="editor">          
-      <?
-        // Draft essay
-        if($cate == 'mydone' || $cate == 'draft' || $cate == 'admin' || $cate == 'pj_draft'){          
-          echo nl2br(trim($edit_writing));
-        }else{ // New essay          
-          echo trim($writing); 
-        }
-      ?>      
-    </div>
-
-    <hr class="text-box-hr">      
-        <div class="panel-group" id="accordion">          
-          <div class="panel panel-default">
-            <div class="panel-heading">
-              <h4 class="panel-title">
-                <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
-                  Critique
-                </a>
-              </h4>
-            </div>
-            
-            <div id="collapseOne" class="panel-collapse collapse in">
-              <div class="panel-body">
-                <?
-                if($cate == 'mydone' || $cate == 'draft' || $cate == 'admin' || $cate == 'pj_draft'){
-                ?>
-                  <textarea class="border text_box" id="critique" style="width:100%;" rows="7"><?=trim($critique);?></textarea>              
-                <?
-                }else{
-                ?>
-                  <textarea class="border text_box" id="critique" style="width:100%;" rows="7"></textarea>           
-                <? } ?>   
-              </div>
-            </div>            
-          </div>           
+          <div class="btn-group">
+            <a class="btn" data-edit="justifyleft" title="Align Left (Ctrl/Cmd+L)"><i class="icon-align-left"></i></a>
+            <a class="btn" data-edit="justifycenter" title="Center (Ctrl/Cmd+E)"><i class="icon-align-center"></i></a>
+            <a class="btn" data-edit="justifyright" title="Align Right (Ctrl/Cmd+R)"><i class="icon-align-right"></i></a>
+            <a class="btn" data-edit="justifyfull" title="Justify (Ctrl/Cmd+J)"><i class="icon-align-justify"></i></a>
+          </div>     
+                
+          <div class="btn-group pull-right">
+            <a class="btn" data-edit="undo" title="Undo (Ctrl/Cmd+Z)"><i class="icon-undo"></i></a>
+            <a class="btn" data-edit="redo" title="Redo (Ctrl/Cmd+Y)"><i class="icon-repeat"></i></a>
+          </div>      
+        </div> <!-- btn-toolbar -->
+              
+        <!-- Error detecting -->
+        <div id="editor">          
+          <?
+            // Draft essay
+            if($cate == 'com' || $cate == 'draft' || $cate == 'pj_draft' || $cate == 'tbd'){          
+              echo nl2br(trim($edit_writing));
+            }else{ // New essay or T.B.D          
+              echo trim($writing); 
+            }
+          ?>      
         </div>
-        <br>
-        <!-- accordion end -->
-    </div>  
-  </div>
 
-  <!-- accordion tagging -->
+        <hr class="text-box-hr">      
+            <div class="panel-group" id="accordion">          
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+                      Critique
+                    </a>
+                  </h4>
+                </div>
+                
+                <!-- Critique -->
+                <div id="collapseOne" class="panel-collapse collapse in">
+                  <div class="panel-body">
+                    <? // Draft essay
+                    if($cate == 'com' || $cate == 'draft' || $cate == 'pj_draft' || $cate == 'tbd'){
+                    ?>
+                      <textarea class="border text_box" id="critique" style="width:100%;" rows="7"><?=trim($critique);?></textarea>              
+                    <?
+                    }else{ // New essay or T.B.D          
+                    ?>
+                      <textarea class="border text_box" id="critique" style="width:100%;" rows="7"></textarea>           
+                    <? } ?>   
+                  </div>
+                </div>            
+              </div>           
+            </div>
+            <br>
+            <!-- accordion end -->
+      </div>  <!-- col-md-12 -->
+    </div> <!-- tab-pane -->
 
+  <!-- Tagging start -->
     <div class="tab-pane div-box-line" id="tagging">
         <!--<div class="div-box-line">-->
         <div class="col-md-12">           
           <div class="col-md-12" style="margin-top:10px;"> 
 
-          <div class="col-md-12"> 
-            <div class="col-md-12" style="margin-top:20px; text-align:center" id="confbox">
-              <h5>Confirm&nbsp;&nbsp;    
-                <button id="block" tag="in" type="button" class="btn btn-default btn-sm" data-toggle="button"><span class="glyphicon glyphicon-tasks"></span> IN</button>
-                <button id="block" tag="bo" type="button" class="btn btn-default btn-sm" data-toggle="button"><span class="glyphicon glyphicon-tasks"></span> BO</button>
-                <button id="block" tag="co" type="button" class="btn btn-default btn-sm" data-toggle="button"><span class="glyphicon glyphicon-tasks"></span> CO</button>
-                <button id="block" tag="ts" type="button" class="btn btn-default btn-sm" data-toggle="button"><span class="glyphicon glyphicon-tasks"></span> TS</button>
-                <button id="block" tag="mi" type="button" class="btn btn-default btn-sm" data-toggle="button"><span class="glyphicon glyphicon-tasks"></span> MI</button>
-                <button id="block" tag="si" type="button" class="btn btn-default btn-sm" data-toggle="button"><span class="glyphicon glyphicon-tasks"></span> SI</button>
-                <button id="block" tag="tr" type="button" class="btn btn-default btn-sm" data-toggle="button"><span class="glyphicon glyphicon-tasks"></span> TR</button>
-                <button id="block" tag="ohter" type="button" class="btn btn-default btn-sm" data-toggle="button"><span class="glyphicon glyphicon-tasks"></span> Ohter</button>
-                <button id="block" tag="tp" type="button" class="btn btn-default btn-sm" data-toggle="button"><span class="glyphicon glyphicon-tasks"></span> TP</button>            
-                <button id="block" tag="tq" type="button" class="btn btn-default btn-sm" data-toggle="button"><span class="glyphicon glyphicon-tasks"></span> TQ</button>
-                <button id="block" tag="ex" type="button" class="btn btn-default btn-sm" data-toggle="button"><span class="glyphicon glyphicon-tasks"></span> EX</button>                
-              </h5>
-            </div>
-            <hr style="border:1px dashed; border-color: #d6e9c6;">                         
-          </div>        
-            <?
-            if($this->session->userdata('classify') == 0 && $cate == 'admin'){        
-            ?>           
-            <button id="tag" tag="IN" type="button" class="btn btn-success btn-sm" disabled>&lt;IN&gt;</button>
-            <button id="tag" tag="BO" type="button" class="btn btn-success btn-sm" disabled>&lt;BO&gt;</button>
-            <button id="tag" tag="CO" type="button" class="btn btn-success btn-sm" disabled>&lt;CO&gt;</button>
-            <button id="tag" tag="TS" type="button" class="btn btn-success btn-sm" disabled>&lt;TS&gt;</button>
-            <button id="tag" tag="MI" type="button" class="btn btn-success btn-sm" disabled>&lt;MI&gt;</button>
-            <button id="tag" tag="SI" type="button" class="btn btn-success btn-sm" disabled>&lt;SI&gt;</button>
-            <button id="tag" tag="TR" type="button" class="btn btn-success btn-sm" disabled>&lt;TR&gt;</button>
-            <button id="tag" tag="Ohter" type="button" class="btn btn-success btn-sm" disabled>&lt;Ohter&gt;</button>
-            <button id="tag" tag="TP" type="button" class="btn btn-success btn-sm" disabled>&lt;TP&gt;</button>
-            <button id="tag" tag="TQ" type="button" class="btn btn-success btn-sm" disabled>&lt;TQ&gt;</button>
-            <button id="tag" tag="EX" type="button" class="btn btn-success btn-sm" disabled>&lt;EX&gt;</button>            
-            <button id="all" type="button" class="btn btn-default btn-sm pull-right" disabled><span class="glyphicon glyphicon-refresh"></span> Clear All</button>            
-            <button id="redo" tag="TR" type="button" class="btn btn-default btn-sm pull-right" style="margin-right:5px;" disabled><span class="glyphicon glyphicon-refresh"></span> Redo</button>
-            <button id="undo" tag="TR" type="button" class="btn btn-default btn-sm pull-right" style="margin-right:5px;" disabled><span class="glyphicon glyphicon-refresh"></span> Undo</button>            
-            <? }else{ ?>            
+            <div class="col-md-12"> 
+              <div class="col-md-12" style="margin-top:20px; text-align:center" id="confbox">
+                <h5>Confirm&nbsp;&nbsp;    
+                  <button id="block" tag="in" type="button" class="btn btn-default btn-sm" data-toggle="button"><span class="glyphicon glyphicon-tasks"></span> IN</button>
+                  <button id="block" tag="bo" type="button" class="btn btn-default btn-sm" data-toggle="button"><span class="glyphicon glyphicon-tasks"></span> BO</button>
+                  <button id="block" tag="co" type="button" class="btn btn-default btn-sm" data-toggle="button"><span class="glyphicon glyphicon-tasks"></span> CO</button>
+                  <button id="block" tag="ts" type="button" class="btn btn-default btn-sm" data-toggle="button"><span class="glyphicon glyphicon-tasks"></span> TS</button>
+                  <button id="block" tag="mi" type="button" class="btn btn-default btn-sm" data-toggle="button"><span class="glyphicon glyphicon-tasks"></span> MI</button>
+                  <button id="block" tag="si" type="button" class="btn btn-default btn-sm" data-toggle="button"><span class="glyphicon glyphicon-tasks"></span> SI</button>
+                  <button id="block" tag="tr" type="button" class="btn btn-default btn-sm" data-toggle="button"><span class="glyphicon glyphicon-tasks"></span> TR</button>
+                  <button id="block" tag="ohter" type="button" class="btn btn-default btn-sm" data-toggle="button"><span class="glyphicon glyphicon-tasks"></span> Ohter</button>
+                  <button id="block" tag="tp" type="button" class="btn btn-default btn-sm" data-toggle="button"><span class="glyphicon glyphicon-tasks"></span> TP</button>            
+                  <button id="block" tag="tq" type="button" class="btn btn-default btn-sm" data-toggle="button"><span class="glyphicon glyphicon-tasks"></span> TQ</button>
+                  <button id="block" tag="ex" type="button" class="btn btn-default btn-sm" data-toggle="button"><span class="glyphicon glyphicon-tasks"></span> EX</button>                
+                </h5>
+              </div>
+              <hr style="border:1px dashed; border-color: #d6e9c6;">                         
+            </div>        
+                      
             <button id="tag" tag="IN" type="button" class="btn btn-success btn-sm">&lt;IN&gt;</button>
             <button id="tag" tag="BO" type="button" class="btn btn-success btn-sm">&lt;BO&gt;</button>
             <button id="tag" tag="CO" type="button" class="btn btn-success btn-sm">&lt;CO&gt;</button>
@@ -226,18 +207,17 @@
             <button id="all" type="button" class="btn btn-default btn-danger btn-sm pull-right" click="clear"><span class="glyphicon glyphicon-refresh"></span> Clear All</button>            
             <button id="redo" tag="TR" type="button" class="btn btn-default btn-sm pull-right" style="margin-right:5px;"><span class="glyphicon glyphicon-refresh"></span> Redo</button>
             <button id="undo" tag="TR" type="button" class="btn btn-default btn-sm pull-right" style="margin-right:5px;"><span class="glyphicon glyphicon-refresh"></span> Undo</button>            
-
-            <? } ?>             
-          </div>   
-        </div>               
+   
+          </div>  <!-- col-md-12 -->
+        </div> <!-- col-md-12 -->              
         <hr class="text-box-hr">              
         <div class="col-md-12" id="hrline">                    
           <?
-          if($cate == 'mydone' || $cate == 'draft' || $cate == 'admin' || $cate == 'pj_draft'){
+          if($cate == 'com' || $cate == 'draft' || $cate == 'pj_draft' || $cate == 'tbd'){
           ?>
           <div class="divtagging_box" id="tagging_box"><?=trim($tagging);?></div>          
           <?
-          }else{
+          }else{ // New or Writing
           ?>
           <div class="divtagging_box" id="tagging_box"><?=trim($writing);?></div>          
           <?
@@ -318,7 +298,7 @@
                     </div>
                   </div> 
                  
-                  <? }else{ // Draft ?> 
+                  <? }else{ // Draft,T.B.D?> 
                  
                   <div class="row" style="margin-bottom:10px;">  
                     <label for="inputEmail3" class="col-md-2 ">I/B/C</label>
@@ -391,12 +371,12 @@
 
       <div style="margin-top:8px;">
         <?
-        if($this->session->userdata('classify') == 1 && $cate == 'draft' || $cate == 'todo' || $cate == 'pj_draft'){     
+        if($this->session->userdata('classify') == 1 && $cate == 'draft' || $cate == 'todo' || $cate == 'pj_draft' || $cate == 'tbd'){     
         ?>  
         <button class="btn btn-danger pull-right" id="submit">Submit</button>
         <button class="btn btn-primary" id="draft">Save Draft</button>
         <?  
-        }elseif($this->session->userdata('classify') == 1 && $cate == 'mydone'){          
+        }elseif($this->session->userdata('classify') == 1 && $cate == 'com'){          
         ?>
         <button class="btn btn-danger pull-right" id="editSubmit">Submit</button>
         <?
@@ -415,13 +395,16 @@
 </div>   
 <script type="text/javascript" src="/public/js/jquery.timer.js"></script>
 <script>
-
-// Timer
 var cate = '<?=$cate;?>';
 var draft_time = <?=$time;?>;
-//var draft_time = 0;
 console.log(cate);
-console.log(draft_time);
+
+if(cate == 'writing'){
+  clearInterval(service_chk); //realtime service chk clear.  
+  console.log('stop');
+}
+
+// Timer
 function formatTime(time) {
     var min = parseInt(time / 6000),
         sec = parseInt(time / 100) - (min * 60),
@@ -450,7 +433,7 @@ var Example1 = new (function() {
     if(cate == 'draft'){
       var currentTime = draft_time; // Current time in hundredths of a second 100 == 1  
           incrementTime = 70; // Timer speed in milliseconds      
-    }else if(cate == 'admin' || cate == 'mydone'){
+    }else if(cate == 'admin' || cate == 'com'){
       var currentTime = draft_time; // Current time in hundredths of a second 100 == 1  
       var incrementTime = 0; // Timer speed in milliseconds       
     }else{      
@@ -730,7 +713,7 @@ $('button#draft').click(function(){
   
   $.ajax(
   {
-    url: '/text/draft_save', // 포스트 보낼 주소
+    url: '/text_editor/draft_save', // 포스트 보낼 주소
     type: 'POST',         
     data: data,
     dataType: 'json',
@@ -800,7 +783,7 @@ $('button#submit').click(function()
   //console.log(data);  
   $.ajax(
   {
-    url: '/text/submit', // 포스트 보낼 주소
+    url: '/text_editor/submit', // 포스트 보낼 주소
     type: 'POST',         
     data: data,
     dataType: 'json',
@@ -858,7 +841,7 @@ $('button#editSubmit').click(function()
   
   $.ajax(
   {
-    url: '/text/editsubmit', // 포스트 보낼 주소
+    url: '/text_editor/editsubmit', // 포스트 보낼 주소
     type: 'POST',         
     data: data,
     dataType: 'json',
@@ -931,12 +914,13 @@ $("button#w_submit").click(function(){
   var submit_data = {
     token: token,
     w_id: id,
+    time : total_time,
     kind: kind,
-    title: title,
-    raw_writing: raw_writing,
+    title: title,    
     editing: editing,
     critique: critique,
     tagging: tagging,
+    raw_writing : raw_writing,
     ibc: ibc,
     thesis: thesis,
     topic: topic,
@@ -945,24 +929,25 @@ $("button#w_submit").click(function(){
     mi: mi,
     si: si,
     style: style,
-    usage: usage,
-    time : total_time
+    usage: usage    
   };
-  //console.log(submit_data); 
+  console.log(submit_data); 
   $.ajax({    
-    url: '/writing/submit',
+    url: '/service/w_submit',
     type: 'POST',         
     data: submit_data,
     dataType: 'json',
-    success: function(json){
-      var access = JSON.parse(json['result']);      
-      console.log(json);                  
-      if(access['status']){  
+    success: function(json){      
+      var access = json['result'];      
+      //console.log(access);                  
+      if(access == true){  
         alert('It’s been successfully processed!');
         window.history.back();
         //window.location = "/essaylist/done";
       }else if(access == 'localdb'){
         alert('local db insert error');
+      }else{
+        alert('Curl Error');
       }
     }
   });       

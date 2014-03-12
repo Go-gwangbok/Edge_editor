@@ -13,19 +13,6 @@ class Notice extends CI_Controller {
 
 	public function index(){
 		if($this->session->userdata('is_login')){
-			$data['cate'] = 'notice';
-			$this->load->view('head',$data);
-			//$data['list'] = $this->all_list->status_list();
-
-			$this->load->view('notice_write',$data);		
-			$this->load->view('footer');			
-		}else{
-			redirect('/');
-		}
-	}
-
-	public function notice_list(){
-		if($this->session->userdata('is_login')){
 			if($this->session->userdata('classify') == 0){ //admin
 				$data['cate'] = 'notice';
 				$this->load->view('head',$data);
@@ -41,14 +28,27 @@ class Notice extends CI_Controller {
 
 				$this->load->view('notice_list',$data);		
 				$this->load->view('footer');			
-			}
-			
+			}			
 		}else{
 			redirect('/');
 		}	
 	}
 
-	public function notice_detail($id){
+	public function notice_list(){
+		if($this->session->userdata('is_login')){
+			$data['cate'] = 'notice';
+			$this->load->view('head',$data);
+			//$data['list'] = $this->all_list->status_list();
+
+			$this->load->view('notice_write',$data);		
+			$this->load->view('footer');			
+		}else{
+			redirect('/');
+		}
+	}
+	
+	// notice_detail
+	public function contents($id){
 		if($this->session->userdata('is_login')){
 			if($this->session->userdata('classify') == 0){ //admin
 				$data['cate'] = 'notice';

@@ -1,6 +1,23 @@
 <?
 class All_list extends CI_Model{
 
+	function getproject_name($pj_id){
+		return $this->db->query("SELECT * FROM project where id = '$pj_id'")->row();
+	}
+
+	function get_project($usr_id){
+		return $this->db->query("SELECT project.name, project.id AS pj_id, project.disc
+									FROM tag_essay
+									LEFT JOIN project ON tag_essay.pj_id = project.id
+									LEFT JOIN usr ON tag_essay.usr_id = usr.id
+									WHERE tag_essay.usr_id =  '$usr_id'
+									AND tag_essay.active =0
+									AND tag_essay.essay_id !=0
+									GROUP BY project.id
+									ORDER by project.add_date desc
+									LIMIT 3")->result();
+	}
+	
 	public function getList($usr_id){
 		$query = "SELECT * FROM essay where id != 0";
 		return $this->db->query($query)->result();
@@ -61,10 +78,10 @@ class All_list extends CI_Model{
 		return $this->db->query($query)->result();
 	}
 
-	public function essayList($usr_id){
-		$query = "SELECT * FROM tag_essay WHERE usr_id = '$usr_id' and active = 0 and submit = 0 and type = 'Tagging' limit 10";
-		return $this->db->query($query)->result();
-	}
+	// public function essayList($usr_id){
+	// 	$query = "SELECT * FROM tag_essay WHERE usr_id = '$usr_id' and active = 0 and submit = 0 and type = 'Tagging' limit 10";
+	// 	return $this->db->query($query)->result();
+	// }
 
 	public function page_essayList($usr_id,$last_num){
 		$query = "SELECT * FROM tag_essay WHERE usr_id = '$usr_id' and active = 0 and submit = 0 and essay_id != 0 and type = 'Tagging' and id >= '$last_num' limit 10";
@@ -81,10 +98,10 @@ class All_list extends CI_Model{
 		return $this->db->query($query)->result();
 	}
 
-	public function doneList($usr_id){
-		$query = "SELECT * FROM tag_essay WHERE usr_id = '$usr_id' and active = 0 and submit = 1 and essay_id != 0";
-		return $this->db->query($query)->result();
-	}	
+	// public function doneList($usr_id){
+	// 	$query = "SELECT * FROM tag_essay WHERE usr_id = '$usr_id' and active = 0 and submit = 1 and essay_id != 0";
+	// 	return $this->db->query($query)->result();
+	// }	
 
 	public function other_donelist($usr_id,$last_num){
 		$query = "SELECT * FROM tag_essay WHERE usr_id = '$usr_id' and active = 0 and submit = 1 and essay_id != 0 and id >= '$last_num' LIMIT 10";
@@ -96,9 +113,9 @@ class All_list extends CI_Model{
 		return $this->db->query($query)->result();
 	}	
 
-	public function memName($usr_id){
-		return $this->db->query("SELECT * FROM usr WHERE id = '$usr_id'")->row();
-	}
+	// public function memName($usr_id){
+	// 	return $this->db->query("SELECT * FROM usr WHERE id = '$usr_id'")->row();
+	// }
 
 	public function count($id){
 		$query = "SELECT count(id) as count FROM essay WHERE id != 0 and pj_id = '$id' and chk = 'N'";
@@ -1057,13 +1074,15 @@ class All_list extends CI_Model{
 				// 					AND tag_essay.pj_active = 0
 				// 					AND tag_essay.active = 0
 				// 					ORDER BY add_date DESC")->result(); 		
-  		return $this->db->query("SELECT pj_id, project.name, project.disc, project.add_date, tag_essay.usr_id, COUNT( * ) as tbd
+  		return $this->db->query("SELECT pj_id, project.name, project.disc, project.add_date, tag_essay.usr_id
 									FROM tag_essay
 									LEFT JOIN project ON project.id = tag_essay.pj_id
-									WHERE usr_id = '$usr_id'
-									AND discuss =  'N'
+									WHERE usr_id =  '$usr_id'
+									AND tag_essay.essay_id != 0
+									AND discuss =  'Y'
+									AND tag_essay.active = 0
 									GROUP BY pj_id
-									ORDER BY add_date DESC")->result();
+									ORDER BY add_date DESC ")->result();
    	}
 
    	public function editor_pj_list_count($pj_id,$usr_id){
@@ -1089,7 +1108,7 @@ class All_list extends CI_Model{
    				}
    			}
    			return true;
-		}else{ // 멤버가 1명일때!
+		}else{ // 데이터가 1개 일때!
 			$query = $this->db->query("SELECT * FROM tag_essay WHERE usr_id = '$editor_id' and pj_id = '$pj_id' and essay_id = '$share_data' and pj_active = 0 and active = 0");
 			if($query->num_rows() > 0){
 				$update = $this->db->query("UPDATE tag_essay SET usr_id = '$select_mem' WHERE usr_id = '$editor_id' and pj_id = '$pj_id' and essay_id = '$share_data' and pj_active = 0 and active = 0");
@@ -1188,11 +1207,9 @@ class All_list extends CI_Model{
    		$query = "SELECT tag_essay.*,usr.name
 					FROM tag_essay
 					left join usr on usr.id = tag_essay.usr_id
-					WHERE tag_essay.pj_id = '$pj_id'
-					AND discuss = 'Y'
+					WHERE tag_essay.pj_id = '$pj_id'					
 					AND essay_id != 0
-					AND tag_essay.pj_active = 0
-					AND tag_essay.active = 0
+					AND tag_essay.pj_active = 0					
 					AND submit = 1
 					AND ex_editing != ''
 					LIMIT $limit,$list";
@@ -1235,18 +1252,36 @@ class All_list extends CI_Model{
    		return $this->db->query("SELECT * FROM tag_essay WHERE pj_id = '$pj_id' and submit = 1 and pj_active = 0 and active = 0 and discuss = 'Y'")->result();
    	}
 
-   	public function export_error_count($editor_id){				
-   		return $this->db->query("SELECT tag_essay.*,usr.name
-					FROM tag_essay
-					left join usr on usr.id = tag_essay.usr_id
-					WHERE essay_id in($editor_id)
-					AND tag_essay.pj_active = 0 
-					AND tag_essay.active = 0")->result();
-   	}
+   	// public function export_error_count($editor_id){				
+   	// 	return $this->db->query("SELECT tag_essay.*,usr.name
+				// 	FROM tag_essay
+				// 	left join usr on usr.id = tag_essay.usr_id
+				// 	WHERE essay_id in($editor_id)
+				// 	AND tag_essay.pj_active = 0 
+				// 	AND tag_essay.active = 0")->result();
+   	// }
 
    	public function editing_update($id,$data){
    		$result = $this->db->query("UPDATE tag_essay SET editing = '$data' WHERE essay_id = '$id'");
    		return $result;      
    	}
+
+   	public function get_export_error_data($pj_id,$limit,$list){
+   		$query = "SELECT tag_essay.*,usr.name
+					FROM tag_essay
+					left join usr on usr.id = tag_essay.usr_id
+					WHERE tag_essay.pj_id = '$pj_id'										
+					AND essay_id != 0					
+					AND tag_essay.active = 0
+					AND submit = 1 
+					AND ex_editing = ''										
+					ORDER BY sub_date asc
+					LIMIT $limit,$list";
+		return $this->db->query($query)->result();		
+   	}   
+
+   	public function export_error_count($pj_id){
+   		return $this->db->query("SELECT count(id) as count FROM tag_essay WHERE pj_id = '$pj_id' and essay_id != 0 and active = 0 and submit = 1 and ex_editing = ''")->row();
+   	}   	
 }
 ?>

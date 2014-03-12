@@ -10,6 +10,7 @@ class Project extends CI_Controller {
 		$this->load->helper('file');
 		$this->load->helper(array('form', 'url'));
 		$this->load->helper('download');		
+		$this->load->dbutil();				
 	}
 
 	public function index()
@@ -346,6 +347,7 @@ class Project extends CI_Controller {
 			$limit = ($page - 1) * $list;		
 
 			//$json['history_list'] = $this->all_list->admin_pj_memList($pj_id,$editor_id,$page,$limit,$list); // history							
+
 			if($cate == 'history'){
 				$history_totalcount = $this->all_list->pj_history_totalcount($pj_id,$editor_id); 
 				$json['history_totalcount'] = $history_totalcount->count;				
@@ -377,8 +379,10 @@ class Project extends CI_Controller {
 				$json['history_totalcount'] = $history_totalcount->count;
 				$json['history_list'] = $this->all_list->export_list($pj_id,$limit,$list);				
 			}elseif($cate == 'error_export'){
-				$json['history_totalcount'] = $this->all_list->export_error_count($editor_id);				
-				$json['pj_id'] = $pj_id;				
+				$history_totalcount = $this->all_list->export_error_count($pj_id);										
+				$json['history_totalcount'] = $history_totalcount->count;
+				$json['history_list'] = $this->all_list->get_export_error($pj_id,$limit,$list);		
+				$json['pj_id'] = $pj_id;
 			}
 			
 			$export_total = $this->all_list->exporttotal_count($pj_id);				
@@ -545,7 +549,6 @@ class Project extends CI_Controller {
 		        if($item->nodeValue != ''){
 		        	//$value = '<u>'.$item->nodeValue.'</u>';
 		        	$value = $item->nodeValue;
-
 		        	$out[] = $value;	
 		        }
 		        
@@ -601,18 +604,18 @@ class Project extends CI_Controller {
 		return $arr;
 	}	
 
-	public function member_list(){
+	public function member_list($option,$essay_id){
 		if($this->session->userdata('is_login')){			
 			$pj_id = $this->input->post('pj_id');			
-			$err_id = array();
-			//$err_utag = array();
+			$err_id = array();			
 			$done_data = array();		
-
+			
+			if($option == 'all'){				
+				$all_id = $this->all_list->all_essayid($pj_id); // 완료된 모든 에세이를 가지고 온다!	
+			}elseif ($option == 'once') {				
+				$all_id = $this->all_list->memchkExportget_essay($essay_id); // 완료된 모든 에세이를 가지고 온다!	
+			}			
 			$update = true;
-			$all_id = $this->all_list->all_essayid($pj_id); // 완료된 모든 에세이를 가지고 온다!
-			// $aa = 10766;
-			// $all_id = $this->all_list->memchkExportget_essay($aa); // 완료된 모든 에세이를 가지고 온다!
-
 			foreach ($all_id as $values) {
 				$editing = $values->editing;
 				$id = $values->essay_id;
@@ -629,6 +632,8 @@ class Project extends CI_Controller {
 				$string = str_replace('<b style="-webkit-box-sizing: border-box; font-weight: bold; color: rgb(1, 0, 255); ">', '<b>',$string);
 				$string = str_replace('<b style="-webkit-box-sizing: border-box; font-weight: bold; ">', '<b>',$string);
 				$string = str_replace('&nbsp;', ' ',$string);
+				$string = str_replace('“', '"',$string);
+				// “
 
 				$patterns = array('(<s>)','(</s>)'); // <s> 태그는 <strike> 태그가 오류난 것이다! 이것을 <strike>로 돌려줘야 한다!
 				$replace = array("<strike>","</strike>");
@@ -643,10 +648,12 @@ class Project extends CI_Controller {
 					array_push($err_id, $id);					
 				}							
 				
-				if($ex_editing == ''){ //DB에 ex_editing 이 없다면 confirm 한다!					
-					$editing = eregi_replace('</?(span)[^>]*>','',$editing); //span 테그 제거!
-					$editing = eregi_replace('</?(font)[^>]*>','',$editing); //font 테그 제거!							
-					$int = preg_match_all('/\/\//', $editing, $matches); //  '//' count			
+				if($ex_editing == ''){ //DB에 ex_editing 이 없다면 confirm 한다!										
+					$editing = preg_replace('/<span[^>]+\>/i','',$editing); //span 테그 제거!
+					$editing = preg_replace('/<font[^>]+\>/i','',$editing); //font 테그 제거!							
+					$editing = str_replace('</font>', '',$editing);
+					$editing = str_replace('</span>', '',$editing);
+					$int = preg_match_all('/\/\//', $editing, $matches); //  '//' count								
 					$content = $this->getTextBetweenTags('cou','u', $editing); // <u>태그</u> 사이에 있는 값 가져오기!									
 					
 					$match = preg_match('/\/\/\/\//', $editing); // <u>문자////문자</u> -- Error
@@ -696,15 +703,19 @@ class Project extends CI_Controller {
 						if(count($not_replace[0]) > 0){
 							array_push($err_id, $id);							
 						}else{
-							$data = mysql_real_escape_string($editing);
-						
-							if($update){
-								$update = $this->all_list->ex_editing_update($id,$data);	
-								array_push($done_data,$id);
+							$data = mysql_real_escape_string($editing);						
+							
+							$update = $this->all_list->ex_editing_update($id,$data);	
+
+							if($update){								
+								array_push($done_data,$id);	
+								if($option == 'once'){
+									return $update;									
+								}
 							}else{
 								$json['update'] = 'error';
-								break;
-							}													
+								break;	
+							}																									
 						}						
 					}					
 				}else{
@@ -713,17 +724,18 @@ class Project extends CI_Controller {
 
 			} //foreach end.
 
-			$result = $this->all_list->exportmembers($pj_id);								
-			$json['result'] = $result;						
+			if($option == 'all'){
+				$result = $this->all_list->exportmembers($pj_id);								
+				$json['result'] = $result;									
 
-			$json['error'] = count($err_id);		
-			$json['error_id'] = $err_id;					
-			$json['done_id'] = $done_data;								
+				$json['error'] = count($err_id);		
+				$json['error_id'] = $err_id;					
+				$json['done_id'] = $done_data;								
+				$this->output->set_content_type('application/json')->set_output(json_encode($json));
+			}
 		}else{
 			redirect('/');
 		}
-		$this->output->set_content_type('application/json')->set_output(json_encode($json));
-
 	}
 
 	function getarraybetweenmod($original_text, $needle1, $needle2) {
@@ -815,8 +827,7 @@ class Project extends CI_Controller {
 	public function all_export(){
 		if($this->session->userdata('is_login')){			
 			$done_id = $this->input->get_post('done');
-			$pj_name = $this->input->get_post('pj_name');
-			$this->load->dbutil();				
+			$pj_name = $this->input->get_post('pj_name');			
 
 			$query = $this->db->query("SELECT prompt,ex_editing
 					FROM tag_essay					
@@ -824,16 +835,17 @@ class Project extends CI_Controller {
 					AND tag_essay.pj_active = 0 
 					AND tag_essay.active = 0");
 
+			//$query = "aa";
 			$delimiter = ":::";
 			$newline = "\r\n";
+
 			$result = $this->dbutil->csv_from_result($query, $delimiter, $newline);			
 
-			if ( ! write_file('./'.$pj_name.'.csv', $result)){
-			     $json['result'] = true;
-			}
-			else{
-			    $data = file_get_contents("./".$pj_name.".csv"); // Read the file's contents
-				$name = $pj_name.'.csv';
+			if (!write_file('./csv/'.$pj_name.'.csv', $result)){
+			     $json['result'] = false;
+			}else{
+			    $data = file_get_contents('./csv/'.$pj_name.".csv"); // Read the file's contents
+				//$name = $pj_name.'.csv';
 				if(strlen($data) > 0){
 					$json['result'] = true;	
 					//force_download($name,$data);
@@ -853,9 +865,62 @@ class Project extends CI_Controller {
 	public function download(){
 		$pj_name = $this->input->get_post('pjname');
 
-		$data = file_get_contents("./".$pj_name.".csv"); // Read the file's contents
+		$data = file_get_contents('./csv/'.$pj_name.".csv"); // Read the file's contents
 		$name = $pj_name.'.csv';	
 		force_download($name,$data);
+	}
+
+	public function error_list($pjid){
+		if($this->session->userdata('is_login')){			
+			$cate['cate'] = 'project';
+			$this->load->view('head',$cate);				
+			
+			$page = 1;
+			$data['page'] = $page;
+			$list = 20; // 한페이지에 보요질 갯수.			
+			$data['list'] = $list;			
+			// $limit = ($page - 1) * $list;								
+
+			$name = $this->all_list->pj_name($pjid);				
+			$data['pjName'] = $name->name;			
+			$data['pj_id'] = $pjid;			
+			$data['cate'] = 'error_export';
+
+			$this->load->view('export_errorlist',$data);		
+			$this->load->view('footer');
+		}
+		else
+		{
+			redirect('/');
+		}
+	}
+
+	function get_error_data(){
+		$pj_id = $this->input->post('pj_id');
+
+		if($this->session->userdata('is_login')){			
+			$pj_id = $this->input->post('pj_id');				
+			$cate = $this->input->post('cate');
+			$page = $this->input->post('page');
+			
+			$page_list = 20;			
+			$limit = ($page - 1) * $page_list;					
+
+			$totalcount = $this->all_list->export_error_count($pj_id);										
+			$json['data_count'] = $totalcount->count;
+			$json['data_list'] = $this->all_list->get_export_error_data($pj_id,$limit,$page_list);
+
+			$json['pj_id'] = $pj_id;					
+			$json['page'] = $page;
+			$json['page_list'] = $page_list;			
+			$json['cate'] = $cate;			
+
+		}else{
+			redirect('/');
+		}
+		$this->output->set_content_type('application/json')->set_output(json_encode($json));
+
+
 	}
 
 }

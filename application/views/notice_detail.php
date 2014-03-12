@@ -2,8 +2,8 @@
 	<div class="row">    
       <ol class="breadcrumb" style="background:white;">        
         <li><a href="/">Home</a></li>
-        <li><a href="/notice/notice_list">Notice</a></li>
-        <li class="active"><?=$list->title;?></li>   
+        <li><a href="/notice">Notice</a></li>
+        <li class="akacolor"><?=$list->title;?></li>   
       </ol>
   	</div>
 	
@@ -56,7 +56,4 @@
   	}
   	?>
 </div>
-
-
-
 

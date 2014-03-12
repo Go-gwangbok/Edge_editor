@@ -3,61 +3,42 @@
 		<ol class="breadcrumb" style="background:white;">
 	       	<li><a href="/">Home</a></li>	       	
 	       	<?
-				if($this->session->userdata('classify') == 0) {
+				if($this->session->userdata('classify') == 0) { //Admin
 			?>
-		       	<li><a href="/project/">Project List</a></li>   
+		       	<li><a href="/project/">Project</a></li>   
 	    	   	<li><a href="/project/status/<?=$pj_id;?>"><?=$pjName;?></a></li>   
 	       	<? }else{  // Editor ?> 
-	       		<li><a href="/project/">Project List</a></li>   
-	       	<? } 
-	       	if($cate == 'todo'){
-	       	?>
-	       		<li class="active">Todo</li>   	       	
-	       	<?
-	       	}elseif($cate == 'done'){
-	       	?>
-	       		<li class="active">Completed</li>   	       	
-	       	<?
-	       	}elseif($cate == 'history'){
-	       	?>
-	       		<li class="active">History</li>   	       	
-	       	<?
-	       	}elseif($cate == 'share'){
-	       	?>
-	       		<li class="active">Share</li>   	       	
-	       	<?
-	       	}elseif ($cate == 'discuss') {
-	       	?>
-	       		<li class="active">Discuss</li>   	       	
-	       	<?
-	       	}
-	       	?>
-	    </ol>
-	</div>	
-	<table class="table table-striped">
-		<?
-			if($cate == 'history'){
-		?>
-			<h4 class="text-center">History (<?=$memName;?>)</h4>		
-		<?
-			}elseif($cate == 'todo'){
-		?>
-			<h4 class="text-center">Todo (<?=$memName;?>)</h4>		
-		<?
-			}elseif($cate == 'done'){
-		?>
-			<h4 class="text-center">Completed (<?=$memName;?>)</h4>		
-		<?
-			}elseif($cate == 'share'){
-		?>
-			<h4 class="text-center">Share (<?=$memName;?>)</h4>		
-		<?  
-			}elseif($cate == 'discuss'){
-		?>
-			<h4 class="text-center">Discuss (<?=$memName;?>)</h4>		
-		<?  
-			}  		
-		?>			
+	       		<li><a href="/musedata/project/">Project</a></li>   
+	       		<li class="akacolor"><?=$pjName;?></li>   	       		       	
+	       	<? } ?>
+	    </ol> <!-- Navi end -->
+	</div>		
+	
+	<h4 class="text-center"><?=$pjName;?></h4>	
+	<ul class="nav nav-tabs" id="pjboard">
+	  <li class="tab_action" id="tab_todo"><a href="#todo" data-toggle="tab">To do</a></li>
+	  <li class="tab_action" id="tab_com"><a href="#com" data-toggle="tab">Completed</a></li>
+	  <li class="tab_action" id="tab_tbd"><a href="#tbd" data-toggle="tab">T.B.D</a></li>
+	  <li class="tab_action" id="tab_history"><a href="#history" data-toggle="tab">History</a></li>
+	  
+	</ul>
+
+	<div class="tab-content">
+    	<div class="tab-pane" id="todo">
+    		
+    	</div>
+    	<div class="tab-pane" id="com">
+    		
+    	</div>
+    	<div class="tab-pane" id="tbd">
+    		
+    	</div>
+    	<div class="tab-pane" id="history">
+    		
+    	</div>
+    </div>
+
+	<table class="table table-hover">					
 	  	<thead>
 			<tr>
 				<?
@@ -152,7 +133,6 @@ var history_totalcount = '';
 var data = '';
 var url = '';
 var cate = '<?=$cate;?>';
-console.log(cate);
 
 function formatTime(time) {
     var min = parseInt(time / 6000),
@@ -169,50 +149,50 @@ function pad(number, length) {
 }
 
 function ajaxPost(url,data){
-	$.post(url,data,function(json) {		
-		//console.log(json['page']);
-		//console.log(json['classify']);
-		console.log(cate);
-		console.log(json['history_totalcount']);
+	$.post(url,data,function(json) {				
+		//console.log(json['total_count']);
 		page = json['page'];
 
 		$('tbody#list').children().remove();
-		var history_list = json['history_list'];	
+		var data_list = json['list'];	
 		var num = (list * page) - (list-1);
-		history_totalcount = json['history_totalcount'];
+		total_count = json['total_count'];
+		$('li#count').remove();
+		$('ul#pjboard').last().append('<li class="pull-right" id="count"><button class="btn btn-default disabled" style="border-color:#f15e22;">Count : '+total_count+'</button></li>');
+		//$('li#tab_history').next().append('<p>');
 
 		if(cate == 'share'){
-			for(var i = 0; i < json['history_list'].length; i++) {
-				var essay_id = history_list[i]['essay_id'];
-				var task = history_list[i]['type'];
-				var timer = formatTime(history_list[i]['time']);			
+			for(var i = 0; i < json['list'].length; i++) {
+				var essay_id = data_list[i]['essay_id'];
+				var task = data_list[i]['type'];
+				var timer = formatTime(data_list[i]['time']);			
 
-				if(history_list[i]['draft'] == 0 || history_list[i]['draft'] == 1 ){
-					var date = history_list[i]['start_date'];				
-				}else if(history_list[i]['draft'] == 1 && history_list[i]['submit'] == 1){
-					var date = history_list[i]['sub_date'];
+				if(data_list[i]['draft'] == 0 || data_list[i]['draft'] == 1 ){
+					var date = data_list[i]['start_date'];				
+				}else if(data_list[i]['draft'] == 1 && data_list[i]['submit'] == 1){
+					var date = data_list[i]['sub_date'];
 				}
 				
-				$('tbody#list').append('<tr id='+i+'><td><label class="checkbox"><input class="box" type="checkbox" value="'+history_list[i]['essay_id']+'">'+num+'</label></td><td>'																				 
-					+history_list[i]['prompt'].replace(/"/gi,'')+'</td><td>'
-					+history_list[i]['kind']+'</td><td>'
+				$('tbody#list').append('<tr id='+i+'><td><label class="checkbox"><input class="box" type="checkbox" value="'+data_list[i]['essay_id']+'">'+num+'</label></td><td>'																				 
+					+data_list[i]['prompt'].replace(/"/gi,'')+'</td><td>'
+					+data_list[i]['kind']+'</td><td>'
 					+date+'</td><td>'
-					+history_list[i]['type']+'</td><td>'
+					+data_list[i]['type']+'</td><td>'
 					+timer+'</td>');
 
-				if(history_list[i]['draft'] == 0){ // new
+				if(data_list[i]['draft'] == 0){ // new
 					if(json['classify'] == 1){
 						$('tbody#list tr#'+i).append('<td><a href="/text/todo/'+essay_id+'/'+task+'" class="no-uline"><button type="button" class="btn btn-default btn-sm">&nbsp;&nbsp;Revise&nbsp;&nbsp;</button></a></td></tr>');
 					}else{
 						$('tbody#list tr#'+i).append('<td><a href="#" class="no-uline"><button type="button" class="btn btn-default btn-sm" disabled>&nbsp;&nbsp;Revise&nbsp;&nbsp;</button></a></td></tr>');
 					}					
-				}else if(history_list[i]['draft'] == 1 && history_list[i]['submit'] == 0){ //draft
+				}else if(data_list[i]['draft'] == 1 && data_list[i]['submit'] == 0){ //draft
 					if(json['classify'] == 1){
 						$('tbody#list tr#'+i).last().append('<td><a href="/text/draft/'+essay_id+'/'+task+'" class="no-uline"><button type="button" class="btn btn-primary btn-sm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Edit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button></a></td>');
 					}else{
 						$('tbody#list tr#'+i).last().append('<td><a href="/text/admin_eachdone/'+editor_id+'/'+essay_id+'/'+task+'" class="no-uline"><button type="button" class="btn btn-primary btn-sm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Edit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button></a></td>');
 					}					
-				}else if(history_list[i]['submit'] == 1){ //submit
+				}else if(data_list[i]['submit'] == 1){ //submit
 					if(json['classify'] == 1){
 						$('tbody#list tr#'+i).last().append('<td><a href="/text/edit/'+essay_id+'/'+task+'" class="no-uline"><button type="button" class="btn btn-success btn-sm">Completed</button></a></td>');
 					}else{
@@ -221,102 +201,90 @@ function ajaxPost(url,data){
 				}
 				num++;
 			}
-		}else if(cate == 'discuss'){
-			for(var i = 0; i < json['history_list'].length; i++) {
-				var essay_id = history_list[i]['essay_id'];
-				var task = history_list[i]['type'];
-				var timer = formatTime(history_list[i]['time']);			
+		}else{ // todo,com,tbd,history
+			for(var i = 0; i < json['list'].length; i++) {
+				var essay_id = data_list[i]['essay_id'];
+				var task = data_list[i]['type'];
+				var timer = formatTime(data_list[i]['time']);			
 
-				if(history_list[i]['draft'] == 0 || history_list[i]['draft'] == 1 ){
-					var date = history_list[i]['start_date'];				
-				}else if(history_list[i]['draft'] == 1 && history_list[i]['submit'] == 1){
-					var date = history_list[i]['sub_date'];
+				if(data_list[i]['draft'] == 0 || data_list[i]['draft'] == 1 ){
+					var date = data_list[i]['start_date'];				
+				}else if(data_list[i]['draft'] == 1 && data_list[i]['submit'] == 1){
+					var date = data_list[i]['sub_date'];
+				}
+
+				if(data_list[i]['draft'] == 0 && data_list[i]['discuss'] == 'Y'){ // new
+					if(json['classify'] == 1){ // Editor
+						var href = '/text_editor/todo/';
+						var color = 'red';
+						var status = 'New';
+					}else{ // Admin
+						var href = '/text_editor/todo/';
+						var color = 'red';
+						var status = 'New';
+					}					
+				}else if(data_list[i]['draft'] == 1 && data_list[i]['submit'] == 0 && data_list[i]['discuss'] == 'Y'){ //draft
+					if(json['classify'] == 1){ // Editor
+						//$('tbody#list tr#'+i).last().append('<td><a href="/text/draft/'+essay_id+'/'+task+'" class="no-uline"><button type="button" class="btn btn-primary btn-sm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Edit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button></a></td>');
+						var href = '/text_editor/draft/';
+						var color = '#0100FF';
+						var status = 'Edit';
+					}else{ // Admin
+						//$('tbody#list tr#'+i).last().append('<td><a href="/text/admin_eachdone/'+editor_id+'/'+essay_id+'/'+task+'" class="no-uline"><button type="button" class="btn btn-primary btn-sm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Edit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button></a></td>');
+						var href = '/text_editor/admin_eachdone/';
+						var color = '#0100FF';
+						var status = 'Edit';
+					}					
+				}else if(data_list[i]['submit'] == 1){ //submit
+					if(json['classify'] == 1){ // Editor
+						//$('tbody#list tr#'+i).last().append('<td><a href="/text/edit/'+essay_id+'/'+task+'" class="no-uline"><button type="button" class="btn btn-success btn-sm">Completed</button></a></td>');
+						var href = '/text_editor/completed/';
+						var color = '#1DDB16';
+						var status = 'Completed';
+					}else{ // Admin
+						//$('tbody#list tr#'+i).last().append('<td><a href="/text/admin_eachdone/'+editor_id+'/'+essay_id+'/'+task+'" class="no-uline"><button type="button" class="btn btn-success btn-sm">Completed</button></a></td>');	
+						var href = '/text_editor/admin_eachdone/';
+						var color = '#1DDB16';
+						var status = 'Completed';
+					}					
+				}else if(data_list[i]['discuss'] == 'N'){ // T.B.D
+					if(json['classify'] == 1){ // Editor
+						//$('tbody#list tr#'+i).last().append('<td><a href="/text/edit/'+essay_id+'/'+task+'" class="no-uline"><button type="button" class="btn btn-success btn-sm">Completed</button></a></td>');
+						var href = '/text_editor/tbd/';
+						var color = '#FFBB00';
+						var status = 'T.B.D';
+					}else{ // Admin
+						//$('tbody#list tr#'+i).last().append('<td><a href="/text/admin_eachdone/'+editor_id+'/'+essay_id+'/'+task+'" class="no-uline"><button type="button" class="btn btn-success btn-sm">Completed</button></a></td>');	
+						var href = '/text_editor/admin_eachdone/';
+						var color = '#FFBB00';
+						var status = 'T.B.D';
+					}					
 				}
 				
-				$('tbody#list').append('<tr id='+i+'><td>'+num+'</td><td>'
-					+history_list[i]['prompt'].replace(/"/gi,'')+'</td><td>'
-					+history_list[i]['kind']+'</td><td>'
-					+date+'</td><td>'
-					+history_list[i]['type']+'</td><td>'
-					+timer+'</td>');
-
-				if(history_list[i]['draft'] == 0){ // new
-					if(json['classify'] == 1){
-						$('tbody#list tr#'+i).append('<td><a href="/text/todo/'+essay_id+'/'+task+'" class="no-uline"><button type="button" class="btn btn-default btn-sm">&nbsp;&nbsp;Revise&nbsp;&nbsp;</button></a></td></tr>');
-					}else{
-						$('tbody#list tr#'+i).append('<td><a href="/text/todo/'+essay_id+'/'+task+'" class="no-uline"><button type="button" class="btn btn-default btn-sm">&nbsp;&nbsp;Revise&nbsp;&nbsp;</button></a></td></tr>');
-					}					
-				}else if(history_list[i]['draft'] == 1 && history_list[i]['submit'] == 0){ //draft
-					if(json['classify'] == 1){
-						$('tbody#list tr#'+i).last().append('<td><a href="/text/draft/'+essay_id+'/'+task+'" class="no-uline"><button type="button" class="btn btn-primary btn-sm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Edit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button></a></td>');
-					}else{
-						$('tbody#list tr#'+i).last().append('<td><a href="/text/admin_eachdone/'+editor_id+'/'+essay_id+'/'+task+'" class="no-uline"><button type="button" class="btn btn-primary btn-sm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Edit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button></a></td>');
-					}					
-				}else if(history_list[i]['submit'] == 1){ //submit
-					if(json['classify'] == 1){
-						$('tbody#list tr#'+i).last().append('<td><a href="/text/edit/'+essay_id+'/'+task+'" class="no-uline"><button type="button" class="btn btn-success btn-sm">Completed</button></a></td>');
-					}else{
-						$('tbody#list tr#'+i).last().append('<td><a href="/text/admin_eachdone/'+editor_id+'/'+essay_id+'/'+task+'" class="no-uline"><button type="button" class="btn btn-success btn-sm">Completed</button></a></td>');	
-					}					
-				}
-				num++;
-			}
-		}else{		
-			for(var i = 0; i < json['history_list'].length; i++) {
-				var essay_id = history_list[i]['essay_id'];
-				var task = history_list[i]['type'];
-				var timer = formatTime(history_list[i]['time']);			
-
-				if(history_list[i]['draft'] == 0 || history_list[i]['draft'] == 1 ){
-					var date = history_list[i]['start_date'];				
-				}else if(history_list[i]['draft'] == 1 && history_list[i]['submit'] == 1){
-					var date = history_list[i]['sub_date'];
-				}
-				
-				$('tbody#list').append('<tr id='+i+'><td>'+num+'</td><td>'
-					+history_list[i]['prompt'].replace(/"/gi,'')+'</td><td>'
-					+history_list[i]['kind']+'</td><td>'
-					+date+'</td><td>'
-					+history_list[i]['type']+'</td><td>'
-					+timer+'</td>');
-
-				if(history_list[i]['draft'] == 0){ // new
-					if(json['classify'] == 1){
-						$('tbody#list tr#'+i).append('<td><a href="/text/todo/'+essay_id+'/'+task+'" class="no-uline"><button type="button" class="btn btn-default btn-sm">&nbsp;&nbsp;Revise&nbsp;&nbsp;</button></a></td></tr>');
-					}else{
-						$('tbody#list tr#'+i).append('<td><a href="#" class="no-uline"><button type="button" class="btn btn-default btn-sm" disabled>&nbsp;&nbsp;Revise&nbsp;&nbsp;</button></a></td></tr>');
-					}					
-				}else if(history_list[i]['draft'] == 1 && history_list[i]['submit'] == 0){ //draft
-					if(json['classify'] == 1){
-						$('tbody#list tr#'+i).last().append('<td><a href="/text/draft/'+essay_id+'/'+task+'" class="no-uline"><button type="button" class="btn btn-primary btn-sm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Edit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button></a></td>');
-					}else{
-						$('tbody#list tr#'+i).last().append('<td><a href="/text/admin_eachdone/'+editor_id+'/'+essay_id+'/'+task+'" class="no-uline"><button type="button" class="btn btn-primary btn-sm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Edit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button></a></td>');
-					}					
-				}else if(history_list[i]['submit'] == 1){ //submit
-					if(json['classify'] == 1){
-						$('tbody#list tr#'+i).last().append('<td><a href="/text/edit/'+essay_id+'/'+task+'" class="no-uline"><button type="button" class="btn btn-success btn-sm">Completed</button></a></td>');
-					}else{
-						$('tbody#list tr#'+i).last().append('<td><a href="/text/admin_eachdone/'+editor_id+'/'+essay_id+'/'+task+'" class="no-uline"><button type="button" class="btn btn-success btn-sm">Completed</button></a></td>');	
-					}					
-				}
+				$('tbody#list').append('<tr id='+i+' class="clickableRow" href="'+href+essay_id+'/'+task+'/'+pj_id+'"><td class="text-center">'+num+'</td><td>'
+					+data_list[i]['prompt'].replace(/"/gi,'')+'</td><td class="text-center">'
+					+data_list[i]['kind']+'</td><td style="width:90px;">'
+					+date+'</td><td class="text-center">'
+					+data_list[i]['type']+'</td><td class="text-center">'
+					+timer+'<td class="text-center"><h5><font color="'+color+'">'+status+'</font></h5></td></tr>');				
 				num++;
 			}
 		}		
-		//console.log(page,list,history_totalcount);
+		
 		$('div#pageblock').children().remove();
 		
-		pageBlock(page,list,history_totalcount); // page button.
+		pageBlock(page,list,total_count); // page button.
 	});
 
 }
 
-function pageBlock(page,list,history_totalcount){
+function pageBlock(page,list,total_count){
 
 	var b_pageNum_list = 10; //블럭에 나타낼 페이지 번호 갯수
 	var block = Math.ceil(page/b_pageNum_list); //현재 리스트의 블럭 구하기
     var b_start_page = ( (block - 1) * b_pageNum_list ) + 1; //현재 블럭에서 시작페이지 번호    
     var b_end_page = b_start_page + b_pageNum_list - 1; //현재 블럭에서 마지막 페이지 번호		 	
-    var total_page =  Math.ceil(history_totalcount/list); //총 페이지 수
+    var total_page =  Math.ceil(total_count/list); //총 페이지 수
 
     if (b_end_page > total_page) {
     	b_end_page = total_page;
@@ -358,6 +326,19 @@ function pageBlock(page,list,history_totalcount){
 }
 
 $(document).ready(function(){	
+	if(cate == 'todo' || cate == 'draft'){
+		$('li#tab_todo').addClass("active");
+		$('div#todo').addClass("active");
+	}else if(cate == 'com'){
+		$('li#tab_com').addClass("active");
+		$('div#com').addClass("active");
+	}else if(cate == 'tbd'){
+		$('li#tab_tbd').addClass("active");
+		$('div#tbd').addClass("active");		
+	}else if(cate == 'history'){
+		$('li#tab_history').addClass("active");
+		$('div#history').addClass("active");		
+	}
 	data = {
 		page : page,
 		list : list,
@@ -366,7 +347,7 @@ $(document).ready(function(){
 		cate : cate
 	}
 	console.log(data);
-	url = '/project/page_list';
+	url = '/musedata/project/page_list';
 	
 	ajaxPost(url,data);	//page list.
 });
@@ -382,10 +363,32 @@ $('div#pageblock').delegate('button#p_button', 'click', function(){
 		cate : cate		
 	}
 	console.log(data);
-	url = '/project/page_list';
+	url = '/musedata/project/page_list';
 	
 	ajaxPost(url,data); //page list.
 });
+
+$('ul.nav').delegate('li.tab_action', 'click', function(){		
+	var tab = $(this).attr('id');
+	cate = tab.substr(4);	
+	console.log(cate);
+	data ={
+		page : 1,
+		list : list,
+		pj_id : pj_id,
+		editor_id : editor_id,
+		cate : cate		
+	}
+	
+	url = '/musedata/project/page_list';	
+	ajaxPost(url,data); //page list.
+});
+
+//<tbody id="list">
+$('tbody#list').delegate('tr.clickableRow', 'click', function(){		      
+    window.document.location = $(this).attr("href");      
+});
+
 
 // Share
 $("#checkAll").click(function() {

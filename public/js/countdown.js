@@ -116,7 +116,22 @@ and GPL-3.0 (http://opensource.org/licenses/GPL-3.0) licenses.
       onEnd: $.noop,
       render: function(date) {
         //return $(this.el).html("" + date.years + " years, " + date.days + " days, " + (this.leadingZeros(date.hours)) + " hours, " + (this.leadingZeros(date.min)) + " min and " + (this.leadingZeros(date.sec)) + " sec");
-        return $(this.el).html("" + (this.leadingZeros(date.hours)) + " : " + (this.leadingZeros(date.min)) + " min " + (this.leadingZeros(date.sec)) + " sec" + '<br><FONT COLOR="#FF0000"> (24HR)</font>');
+        var hours = this.leadingZeros(date.hours);
+        var min = this.leadingZeros(date.min);
+        var sec = this.leadingZeros(date.sec);
+
+        if(hours == 00 && min == 00 && sec == 00){          
+          stop();
+          //clearInterval(_this.interval);
+          //$.stop;
+          //$(this).stop;
+          return $(this.el).html('<FONT COLOR="#FF0000"><h5> -- : -- </h5></font>');          
+        }else{
+          return $(this.el).html('<FONT COLOR="#FF0000"><h5>' + (this.leadingZeros(date.hours)) + " : " + (this.leadingZeros(date.min)) + " min " + (this.leadingZeros(date.sec)) + " sec</h5></font>");
+        }
+
+        //return $(this.el).html(hours)
+        //return $(this.el).html('<FONT COLOR="#FF0000"><h5>' + (this.leadingZeros(date.hours)) + " : " + (this.leadingZeros(date.min)) + " min " + (this.leadingZeros(date.sec)) + " sec</h5></font>");
       }
     };
     $.fn.countdown = function(options) {

@@ -16,6 +16,8 @@ class Index extends CI_Controller {
 
 		$data['notice'] = $this->all_list->notice();
 		$data['recent_notice'] = $this->all_list->recent_notice();
+		$usr_id = $this->session->userdata('id');
+		$data['pj_list'] = $this->all_list->get_project($usr_id);				
 		$data['usr_list'] = $this->all_list->all_usr();
 		$this->load->view('index',$data);		
 		$this->load->view('footer');			

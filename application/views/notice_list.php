@@ -2,7 +2,7 @@
 	<div class="row">		
 		<ol class="breadcrumb" style="background:white;">
 	        	<li><a href="/">Home</a></li>	        	
-	        	<li class="active">Notice </li>   
+	        	<li class="akacolor">Notice </li>   
 	    </ol>
 		<?
 		if($this->session->userdata('classify') == 0){
@@ -36,7 +36,7 @@
 			?>
 			<tr>
 			<td class="text-center"><?=$num;?></td>
-			<td><a href="/notice/notice_detail/<?=$id;?>"><?=$title?></a></td>
+			<td><a href="/notice/contents/<?=$id;?>"><?=$title?></a></td>
 			<td class="text-center"><?=substr($date,0,-3)?></td>
 			</tr>
 			<?$num++; } ?>		

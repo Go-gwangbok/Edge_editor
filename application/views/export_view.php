@@ -52,7 +52,7 @@
 	</div>
 	<!-- Loading Modal End -->
 </div>
-<script>
+<script type="text/javascript">
 var page = '<?=$page;?>';
 var list = '<?=$list;?>';
 var pj_id = '<?=$pj_id;?>';
@@ -234,14 +234,14 @@ $(document).ready(function(){
 		pj_id : pj_id
 	}
 	console.log(members);	
-	$.post('/project/member_list',members,function(json){
+	$.post('/project/member_list/all/0',members,function(json){
 		//console.log(json['result']);	
 		console.log(json['error']);
 		//console.log('error_id : ' + json['error_id']);						
 		// console.log('done_id : ' + json['done_id']);				
 		//console.log('error_slash : '+json['int']);
 		if(json['error'] > 0){ // Error			
-			$('div#error').append('<button class="btn btn-danger" id="errorbtn" style="margin-top:-15px; margin-right:15px;">Error List<span class="badge" style="background-color:transparent;">'+json['error']+'</span></button>');			
+			$('div#error').append('<a href="/project/error_list/'+pj_id+'"><button class="btn btn-danger" id="errorbtn" style="margin-top:-15px; margin-right:15px;">Error List<span class="badge" style="background-color:transparent;">'+json['error']+'</span></button></a>');			
 			error_id = json['error_id'].toString();			
 		}	
 
@@ -368,35 +368,24 @@ $('button#sorting').click(function(){
 
 });
 
-$('div#error').delegate('button#errorbtn', 'click', function(){			
-	data = {
-		page : page,
-		list : list,
-		pj_id : pj_id,
-		editor_id : error_id,
-		cate : 'error_export'
-	}
-	//console.log(data);
-	url = '/project/page_list';
-
-	ajaxPost(url,data);	//page list.
-});
-
 $('button#allexport').click(function(){		
 	var pj_name = '<?=$pjName;?>';	
 	data = {
 		done : done_id,
 		pj_name : pj_name
 	}
-	
+	console.log(data);
 	var download_url  = '/project/all_export?done='+ done_id +'&pj_name='+pj_name;
+	
 	$.post('/project/all_export',data,function(json){
 		console.log(json['result']);
 		$('#myModal').modal('show');
+		
 		if(json['result']){
 			window.location = '/project/download?pjname='+pj_name;			
 		}else{
-			alert('This file is not available for download.');
+			console.log(json['result']);
+			//alert('This file is not available for download.');
 		}		
 		$('#myModal').modal('hide');
 	});	
