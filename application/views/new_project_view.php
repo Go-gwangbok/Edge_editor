@@ -2,12 +2,28 @@
 	<div class="row">
 		<ol class="breadcrumb" style="background:white;">
 	    	<li><a href="/">Home</a></li>
-	    	<li><a href="/project">Project List</a></li>   
-	    	<li class="active">New Project</li>   
+	    	<li><a href="/musedata/project">Project</a></li>   
+	    	<li class="akacolor">New Project</li>   
 	    </ol>
-   	</div>
-	<h2 class="text-center">New Project</h2>		
+	    <h3 class="text-center">New Project</h3>
+   	</div> <!-- Div row -->	
 	<br> 
+	<br> 
+	<div class="row" style="margin-bottom:10px;">  
+	    <label for="inputEmail3" class="col-sm-2 control-label">Project Type</label>
+	    <div class="col-sm-3">
+	      <select class="form-control input-sm" id="selectBox">
+	      	<option>Null</option>
+	      	<?
+	      	foreach ($data_type as $value) {
+	      		$kind = $value->kind;
+	      		$kind_id = $value->id;
+	      	?>
+	      	<option id="<?=$kind_id;?>"><?=strtoupper($kind);?></option>
+	      	<? } ?>
+	      </select>
+	    </div>
+    </div>    
 	
 	<div class="row" style="margin-bottom:10px;">  
 	    <label for="inputEmail3" class="col-sm-2 control-label">Project Name</label>
@@ -24,7 +40,7 @@
     </div>
 
     <div class="row" style="margin-bottom:10px;">  
-	    <label for="inputPassword3" class="col-sm-2 control-label">Member</label>
+	    <label for="inputPassword3" class="col-sm-2 control-label">Members</label>
 	    <div class="col-sm-9">
 	     <?
 	     foreach ($mem_list as $rows) {
@@ -43,11 +59,10 @@
 	      <button type="submit" class="btn btn-danger" id="submit" disabled>Create Project</button>
 	    </div>
 	</div>
-	  
-	
 </div>
 
 <script>
+
 
 $('input.mem_check').click(function(){
 	var isChecked = false;
@@ -70,6 +85,7 @@ $('input.mem_check').click(function(){
 
 
 $("button#submit").click(function(){
+	var selVal = $('#selectBox option:selected').attr('id');
 	var name = $("input#name").val();	
 	var disc = $("textarea#disc").val();
 	var mem_list = $('input:checkbox:checked.mem_check').map(function ()
@@ -77,19 +93,20 @@ $("button#submit").click(function(){
 		return this.value;
 	}).get();		
 	
-	if(name == '' || disc == ''){
+	if(name == '' || disc == '' || selVal == 'null'){
 		alert('Please enter all the values in the blanks!');
 	}else{
 		var data = {
 			name: name,			
 			disc: disc,
+			kind: selVal,
 			mem_list: mem_list.toString()
 		};
 		console.log(data);
 
 		$.ajax(
 		{
-			url: '/project/create_pj', // 포스트 보낼 주소
+			url: '/musedata/project/create_pj', // 포스트 보낼 주소
 			type: 'POST',					
 			data: data,
 			dataType: 'json',
@@ -100,7 +117,7 @@ $("button#submit").click(function(){
 				{
 					// 정상적으로 처리됨
 					alert('New project has been created!');
-					window.location.replace('/project'); // 리다이렉트할 주소
+					window.location.replace('/musedata/project'); // 리다이렉트할 주소
 				}
 				else{
 					alert('all_list_db ==> create_pj Error');

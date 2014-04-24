@@ -48,7 +48,7 @@
                             ?>                                
                                 <h4>
                                     <span class="glyphicon glyphicon-align-justify"></span>&nbsp;Recent notice&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-size:13px;"><?=substr($recent_notice->date,0,-3);?></span>
-                                    <a href="/notice" class="btn btn-xs btn-default pull-right"><b><span class="glyphicon glyphicon-pushpin"></span>&nbsp;&nbsp;Write</b></a>
+                                    <a href="/notice/write" class="btn btn-xs btn-default pull-right"><b><span class="glyphicon glyphicon-pushpin"></span>&nbsp;&nbsp;Write</b></a>
                                 </h4>   
                                 
                                 <?
@@ -56,7 +56,7 @@
                                 ?>
                                 
                                 <h4><span class="glyphicon glyphicon-align-justify"></span>&nbsp;Recent notice&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-size:13px;"></span>
-                                    <a href="/notice" class="btn btn-xs btn-default pull-right"><b><span class="glyphicon glyphicon-pushpin"></span>&nbsp;&nbsp;Write</b></a>
+                                    <a href="/notice/write" class="btn btn-xs btn-default pull-right"><b><span class="glyphicon glyphicon-pushpin"></span>&nbsp;&nbsp;Write</b></a>
                                 </h4>   
                                 
                                 <?
@@ -138,9 +138,9 @@
                                     $id = $value->id;
                                 ?>
                                 <li>                                    
-                                    <div class="news-item-detail">                                      
-                                        <a href="/notice/contents/<?=$id?>" class="news-item-title"><?=substr($title,0,64).'...';?></a>
-                                        <p class="news-item-preview" ><?=$short_cont?></p>
+                                    <div class="news-item-detail" href="/notice/contents/<?=$id?>" style="cursor:pointer;">
+                                        <h5 class="news-item-preview akacolor"><?=substr($title,0,64).'...';?><h5>
+                                        <p style="color:black;"><?=$short_cont?></p>
                                     </div>
                                     
                                     <div class="news-item-date text-right" style="margin-top:-20px;">
@@ -159,42 +159,49 @@
                 </div> <!-- /span6 -->
                 
                 
-<!-- Quick -->  <div class="col-md-6">  
-                    
+<!-- Quick -->  <div class="col-md-6">                   
                     
                     <div class="widget stacked">
                             
-                        <div class="widget-header">                            
-                            <h4><span class="glyphicon glyphicon-list-alt"></span>&nbsp;Project<span><a href="/musedata/project"><button class="btn btn-default btn-xs pull-right">More</button></a></span></h4>
-                        </div> <!-- /widget-header -->
-
-                        <div class="widget-content">
+                        <div class="widget-header"> 
+                            <?
+                            if($this->session->userdata('classify') == 0){ //admin
+                            ?>
+                                <h4><span class="glyphicon glyphicon-list-alt"></span>&nbsp;Quick Shortcuts<span></span></h4>
+                            <?
+                            }else{
+                            ?>
+                                <h4><span class="glyphicon glyphicon-list-alt"></span>&nbsp;Project<span><a href="/musedata/project"><button class="btn btn-default btn-xs pull-right">More</button></a></span></h4>
+                            <?
+                            }
+                            ?>                           
                             
+                        </div> <!-- /widget-header -->                        
+                        
+                        <div class="widget-content" style="margin-top:15px;">                            
                             <div class="pull-center">                                
                                 <?
-                                if($this->session->userdata('is_login')){
-                                ?>   
-                                
-                                    <?
+                                if($this->session->userdata('is_login')){                                
                                     if($this->session->userdata('classify') == 0){ //admin
                                     ?>
-                                    <h3>
-                                    <a href="/project" class="shortcut btn btn-default btn-lg">
-                                        <i class="glyphicon glyphicon-inbox"></i>&nbsp; Project
-                                    </a>
+                                    <div class="col-md-4 line" id="musedata" href="/musedata/project" style="height:70px; cursor:pointer;border-color:black;">                                        
+                                        <h3 class="text-center" style="margin-top:10px;" ><span class="glyphicon glyphicon-inbox"></span></h3>
+                                        <h5 class="text-center">&nbsp; Musedata</h5>
+                                    </div>
                                     
-                                    <a href="/status" class="shortcut btn btn-default btn-lg">
-                                        <i class="glyphicon glyphicon-eye-open"></i> Status
-                                    </a>
+                                    <div class="col-md-4 line" id="service" href="/service" style="height:70px; cursor:pointer;border-color:black;">                                    
+                                        <h3 class="text-center" style="margin-top:10px;" ><span class="glyphicon glyphicon-globe"></span></h3>
+                                        <h5 class="text-center">&nbsp; Service</h5>
+                                    </div>                 
 
-                                    <a href="/notice/notice_list" class="shortcut btn btn-default btn-lg">
-                                        <i class="glyphicon glyphicon-bullhorn"></i> Notice
-                                    </a>
-
-                                    <a href="/neweditor" class="shortcut btn btn-default btn-lg" id="newEditor" disabled>
-                                        <i class="glyphicon glyphicon-user"></i> New Editor
-                                    </a>
-                                    </h3>
+                                    <div class="col-md-4 line" id="new_editor" href="/setting/info" style="height:70px; cursor:pointer;border-color:black;">                                    
+                                        <h3 class="text-center" style="margin-top:10px;" ><span class="glyphicon glyphicon-user"></span></h3>
+                                        <h5 class="text-center">&nbsp; New Editor</h5>
+                                    </div>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>                                    
                                     <?
                                     }else{ // Editor
                                         $usr_id = $this->session->userdata('id');
@@ -208,51 +215,38 @@
                                             if(strlen($pjname) > 14){
                                                 $pjname = substr($pjname,0,14).'...';
                                             }                                           
-                                    ?>
-                                            <div class="col-md-4 line line-radius">
-                                                <p class="text-center" style="margin-top:5px;"><?=$pjname;?></p>
-                                                <a class="btn btn-default btn-xs" style="width:75px; margin-bottom:8px;" href="/musedata/project/board/todo/<?=$pj_id;?>/<?=$usr_id?>">Todo</a>
-                                                <a class="btn btn-default btn-xs" style="width:74px; margin-bottom:8px;" href="/musedata/project/board/com/<?=$pj_id;?>/<?=$usr_id?>">Completed</a>                                                
-                                            </div>                                        
+                                    ?>      
+                                        <div class="col-md-6 ">
+                                            <div class="col-md-12  line" style="height:70px; ">
+                                                <span class="glyphicon glyphicon-th-large " style="margin-top:3%"></span>
+                                                <h5 class="text-center " style="margin-top:2%;"><?=$pjname;?></h5>
+                                            </div>
+
+                                            <div class="col-md-6 line " style="height:30px; cursor:pointer;">
+                                                <h5 class="text-center todo" style="width:98px; margin-top:7%;" href="/musedata/project/board/todo/<?=$pj_id;?>/<?=$usr_id?>">To do</h5>
+                                            </div>
+
+                                            <div class="col-md-6 line " style="height:30px; cursor:pointer;">
+                                                <h5 class="text-center comp" style="width:98px; margin-top:7%;" href="/musedata/project/board/com/<?=$pj_id;?>/<?=$usr_id?>">Completed</h5>
+                                            </div>
+                                        </div>                                        
                                     <?
-                                        }                                    
-                                    }
-                                    ?> 
-                                    <br><br>
-                                <?}else{?>
-                                <h3>
-                                    <a href="#" class="shortcut btn btn-default btn-lg" disabled>
-                                        <i class="glyphicon glyphicon-pencil"></i> To do
-                                    </a>
-                                    
-                                    <a href="#" class="shortcut btn btn-default btn-lg" disabled>
-                                        <i class="glyphicon glyphicon-edit"></i> Completed
-                                    </a>                           
-
-                                    <a href="#" class="shortcut btn btn-default btn-lg" disabled>
-                                        <i class="glyphicon glyphicon-bullhorn"></i> Notice
-                                    </a>         
-
-                                    <a href="#" class="shortcut btn btn-default btn-lg" disabled>
-                                        <i class="glyphicon glyphicon-edit"></i> Memo
-                                    </a>
-                                    
-                                </h3>
-                                <?}?>
-                                
-                            </div> <!-- /shortcuts -->  
-                        
+                                        }    
+                                    ?>
+                                    <br><br><br><br><br><br>
+                                    <?                               
+                                    }                                                                        
+                                }?>                                
+                            </div> <!-- /shortcuts -->                          
                         </div> <!-- /widget-content -->
                         
-                    </div> <!-- /widget -->
-                    <br/>
-                    <br/>
+                    </div> <!-- /widget -->                    
                     
                     <div class="widget stacked">
                             
                         <div class="widget-header">
                             
-                            <h4><span class="glyphicon glyphicon-stats"></span>&nbsp;Chart</h4>
+                            <h4><span class="glyphicon glyphicon-stats"></span>&nbsp;Total Chart</h4>
                         </div> <!-- /widget-header -->
                         
                         <div class="widget-content">                    
@@ -264,11 +258,11 @@
                                             if($this->session->userdata('classify') == 0){ // admin
                                         ?>
                                         <dl class="dl-horizontal text-center" style="padding-right:10pxl">                                            
-                                            <dt>To do&nbsp;&nbsp;<span class="glyphicon glyphicon-stop" style="color: #DF4D4D;"></span></dt>
+                                            <dt>To do&nbsp;&nbsp;<span class="glyphicon glyphicon-stop" style="color: #E2EAE9;"></span></dt>
                                             <dd id="todo"></dd>
-                                            <dt>Draft&nbsp;&nbsp;<span class="glyphicon glyphicon-stop" style="color: #E2EAE9;"></span></dt>
+                                            <dt>Draft&nbsp;&nbsp;<span class="glyphicon glyphicon-stop" style="color: #D4CCC5;"></span></dt>
                                             <dd id="draft"></dd>
-                                            <dt>Completed&nbsp;&nbsp;<span class="glyphicon glyphicon-stop" style="color: #D4CCC5;"></span></dt>
+                                            <dt>Completed&nbsp;&nbsp;<span class="glyphicon glyphicon-stop" style="color: #F7464A;"></span></dt>
                                             <dd id="done"></dd>
                                             <hr style="margin-left:70px;">
                                             <dt>TOTAL</dt>
@@ -359,8 +353,8 @@
                                     <?
                                     }
                                     ?>
-                                    </tbody>
-                                </table>
+                                 </tbody>
+                            </table>
                             
                         </div> <!-- /widget-content -->
                     
@@ -381,12 +375,6 @@
 <!-- javascript -->     
 <script src="/public/js/Chart.js"></script>
 <script type="text/javascript">
-
-// tooltip
-$('[data-toggle="tooltip"]').tooltip({
-    'placement': 'top'
-});
-
 $(document).ready(function(){
     $.ajax({
             type: "POST",
@@ -395,12 +383,11 @@ $(document).ready(function(){
             dataType: 'json',
             success: function(json) {
                     console.log(json['new_editor']);
-
                     // new_editor
-                    if(json['new_editor']){
-
-                        $('a#newEditor').attr('disabled',false);
-                        $('a#newEditor').attr('class','shortcut btn btn-danger btn-lg');
+                    if(json['new_editor']){                        
+                        $('div#new_editor').css('background-color','#F15F5F');                        
+                        $('div#new_editor h3').addClass('font-white');
+                        $('div#new_editor h5').addClass('font-white');
                     }
                     // Chart
                     var todo = parseInt(json['chart'][0]);                    
@@ -419,15 +406,15 @@ $(document).ready(function(){
                     var data = [
                         {
                             value: todo,
-                            color: "#DF4D4D"
+                            color: "#E2EAE9"
                         },
                         {
                             value : draft,
-                            color : "#E2EAE9"
+                            color : "#D4CCC5"
                         },
                         {
                             value : done,
-                            color : "#D4CCC5"
+                            color : "#F7464A"
                         }
 
                     ]
@@ -443,7 +430,7 @@ $(document).ready(function(){
                         segmentStrokeWidth : 5,
                         
                         //The percentage of the chart that we cut out of the middle.
-                        percentageInnerCutout : 35,
+                        percentageInnerCutout : 40,
                         
                         //Boolean - Whether we should animate the chart 
                         animation : true,
@@ -475,26 +462,58 @@ $('#SignIn').click(function()
             email: $("#inputEmail").val(),                                                      
             pass: $("#inputPassword").val()             
     };
-    //console.log(form_data);                
+    console.log(form_data);                
     $.ajax({
             type: "POST",
             url: '/sign/sign_in_proc',                
             data: form_data,
             dataType: 'json',
-            success: function(response) {
-                    if(response['status'] == 'true') {                                
+            success: function(json) {
+                    console.log(json['status']);
+
+                    if(json['status'] == 'true') {                                
                             window.location.replace('/'); // 리다이렉트할 주소
-                    }else if(response['status'] == 'empty'){
+                    }else if(json['status'] == 'empty'){
                         alert("Please enter your email and password!");
-                    }else if(response['status'] == 'false'){
+                    }else if(json['status'] == 'false'){
                         alert("Incorrect username and password!");
-                    }else if(response['status'] == 'wait'){
+                    }else if(json['status'] == 'wait'){
                         alert("It has not yet been approved! Please wait for approval.");
                     }
             }
     });
     return false;
 }); 
+
+$('div.news-item-detail').click(function(){
+    //var href = $(this).attr('href');
+    window.document.location = $(this).attr('href');
+});
+
+$('h5.todo').click(function(){
+    //var href = $(this).attr('href');
+    window.document.location = $(this).attr('href');
+});
+
+$('h5.comp').click(function(){
+    //var href = $(this).attr('href');
+    window.document.location = $(this).attr('href');
+});
+
+$('div#musedata').click(function(){
+    //var href = $(this).attr('href');
+    window.document.location = $(this).attr('href');
+});
+
+$('div#service').click(function(){
+    //var href = $(this).attr('href');
+    window.document.location = $(this).attr('href');
+});
+
+$('div#new_editor').click(function(){
+    //var href = $(this).attr('href');
+    window.document.location = $(this).attr('href');
+});
 
 
 

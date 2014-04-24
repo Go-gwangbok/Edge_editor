@@ -1,5 +1,5 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-
+require_once 'errorchk.php';
 class Service extends CI_Controller {
 
 	function __construct(){
@@ -11,7 +11,25 @@ class Service extends CI_Controller {
 		$this->load->helper(array('form', 'url'));
 		$this->load->helper('download');		
 		$this->load->dbutil();	
-		//$this->load->library('session');			
+		//$this->load->library('eng_month');			
+	}
+
+	function eng_month($int_month){
+		switch ($int_month) {
+			case '01' : $str_month = 'January'; break;
+            case '02' : $str_month = 'February'; break;
+            case '03' : $str_month = 'March'; break;
+            case '04' : $str_month = 'April'; break;
+            case '05' : $str_month = 'May'; break;
+            case '06' : $str_month = 'June'; break;
+            case '07' : $str_month = 'July'; break;
+            case '08' : $str_month = 'August'; break;
+            case '09' : $str_month = 'September'; break;
+            case '10' : $str_month = 'October'; break;
+            case '11' : $str_month = 'November'; break;
+            case '12' : $str_month = 'December'; break;
+		}
+		return $str_month;
 	}
 
 	public function index()
@@ -20,31 +38,106 @@ class Service extends CI_Controller {
 			$classify = $this->session->userdata('classify');
 
 			if($classify == 0){ // Admin
-				$data['cate'] = 'musedata';
+				$data['cate'] = 'service';
 				$this->load->view('head',$data);				
 				
-				$data['pjlist'] = $this->all_list->pjlist();
-				$data['all_usr'] = $this->all_list->all_usr();
-
-				$data['cate'] = 'admin';
-				$this->load->view('/musedata_view/index',$data);		
-				$this->load->view('footer');					
-				
+				$data['services'] = $this->all_list->get_service_list();				
+				$this->load->view('/service_view/admin_service_index',$data);					
 			}else{	// Editor
 				$cate['cate'] = 'service';
 				$this->load->view('head',$cate);
 
-				$usr_id = $this->session->userdata('id');				
-				//$data['pjlist'] = $this->all_list->editor_pjlist($usr_id);
+				$usr_id = $this->session->userdata('id');								
 				$data['all_usr'] = '';
 				$data['cate'] = 'service';
 				$this->load->view('/service_view/index',$data);		
-				$this->load->view('footer');					
+					
 			}	
+			$this->load->view('footer');					
 		}else{
 			redirect('/');
 		}		
 	}	
+
+	function serviceType($service_name){
+		if($this->session->userdata('is_login')){			
+			$data['cate'] = 'service';
+			$this->load->view('head',$data);				
+
+			$row = $this->all_list->get_serviceId_num($service_name);
+			$service_id = $row->id;
+			$data['type_id'] = $service_id;			
+			$data['service_name'] = $service_name;
+			$data['all_year'] = $this->all_list->service_all_year_data($service_id);
+			
+			
+			$this->load->view('/service_view/service_type_view',$data);		
+			$this->load->view('footer');					
+		}else{
+			redirect('/');
+		}					
+	}
+
+	function get_service_month_data(){
+		if($this->session->userdata('is_login')){
+			$yen = $this->input->post('yen');			
+			$type_id = $this->input->post('type_id');
+			$result = $this->all_list->service_month_data($yen,$type_id);			
+			$json['data'] = $result;			
+		}else{
+			redirect('/');
+		}
+		$this->output->set_content_type('application/json')->set_output(json_encode($json));
+	}
+
+	function enter($service_name,$month,$year){ // 0
+		if($this->session->userdata('is_login')){
+			$data['cate'] = 'service';
+			$this->load->view('head',$data);
+
+			$str_month = $this->eng_month($month); // 숫자 달을 영문으로 변경하는 함수!
+			$data['str_month'] = $str_month;			
+			$data['int_month'] = $month;			
+			$data['year'] = $year;		
+			$data['service_name'] = $service_name;
+
+			$row = $this->all_list->get_serviceId_num($service_name);
+			$service_id = $row->id;
+			$data['service_id'] = $service_id;			
+
+			//$data['cate'] = 'writing';
+			$this->load->view('/service_view/service_enter_view',$data);		
+			$this->load->view('footer');			
+		}else{
+			redirect('/');
+		}				
+	}
+
+	function get_enter_users(){
+		if($this->session->userdata('is_login')){			
+			$service_id = $this->input->post('service_id');		
+			$year = $this->input->post('year');		
+			$month = $this->input->post('month');		
+
+			$json['memlist'] = $this->all_list->get_enter_users($service_id,$year,$month);
+		}else{
+			redirect('/');
+		}
+		$this->output->set_content_type('application/json')->set_output(json_encode($json));
+	}
+
+	function get_enter_data(){
+		if($this->session->userdata('is_login')){			
+			$service_id = $this->input->post('service_id');		
+
+			$list = $this->all_list->get_service_datalist($service_id);
+			$json['memlist'] = $list;
+
+		}else{
+			redirect('/');
+		}
+		$this->output->set_content_type('application/json')->set_output(json_encode($json));
+	}
 
 	public function get_writing()
 	{
@@ -94,51 +187,6 @@ class Service extends CI_Controller {
 			$json['access'] = $access;
 
 		}		
-		
-		// $usr_id = $this->session->userdata('id');
-		// if($classify_cate == 'pj_mem_history'){
-		// 	$todo_list = $this->all_list->pj_memList($pj_id,$usr_id); // todo list 	
-		// 	$list_count = $this->all_list->editor_pj_list_count($pj_id,$usr_id);
-			
-		// }else{
-		// 	$todo_list = $this->all_list->essayList($usr_id); // todo list 	
-		// 	$list_count = $this->all_list->list_count($usr_id);
-		// }		
-
-		// $todo_list = $this->all_list->essayList($usr_id); // todo list 	
-		// $list_count = $this->all_list->list_count($usr_id);
-
-		// $list_array = array();
-		// $data_value = array();
-
-		// foreach ($todo_list as $rows) {
-		// 	$title = $rows->prompt;
-		// 	$kind = $rows->kind;
-		// 	$date = $rows->start_date;
-		// 	$type_kind = $rows->type;
-		// 	$essay_id = $rows->essay_id;								
-		// 	$draft = $rows->draft;
-		// 	$submit = $rows->submit;	
-		// 	$id = $rows->id;	
-		// 	unset($data_value);
-		// 	$data_value = array();
-		// 	array_push($data_value, $title);
-		// 	array_push($data_value, $kind);
-		// 	array_push($data_value, $date);
-		// 	array_push($data_value, $type_kind);
-		// 	array_push($data_value, $essay_id);
-		// 	array_push($data_value, $draft);
-		// 	array_push($data_value, $submit);
-		// 	array_push($data_value, $id);
-
-		// 	array_push($list_array, $data_value);
-		// }	
-		
-		//$json['cate'] = $classify_cate;
-		//$json['list_count'] = $list_count;
-		//$json['tagging_list'] = $list_array;
-		//$json['access'] = $access;
-
 		$this->output->set_content_type('application/json')->set_output(json_encode($json));
 	}	
 
@@ -167,6 +215,10 @@ class Service extends CI_Controller {
 		$this->output->set_content_type('application/json')->set_output(json_encode($json));
 	}
 
+	function get_templet_ele($kind){
+		return $this->all_list->get_templet_ele($kind);
+	}
+
 	public function writing(){
 		if($this->session->userdata('is_login')){
 			$data['cate'] = 'service';
@@ -180,9 +232,24 @@ class Service extends CI_Controller {
 			$is_critique = $this->input->post('is_critique');		
 			$kind = $this->input->post('kind');
 
+			// $scoring = $rows->scoring;			
+			// $score2 = $rows->score2;			
+			// $kind = $rows->kind; // ex) toefl, essay, toeic
+			// $data['kind'] = $kind;
+
+			$data['tag_templet'] = $this->all_list->get_tag($kind);
+			$data['score_templet'] = $this->all_list->get_scores_temp($kind);		
+
+			$data['templet'] = $this->get_templet_ele($kind);
+			//$score1 = $this->score_pattern_replace($scoring);			
+			$data['score1'] = '';	
+
+			//$score2 = $this->score_pattern_replace($score2);
+			$data['score2'] = '';				
+
 			$data['title'] = str_replace('"', '', $title);
-			
-			$data['writing'] = $writing;			
+			$data['raw_writing'] = $writing;
+			$data['writing'] = $writing;
 			$data['re_raw_writing'] = preg_replace("/[\n\r]/","<br>", $writing); //Tagging 할때 쓰임! All clear
 			$data['token'] = $token;
 			$data['id'] = $w_id;
@@ -195,35 +262,17 @@ class Service extends CI_Controller {
 			$data['submit'] = '';
 			$data['discuss'] = '';
 			$data['time'] = 0;
-
 			$data['cate'] = 'writing';
+			$data['pj_id'] = '';
+			$data['word_count'] = '';
+			//$data['classify'] = 'new';
 
-			$this->load->view('editor',$data);		
+			$this->load->view('/service_view/service_editor',$data);		
 			$this->load->view('footer');					
 		}else{
 			redirect('/');
 		}
-	}
-
-	public function writing_view(){
-		$token = $this->input->post('token');
-		$w_id = $this->input->post('w_id');
-		$title = $this->input->post('title');
-		$writing = $this->input->post('writing');
-		$critique = $this->input->post('critique');		
-		
-		$data['cate'] = 'todo_writing';
-		$this->load->view('head',$data);
-
-		$data['title'] = $title;
-		$data['writing'] = $writing;
-		$data['token'] = $token;
-		$data['w_id'] = $w_id;
-		$data['critique'] = $critique;
-
-		$this->load->view('writing_view',$data);		
-		$this->load->view('footer');									
-	}
+	}	
 
 	public function w_submit(){
 		$usr_id = $this->session->userdata('id');
@@ -236,22 +285,17 @@ class Service extends CI_Controller {
 		$critique = $this->db->escape($this->input->POST('critique'));
 		$tagging = $this->db->escape($this->input->POST('tagging'));
 		$raw_writing = $this->db->escape($this->input->post('raw_writing'));		
-		// Scoring
-		$json['ibc'] = $this->input->POST('ibc');			
-		$json['thesis'] = $this->input->POST('thesis');			
-		$json['topic'] = $this->input->POST('topic');			
-		$json['coherence'] = $this->input->POST('coherence');			
-		$json['transition'] = $this->input->POST('transition');			
-		$json['mi'] = $this->input->POST('mi');			
-		$json['si'] = $this->input->POST('si');			
-		$json['style'] = $this->input->POST('style');			
-		$json['usage'] = $this->input->POST('usage');			
-		$scoring = json_encode($json);
+		$type = 'writing';
+		$scoring = $this->input->post('scoring');		
 
 		//local DB save		
-		$query_res = $this->all_list->local_save($usr_id,$w_id,$raw_writing,$editing,$tagging,$critique,$title,$kind,$scoring,$time);		
-		
+		$query_res = $this->all_list->local_save($usr_id,$w_id,$raw_writing,$editing,$tagging,$critique,$title,$kind,$scoring,$time,$type);		
+				
 		if($query_res){ // True or false
+			// Error chk
+			$errorchk_class = new Errorchk;
+			$error_chk = $errorchk_class->error_chk('once',$w_id,$type);
+
 			$access = $this->curl->simple_post('http://ec2-54-199-4-169.ap-northeast-1.compute.amazonaws.com/editor/editing/done', array('token'=>$token, 'id'=>$w_id, 'editing'=>$this->input->POST('editing'), 'critique'=>$this->input->POST('critique')));
 
 			// $access = '{
@@ -263,59 +307,193 @@ class Service extends CI_Controller {
 
 			$conform = json_decode($access,true);		
 			if($conform['status']){
-				$json['result'] = true;						
+				$json['result'] = true;	
+				
 			}else{			
-				$json['result'] = 'curl';			
-			}	
+				$json['result'] = 'curl';							
+			}
+			$json['error_chk'] = $error_chk;	
 		}else{
 			$json['result'] = 'localdb';
 		}				
 		$this->output->set_content_type('application/json')->set_output(json_encode($json));
 	}
 
-	public function todo_list(){
-		$last_num = $this->input->post('last_num');
-		$pj_id = $this->input->post('pj_id');
-		$cate = $this->input->post('cate');		
-		$usr_id = $this->session->userdata('id');
-		
-		if($cate == 'pj_mem_history'){
-			$todo_list = $this->all_list->editor_pj_todolist($usr_id,$pj_id,$last_num); // pj_todo list 				
+	public function member_enter($service_name,$month,$year,$usr_id){ // 0
+		if($this->session->userdata('is_login')){			
+			$cate['cate'] = 'service';
+			$this->load->view('head',$cate);			
+			$page = 1;
+			$data['page'] = $page;
+			$list = 20; // 한페이지에 보요질 갯수.			
+			$data['list'] = $list;						
+
+			$str_month = $this->eng_month($month); // 숫자 달을 영문으로 변경하는 함수!
+			$usr_name = $this->all_list->get_user($usr_id);
+			$data['name'] = $usr_name->name;
+
+			$data['str_month'] = $str_month;
+			$data['int_month'] = $month;
+			$data['year'] = $year;
+			$data['usr_id'] = $usr_id;
+			$data['service_name'] = $service_name;
+
+			$row = $this->all_list->get_serviceId_num($service_name);
+			$service_id = $row->id;
+			$data['service_id'] = $service_id;			
+
+			$this->load->view('/service_view/member_enter_view',$data);		
+			$this->load->view('footer');					
 		}else{
-			$todo_list = $this->all_list->page_essayList($usr_id,$last_num); // todo list 				
+			redirect('/');
 		}		
+	}
 
-		//$todo_list = $this->all_list->get_todolist($usr_id,$last_num); // todo list 		
-		$list_array = array();
-		$data_value = array();
+	public function get_service_member_comp(){
+		if($this->session->userdata('is_login')){			
+			$page = $this->input->post('page');
+			$month = $this->input->post('month');
+			$year = $this->input->post('year');
+			$usr_id = $this->input->post('usr_id');
+			$service_id = $this->input->post('service_id');
 
-		foreach ($todo_list as $rows) {
-			$title = $rows->prompt; //0
-			$kind = $rows->kind; // 1
-			$date = $rows->start_date; // 2
-			$type_kind = $rows->type; // 3
-			$essay_id = $rows->essay_id; // 4								
-			$draft = $rows->draft; // 5
-			$submit = $rows->submit; // 6
-			$id = $rows->id; // 7
-			unset($data_value); 
-			$data_value = array();
-			array_push($data_value, $title);
-			array_push($data_value, $kind);
-			array_push($data_value, $date);
-			array_push($data_value, $type_kind);
-			array_push($data_value, $essay_id);
-			array_push($data_value, $draft);
-			array_push($data_value, $submit);
-			array_push($data_value, $id);
+			$page_list = 20;			
+			$limit = ($page - 1) * $page_list;					
 
-			array_push($list_array, $data_value);
+			$totalcount = $this->all_list->get_service_mem_completedCount($year,$month,$usr_id,$service_id);
+			$json['data_count'] = $totalcount->count;
+			$json['data_list'] = $this->all_list->get_service_mem_completedData($usr_id,$year,$month,$service_id,$limit,$page_list);
+			
+			$json['page'] = $page;
+			$json['page_list'] = $page_list;						
+		}else{
+			redirect('/');
+		}	
+		$this->output->set_content_type('application/json')->set_output(json_encode($json));
+	}
+
+	public function export($month,$year){
+		if($this->session->userdata('is_login')){			
+			$data['cate'] = 'service';
+			$this->load->view('head',$data);
+
+			$page = 1;
+			$data['page'] = $page;
+			$list = 20; // 한페이지에 보요질 갯수.			
+			$data['list'] = $list;						
+
+			$row = $this->all_list->service_export_total_count($month,$year);
+			$data['total'] = $row->count;
+			$data['export_count'] = $row->export_count;			
+			$data['str_month'] = $str_month = $this->eng_month($month);
+			$data['month'] = $month;
+			$data['year'] = $year;
+			$data['cate'] = 'service_export';
+
+			$this->load->view('/service_view/service_export_view',$data);		
+			$this->load->view('footer');								
+		}else{
+			redirect('/');
+		}			
+	}
+
+	public function get_export_data(){
+		if($this->session->userdata('is_login')){						
+			$page = $this->input->post('page');
+			$year = $this->input->post('year');			
+			$month = $this->input->post('month');
+			
+			$json['year'] = $year;								
+			$page_list = 20;			
+			$limit = ($page - 1) * $page_list;					
+
+			$totalcount = $this->all_list->get_service_export_count($year,$month);
+			$json['data_count'] = $totalcount->count;
+			$json['data_list'] = $this->all_list->get_service_export_data($year,$month,$limit,$page_list);
+			
+			$json['page'] = $page;
+			$json['page_list'] = $page_list;			
+		}else{
+			redirect('/');
 		}
-		
-		$json['tagging_list'] = $list_array;		
-		$json['count'] = count($list_array);
-		$json['cate'] = $cate;
 
+		$this->output->set_content_type('application/json')->set_output(json_encode($json));	
+	}
+
+	function service_export_errorlist(){
+		if($this->session->userdata('is_login')){						
+			$page = $this->input->post('page');
+			$year = $this->input->post('year');			
+			$month = $this->input->post('month');
+			
+			$json['year'] = $year;								
+			$page_list = 20;			
+			$limit = ($page - 1) * $page_list;					
+
+			$totalcount = $this->all_list->get_service_error_count($month,$year);
+			$json['data_count'] = $totalcount->error_count;
+			$json['data_list'] = $this->all_list->get_service_error_list($month,$year,$limit,$page_list);
+			
+			$json['page'] = $page;
+			$json['page_list'] = $page_list;			
+		}else{
+			redirect('/');
+		}
+
+		$this->output->set_content_type('application/json')->set_output(json_encode($json));	
+
+	}
+
+	function all_export(){ // 0
+		if($this->session->userdata('is_login')){						
+			$month = $this->input->get_post('month');			
+			$year = $this->input->get_post('year');			
+
+			$query = $this->db->query("SELECT prompt,ex_editing
+					FROM adjust_data
+					WHERE sub_date
+					BETWEEN  '".$year."-".$month."-01 00:00:00'
+					AND  '".$year."-".$month."-31 00:00:00'
+					AND essay_id !=0						
+					and type != 'musedata'				
+					AND submit = 1
+					and ex_editing != ''
+					and active = 0");
+			
+			$delimiter = ":::";
+			$newline = "\r\n";
+
+			$result = $this->dbutil->csv_from_result($query, $delimiter, $newline);
+
+			if (!write_file('./csv/'.$year.$month.'.csv', $result)){
+			     $json['result'] = false;
+			}else{
+			    $data = file_get_contents('./csv/'.$year.$month.".csv"); // Read the file's contents				
+				if(strlen($data) > 0){
+					$json['result'] = true;					
+				}else{
+					$json['result'] = false;	
+				}				
+			}			
+			
+		}else{
+			redirect('/');
+		}
+		$this->output->set_content_type('application/json')->set_output(json_encode($json));		
+	}
+
+	public function download(){ //0
+		$year = $this->input->get_post('year');
+		$month = $this->input->get_post('month');
+
+		$data = file_get_contents('./csv/'.$year.$month.".csv"); // Read the file's contents
+		$name = $year.$month.'.csv';	
+		force_download($name,$data);
+	}	
+
+	function table_merge(){
+		$merge = $this->all_list->table_merge();
+		$json['result'] = $merge;
 		$this->output->set_content_type('application/json')->set_output(json_encode($json));
 	}
 

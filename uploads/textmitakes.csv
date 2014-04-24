@@ -1,0 +1,252 @@
+$('div#month').append('<div class="col-md-3">'
+                                    +'<div class="panel panel-default">'
+                                        +'<div class="panel-heading">'+month+'</div>'
+                                          +'<div class="panel-body">'
+                                            +'<p><span>Total : </span><span class="pull-right">00</span></p>'
+                                              +'<br>'
+                                                +'<a href="#" role="button">'
+                                                  +'<button class="btn btn-danger btn-sm col-md-12">Export</button>'
+                                                +'</a>'                                                
+                                                +'<a href="#" role="button">'
+                                                  +'<button class="btn btn-primary btn-sm col-md-12" style="margin-top:5px;">Stats</button>'
+                                                +'</a>'
+                                            +'<br>'                                            
+                                          +'</div>'
+                                    +'</div>'
+                                +'</div> ');
+
+SELECT DISTINCT DATE_FORMAT( sub_date,  '%Y-%m' ) AS MONTH , 
+COUNT( IF( sub_date BETWEEN  '2014-01-01 00:00:00'AND  '2014-01-31 00:00:00', 1, NULL ) ) AS 1month,
+COUNT( IF( sub_date BETWEEN  '2014-02-01 00:00:00'AND  '2014-02-29 00:00:00', 1, NULL ) ) AS 2month,
+COUNT( IF( sub_date BETWEEN  '2014-03-01 00:00:00'AND  '2014-03-31 00:00:00', 1, NULL ) ) AS 3month,
+COUNT( IF( sub_date BETWEEN  '2014-04-01 00:00:00'AND  '2014-04-30 00:00:00', 1, NULL ) ) AS 4month,
+COUNT( IF( sub_date BETWEEN  '2014-05-01 00:00:00'AND  '2014-05-31 00:00:00', 1, NULL ) ) AS 5month,
+COUNT( IF( sub_date BETWEEN  '2014-06-01 00:00:00'AND  '2014-06-30 00:00:00', 1, NULL ) ) AS 6month,
+COUNT( IF( sub_date BETWEEN  '2014-07-01 00:00:00'AND  '2014-07-31 00:00:00', 1, NULL ) ) AS 7month,
+COUNT( IF( sub_date BETWEEN  '2014-08-01 00:00:00'AND  '2014-08-31 00:00:00', 1, NULL ) ) AS 8month,
+COUNT( IF( sub_date BETWEEN  '2014-09-01 00:00:00'AND  '2014-09-30 00:00:00', 1, NULL ) ) AS 9month,
+COUNT( IF( sub_date BETWEEN  '2014-10-01 00:00:00'AND  '2014-10-31 00:00:00', 1, NULL ) ) AS 10month,
+COUNT( IF( sub_date BETWEEN  '2014-11-01 00:00:00'AND  '2014-11-30 00:00:00', 1, NULL ) ) AS 11month,
+COUNT( IF( sub_date BETWEEN  '2014-12-01 00:00:00'AND  '2014-12-31 00:00:00', 1, NULL ) ) AS 12month
+FROM tag_essay
+WHERE sub_date
+BETWEEN  '2014-01-01 00:00:00'
+AND  '2014-12-31 00:00:00'
+AND essay_id !=0
+AND submit =1
+ORDER BY MONTH DESC 
+
+SELECT distinct DATE_FORMAT(sub_date, '%Y') as year,
+COUNT( IF( sub_date BETWEEN  '2014-01-01 00:00:00'AND  '2014-01-31 00:00:00', 1, NULL ) ) AS 1month,
+COUNT( IF( sub_date BETWEEN  '2014-02-01 00:00:00'AND  '2014-02-29 00:00:00', 1, NULL ) ) AS 2month,
+COUNT( IF( sub_date BETWEEN  '2014-03-01 00:00:00'AND  '2014-03-31 00:00:00', 1, NULL ) ) AS 3month,
+COUNT( IF( sub_date BETWEEN  '2014-04-01 00:00:00'AND  '2014-04-30 00:00:00', 1, NULL ) ) AS 4month,
+COUNT( IF( sub_date BETWEEN  '2014-05-01 00:00:00'AND  '2014-05-31 00:00:00', 1, NULL ) ) AS 5month,
+COUNT( IF( sub_date BETWEEN  '2014-06-01 00:00:00'AND  '2014-06-30 00:00:00', 1, NULL ) ) AS 6month,
+COUNT( IF( sub_date BETWEEN  '2014-07-01 00:00:00'AND  '2014-07-31 00:00:00', 1, NULL ) ) AS 7month,
+COUNT( IF( sub_date BETWEEN  '2014-08-01 00:00:00'AND  '2014-08-31 00:00:00', 1, NULL ) ) AS 8month,
+COUNT( IF( sub_date BETWEEN  '2014-09-01 00:00:00'AND  '2014-09-30 00:00:00', 1, NULL ) ) AS 9month,
+COUNT( IF( sub_date BETWEEN  '2014-10-01 00:00:00'AND  '2014-10-31 00:00:00', 1, NULL ) ) AS 10month,
+COUNT( IF( sub_date BETWEEN  '2014-11-01 00:00:00'AND  '2014-11-30 00:00:00', 1, NULL ) ) AS 11month,
+COUNT( IF( sub_date BETWEEN  '2014-12-01 00:00:00'AND  '2014-12-31 00:00:00', 1, NULL ) ) AS 12month
+FROM tag_essay
+WHERE sub_date
+BETWEEN  '2013-01-01 00:00:00'
+AND now()
+AND essay_id !=0
+and submit = 1
+group by year desc
+
+<!-- project view -->
+
+<div class="container" style="margin-top:-15px;">   
+  <div class="row">    
+      <ol class="breadcrumb" style="background:white;">
+        <li><a href="/">Home</a></li>
+        <li class="akacolor">Project</li>   
+      </ol>            
+      <h3 style="margin-left:13px;">Muse Project List
+        <?      
+        if($cate == 'admin'){
+          if(count($all_usr) == 0){
+        ?>
+          <a class="btn btn-default btn-sm pull-right" href="/musedata/project/new_pj" id="new_pj" role="button" style="border-color:#6799FF; color:#6799FF; margin-right:15px;" disabled><span class="glyphicon glyphicon-plus"></span> New Project</a>    
+        <?
+          }else{
+        ?>
+          <a class="btn btn-default btn-sm pull-right" href="/musedata/project/new_pj" id="new_pj" role="button" style="border-color:#6799FF; color:#6799FF; margin-right:15px;"><span class="glyphicon glyphicon-plus"></span> New Project</a>
+        <?
+          }
+        }
+        ?>       
+      </h3>  
+  </div>  <!-- Nav or Head title End -->
+  <br>    
+
+  <div class="row">
+    <?    
+      foreach ($pjlist as $rows) {
+      $id = $rows->pj_id; // project id
+      $name = $rows->name;
+      $disc = $rows->disc;
+      $date = substr($rows->add_date,0,16);
+      $disc_length = strlen($disc);      
+      $total_count = $rows->total_count;
+    ?>
+    
+    <div class="col-lg-3" style="margin-bottom:20px;">      
+      <div class="col-lg-12 line">      
+        <h4 style="margin-top:15px;"><?=$name?>
+          
+          <!-- Button trigger modal -->
+          <?
+          if($cate == 'admin'){
+          ?>
+          <button class="btn btn-default btn-xs pull-right" id="pj_del" data-toggle="modal" data-target="#del<?=$id;?>" style="border-color:#BDBDBD; color:#BDBDBD;">
+            <span class="glyphicon glyphicon-trash"></span> 
+          </button> 
+          <!-- Modal -->
+          <div class="modal fade" id="del<?=$id;?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                  <h5 class="modal-title" id="myModalLabel" style="color:black;">Delete</h5>
+                </div>
+                <div class="modal-body">              
+                    <p style="color:black; font-size:15px;"><b><?=$name?></b>&nbsp; Are you sure?</p>              
+                    <p style="color:red; font-size:14px;">When a project is deleted, all the data in the project will also be deleted!</p>             
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                  <button type="button" class="btn btn-primary" id="del_pj" pjid="<?=$id;?>" >Yes</button>
+                </div>
+              </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+          </div><!-- /.modal -->
+          <? } ?>
+        </h4>
+        
+        <?
+        if($disc_length > 115){
+        ?>
+        <p style="height:80px; word-wrap: break-word; width: 230px;"><span><?=substr($disc,0,120).'...'?></span></p>
+        <?
+        }else{
+        ?>        
+        <p style="height:80px; word-wrap: break-word; width: 230px;" class="line"><?=$disc?></p>        
+        <?
+        }
+        ?>  
+
+        <br>
+        <p><span>Total : </span><span class="pull-right"><?=$total_count;?></span></p>     
+        <p style="margin-top:-10px;"><span>Date : </span><span class="pull-right"><?=$date;?></span></p>     
+          <?
+          if($cate == 'admin'){ //admin
+          ?>
+          <!-- <a class="btn btn-danger btn-sm" href="/project/distribute/<?=$id;?>" role="button">Distribute &raquo;</a> -->
+          <a href="/musedata/project/import/<?=$id;?>" role="button">
+              <div class="col-lg-12 line text-center" style="margin-bottom:1px;">Import</div>
+          </a>                
+          <a href="/musedata/project/export/<?=$id;?>" role="button">
+              <div class="col-lg-12 line text-danger text-center" style="margin-bottom:1px;">Export</div>
+          </a>                
+          <a href="/musedata/project/members/<?=$id;?>" role="button">
+              <div class="col-lg-12 line text-success text-center" style="margin-bottom:1px;">Members</div>
+          </a>                
+          <a href="/musedata/project/stats/<?=$id;?>" role="button">
+              <div class="col-lg-12 line text-center" style="margin-bottom:1px;">Stats</div>
+          </a> 
+          <!-- <a class="btn btn-default btn-sm pull-right" href="/project/status/<?=$id;?>" role="button">Status &raquo;</a> -->
+          <?
+          }else{ // editor
+          ?>
+            <a href="/musedata/project/board/todo/<?=$id;?>/<?=$this->session->userdata('id');?>" role="button">
+              <div class="col-lg-12 line text-danger" style="margin-bottom:1px;">To do</div>
+            </a>                
+          
+            <a href="/musedata/project/board/com/<?=$id;?>/<?=$this->session->userdata('id');?>" role="button">
+              <div class="col-lg-12 line text-success" style="margin-bottom:1px;">Completed</div>
+            </a>        
+          
+          <?
+          if($cate == 'editor'){
+          ?>
+            <a href="/musedata/project/board/tbd/<?=$id;?>/<?=$this->session->userdata('id');?>" role="button" style="width:78px; height:30px;">
+              <div class="col-lg-12 line text-warning" style="margin-bottom:1px;">T.B.D <!-- <span class="badge pull-right"><?=$tbd;?></span> --></div>
+            </a>
+          <?
+          }else if($tbd == 0 && $cate == 'editor'){
+          ?>
+            <a href="/musedata/project/board/tbd/<?=$id;?>/<?=$this->session->userdata('id');?>" role="button" style="width:78px; height:30px;">
+              <div class="col-lg-12 line text-warning" style="margin-bottom:1px;">T.B.D <span class="badge pull-right">00</span></div>
+            </a>
+          <?
+          }
+          ?>
+          <a href="/musedata/project/board/history/<?=$id;?>/<?=$this->session->userdata('id');?>" role="button">
+            <div class="col-lg-12 line" style="margin-bottom:1px;">History</div>
+          </a>
+          <?
+          }
+          ?>        
+        <br>
+      </div> <!--div col-12 -->
+    </div> <!--div col-3 -->
+    <?
+    }
+    ?>        
+  </div> <!-- row -->  
+
+</div>
+<script type="text/javascript">
+$("button#pj_del").mouseover(function(){
+  $(this).css("border-color","red");
+  $(this).css("color","red");
+  $(this).css("background","white");
+});
+
+$("button#pj_del").mouseout(function(){
+  $(this).css("border-color","#BDBDBD");
+  $(this).css("color","#BDBDBD");
+  $(this).css("background","white");
+});
+
+$("a#new_pj").mouseover(function(){
+  $(this).css("border-color","red");
+  $(this).css("color","red");
+  $(this).css("background","white");
+});
+
+$("a#new_pj").mouseout(function(){
+  $(this).css("border-color","#6799FF");
+  $(this).css("color","#6799FF");
+  $(this).css("background","white");
+});
+
+$("button#del_pj").click(function(){
+  var pjid = $(this).attr("pjid");
+  console.log(pjid);
+  $.ajax({
+        type: "POST",
+        url: '/musedata/project/del_project',
+        data: { pj_id : pjid },
+        dataType: 'json',
+        success: function(json) {
+          console.log(json['result']);              
+          
+            if(json['result']) {
+              //alert('Project has been deleted!');
+              location.reload();
+            }
+            else
+            {
+              alert(json['result']);  
+              
+            }                            
+        }
+    }); 
+});
+
+</script>

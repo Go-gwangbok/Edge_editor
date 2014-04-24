@@ -1,0 +1,178 @@
+diary,::,EV,::,TR,::,SR,::,CO,::,Comment,//
+"1&Hello everyone.
+<EV>I want to tell you about last night.</EV>
+I could not sleep untill 2 o'clock.
+I do not know the reason but I need to wake up at seven o'clock.
+<TR>Finally</TR> I drank water then I fell into a deep sleep.
+It was 2:00 so I am very tired.
+<TR>But</TR> <SR>I can do my homework.</SR>
+<CO>The end.<CO>",::,3,::,4,::,2,::,3,::,Diary doesn't contain many details describing event or writer's feelings.,//
+"2&Hello
+<EV>I have a good news.
+What is it?
+My mother is better <TR>but</TR> I also have a bad news.
+What is it? Now my dad is sick.<EV> 
+<SR>I do not want hime to be sick. Why? I love him
+and if he is sick, how can we go to places?
+And I have to stay at my aunt's house again. Now he is at the 
+hospital. Please help me to pray for him to God.</SR>",::,2,::,3,::,4,::,4,::,Solid entry. Writer's feelings and event are clear. Entry could use more details.,//
+"3&Hello everyone, <EV>today I have some bad news. 
+What is it? My mom is sick.</EV>
+She has a fever and said she is sick.
+<SR><TR>But</TR> I wish she would not be sick but 
+I know the reason. 
+It is because today she did not wear warm clothes
+when she went out.
+Please, Mom, get well.
+Mom, I love you.</SR> 
+<CO>The end.</CO>",::,4,::,3,::,4,::,4,::,Event and feelings are clear. Details adequately describe the event.,//
+"4&Hi everyone, <EV>on Friday it is my friend's birthday.</EV>
+<SR>She is my best friend. 
+We play every night together, most of the time at her house.
+<TR>But</TR> actually it is not her birthday on Friday,
+it is on Sunday. <TR>But</TR> it is the weekend so we are celebrating 
+her birthday on Friday.
+And it will be so fun and my birthday is on March 3.
+And I am going to go to school in March. 
+I wish March would come soon.</SR>",::,2,::,2,::,2,::,2,::,Entry skips around a lot. Doesn't reflect much about any particular event.,//
+"5&Hi everyone, I have sad news. 
+Do you know what? <EV>My beloved fish died.</EV> <SR>I am very sad.
+And I do not know why. If you take care of some fish and 
+know about fish then teach me how.
+So I can take care of fish well.
+Please, <TR>but</TR> if you do not know it does not matter. <TR>But</TR> two fish have died and
+and I prayed to God and I think God really helped me because now 
+they are a little bit better and <TR>but</TR> you should have good luck. 
+I will pray for them.</SR>
+<CO>The end.</CO> 
+
+",::,4,::,2,::,3,::,4,::,"Writers feelings are clear, but the coherence fades towards the end of the entry.",//
+"6&Hi everyone, <EV>today my fish laid eggs</EV> and 
+<SR>they were cute and I did not know exactly
+how many baby fish there were, because they looked same
+and I do not know who laid them.
+<TR>But I wnat to know.
+Do you like fish?
+I want to buy more fish. 
+<TR>But</TR> my mother told me that fish die easily.
+I am worried.</SR>
+<CO>The end. </CO>
+
+",::,3,::,3,::,2,::,2,::,Writer is clearly excited about the event but cuts the description short. The reader is left wanting to know more about what happened.,//
+"7&Hello, everyone. 
+<EV>On Christmas I got a gift.
+Do you know what I received from Santa?
+It was an aquarium and guess what today is.</EV>
+We are going to buy fish.
+My mother allowed me to.
+Because Santa gave me an aquarium.
+<SR>I think it is expensive so that is the reason.
+I am so happy.
+And right now we will go to see the fish.</SR>
+<CO>Bye</CO>",::,4,::,3,::,4,::,4,::,Entry lacks details that would bring the event to life in the reader's mind.,//
+"8&Hi, today, <EV>I got a dog eraser.</EV>
+<SR>It was pretty. I like it so after writing my diary
+I will play with the dog eraser. And I got it from somewhere. 
+Because I got a lot of stickers from block class. 
+I want to play with it right now. 
+<TR>But</TR> I have to do my homework, and I have to read books,
+so when I am finished I will play.
+I am so happy to have it.</SR> 
+<CO>Good-bye.</CO> 
+
+",::,4,::,2,::,2,::,2,::,Event is clear and so are the writer's emotions. Details are a little unclear.,//
+"9&Hello everyone. <EV>Today, I got a new notebook.</EV> And I think 
+it is my 14th notebook.
+<SR>I like this notebook. 
+Because it has Hello Kitty on it. I love Hello Kitty.
+It is cute and it is also new so it is clean and I can 
+draw Hello Kitty very well.
+Please do not become dirty, my notebook, or I will
+hate you even though I will write on you.
+When I go to school 
+I will ask mom to buy me a Hello Kitty bag.
+How about you?</SR>",::,4,::,2,::,4,::,3,::,Entry is original and the writer's feelings are clear. Emotion is relevant and captured.,//
+"10&Hi, <EV>today my mother was taking care my aunt's baby
+and he began to cry.</EV> <SR>And one time,
+he wanted a piggy back ride. But my mom did not understand
+so she kept holding him. 
+<TR>But</TR> my mom realized that he wanted a piggy back ride. 
+And another time he wanted mother's milk.
+My mother doesn't have mother's milk and my mother said to me,
+&quotHey Hojoon is sleepy, and I guess not.&quot
+<TR>But</TR> to me he looked like a little bit sleepy.</SR>
+<CO>The end.</CO>",::,4,::,2,::,1,::,2,::,This entry is kind of a mess and not very organized. There is no self-reflection describing the writer's feelings.,//
+"11&<EV>On Sunday after church I was surprised. 
+I wanted to go home, but I was at the toy land.</EV>
+<SR>I hoped that it was somewhere fun and I realized it was not too fun. There was nothing to do.
+<TR>But</TR> I rode two wheels, and there was one baby.
+And there was nothing to buy.
+I bought Christmas cards and I sent them and tomorrow my grandmother will receive it.
+Merry Christmas everyone.</SR>
+<CO>The end.</CO>",::,2,::,2,::,2,::,3,::,Not a clear description of what and where action is taking place.,//
+"12&<EV>My friend Gin Young came to my home and I can meet her
+on Tuesday at her house at two o'clock.</EV>
+<SR>We studied with my teacher.
+In fact she is eight and I am seven years old.
+I was clever so I could go to school. 
+<TR>But</TR> I am not used to calling her &quotolder sister.&quot Because I did not call
+her &quotolder sister&quot <TR>but</TR> I will try to call her &quotolder sister.&quot
+<CO>The end.</CO> 
+
+",::,2,::,2,::,2,::,2,::,"Not sure what the main topic of this entry is, but the writer expresses honest feelings about a relevant topic.",//
+"13&<EV>I was invited by my friend at 7 o'clock.</EV>
+I'm going to go to my friend's house today.
+Hyomin and Seoyeon will go there too.
+<SR>They are also my friends and I will have fun at my friend's house.
+It's not so far.
+How lucky I am to be invited, I'm so happy.
+Now I'm going to go right now.
+Hurry!
+If you want to join me, then come and join, OK?</SR>
+<CO>Bye Little Fox.</CO>",::,4,::,3,::,4,::,4,::,Writer's feelings and event are clear. More details and description would be nice,//
+"14&<EV>Hello, as you know I study with a Canadian teacher every Monday,
+Wednesday, and Friday.
+<TR>But</TR> on Wednesday I need to play with my friend at 11:00.
+Maybe I willchange the class to today.</EV> 
+<TR>But</TR> my teacher had a stomachache so she was late today.
+So a teacher whose name is Sally just told me. 
+I studied with her for the second time.
+<SR>I have seen her and I had fun.</SR>
+<CO>The end.</CO>",::,3,::,3,::,2,::,2,::,Entry is loosely thrown together. Very freely written. There isn't a clear event and self-reflection is absent.,//
+"15&<EV>Hello, I like Friday because I just like to go to taekwondo.</EV>
+Do you know my point? <SR>When I win the game 
+I can get points. <TR>But</TR> I need to get 1800 points.
+Because I can use them later. 
+<TR>Next</TR>, I can watch Little Fox on Friday <TR>but</TR> only in the morning. 
+I can watch it for only one hour. I am sad. 
+<TR>But</TR> I can play at night.
+So if I want to see it I have to wake up early.</SR>",::,2,::,3,::,3,::,2,::,Entry is scattered and lacking in detail.,//
+"16&Hello! <SR>March is my favorite month because
+I am going to go to school and also it is the most important
+day in March. 
+It is my birthday. 
+I have waited for years because I want to go to school.
+I like studying and I am going to invite my friends. 
+Their names are Jue hi, Ha Min, Sepyeon, and Hong en.
+I will invite them all on my birthday. 
+I will have fun. How about you?
+Who are you going to invite? </SR>",::,2,::,4,::,2,::,4,::,Entry is unclear in the beginning. More details and self-reflection would strengthen this entry.,//
+"17&<EV>There were three skinny goats.
+They wanted to eat grass and then they needed to cross a bridge.<EV>
+<TR>But</TR> there was a witch at the bridge.
+The first goat walked across the bridge.
+The witch saw it and said, &quotI'm going to kill you.&quot
+The first goat said, &quotPlease spare my life, a bigger goat is going to come.&quot
+&quotOkay, then you may go now.&quot
+The second goat tried to cross the bridge and the witch let him go too.
+And then the third goat tried and they began to fight.
+<CO>And the goat won.</CO>",::,4,::,3,::,1,::,3,::,Creative entry but the joke seems incomplete. More details and self-reflection would be welcome.,//
+"18&<EV>On Saturday, I'm going to see my aunt and a dog.</EV>
+<SR>I like it. He is cute. 
+The dog's name is Gamdori because it is black.
+I like him very much.
+Since he saw me before, he can remember me.
+And also there is an older girl. She is 17 years old.
+I like her, but the dog likes her more.
+I wish I had a dog.
+My mom will buy me one later.</SR>",::,4,::,3,::,4,::,3,::,Entry reflects clear emotion and describes anticipated event well.,//

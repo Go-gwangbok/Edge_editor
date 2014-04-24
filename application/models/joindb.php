@@ -6,6 +6,17 @@ class JoinDb extends CI_Model{
 		return $this->db->query($query)->row();	
 	}
 
+	function get_cate($usr_id){
+   		return $this->db->query("SELECT task.* 
+   									FROM connect_usr_task
+   									LEFT JOIN task ON task.id = connect_usr_task.task_id
+   									LEFT JOIN usr ON usr.id = connect_usr_task.usr_id
+   									WHERE connect_usr_task.usr_id = '$usr_id'
+   									AND connect_usr_task.active = 0
+   									GROUP BY task.type")->result();
+
+   	}
+
 	function sign_up($name,$email,$pass){		
 		$conf = $this->db->query("SELECT * FROM usr WHERE email = '$email'");
 		if($conf->num_rows() > 0){
@@ -14,42 +25,17 @@ class JoinDb extends CI_Model{
 			$query = $this->db->query("INSERT INTO usr(name,email,pass,classify,conf,date) VALUES('$name','$email','$pass','1','1',now())");
 				
 			if($query){
-				return 'true';			
-				// $usr_insert_id = $this->db->insert_id();	
-
-				// $tag_essay_query = $this->db->query("INSERT INTO tag_essay(usr_id,essay_id,draft,submit,type,active,sub_date) VALUES('$usr_insert_id',0,0,0,'join',0,now())");
-				
-				// if($tag_essay_query){
-				// 	//return 'true';
-				// 	$ins_count = $this->db->query("INSERT INTO cou(usr_id,update_count) VALUES('$usr_insert_id',0)");			
-					
-				// 	if($ins_count){
-				// 		return 'true';			
-				// 	}else{
-				// 		return 'false';	
-				// 	}							
-				// }else{
-				// 	return 'false';
-				// }			
+				return 'true';										
 			}else{
 				return 'false';	
 			}
 		}
 	}
-
-
+	
 	function sign_up_ins($name,$email,$pass,$ins,$code){
 		// code 추가 컬럼을 만들고 inser해줘야 한다!
 		$query = "INSERT INTO usr(name,email,pass,is_ins) VALUES('$name','$email','$pass','$ins')";
 		$this->db->query($query);		
 	}
-				
-
-	// function id_check($cls_name,$ins_id){
-	// 	$query = "SELECT cls_id,cls.name FROM ins_doc 
-	// 				JOIN cls ON ins_doc.cls_id = cls.id
-	// 				WHERE ins_id = '$ins_id' AND cls.name = '$cls_name'";
-	// 	return $this->db->query($query)->result();
-	// }
 }
 ?>

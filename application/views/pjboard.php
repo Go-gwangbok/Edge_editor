@@ -1,26 +1,18 @@
 <div class="container" style="margin-top:-15px;">		
 	<div class="row">		
 		<ol class="breadcrumb" style="background:white;">
-	       	<li><a href="/">Home</a></li>	       	
-	       	<?
-				if($this->session->userdata('classify') == 0) { //Admin
-			?>
-		       	<li><a href="/project/">Project</a></li>   
-	    	   	<li><a href="/project/status/<?=$pj_id;?>"><?=$pjName;?></a></li>   
-	       	<? }else{  // Editor ?> 
-	       		<li><a href="/musedata/project/">Project</a></li>   
-	       		<li class="akacolor"><?=$pjName;?></li>   	       		       	
-	       	<? } ?>
+	       	<li><a href="/">Home</a></li>	       		       	
+       		<li><a href="/musedata/project/">Project</a></li>   
+       		<li class="akacolor"><?=$pjName;?></li> 
 	    </ol> <!-- Navi end -->
-	</div>		
-	
-	<h4 class="text-center"><?=$pjName;?></h4>	
+	</div>	
+	<h3 class="text-center"><?=$pjName;?></h3>	
+	<br>
 	<ul class="nav nav-tabs" id="pjboard">
 	  <li class="tab_action" id="tab_todo"><a href="#todo" data-toggle="tab">To do</a></li>
 	  <li class="tab_action" id="tab_com"><a href="#com" data-toggle="tab">Completed</a></li>
 	  <li class="tab_action" id="tab_tbd"><a href="#tbd" data-toggle="tab">T.B.D</a></li>
 	  <li class="tab_action" id="tab_history"><a href="#history" data-toggle="tab">History</a></li>
-	  
 	</ul>
 
 	<div class="tab-content">
@@ -41,33 +33,10 @@
 	<table class="table table-hover">					
 	  	<thead>
 			<tr>
-				<?
-				if($cate == 'share'){
-				?>
-					<th class="text-center"><span></span><label class="checkbox"><input type="checkbox" id="checkAll">No.</label></th>
-				<?
-				}else{
-				?>
-					<th class="text-center">No.</th>
-				<?
-				}
-				?>				
-				<th class="text-center">
-					<?
-					if($cate == 'share'){
-					?>
-						<!-- Button trigger modal -->
-						<button class="btn btn-primary pull-left" id="dis_btn" data-toggle="modal" data-target="#myModal" disabled>
-						  Share
-						</button> 
-					<?
-					}
-					?>					
-					Prompt
-				</th>				
+				<th class="text-center">No.</th>
+				<th class="text-center">Prompt</th>				
 				<th class="text-center">Type</th>				
 				<th class="text-center">Date</th>				
-				<th class="text-center">Task</th>				
 				<th class="text-center">Timer</th>				
 				<th class="text-center">Status</th>			
 			</tr>
@@ -78,51 +47,7 @@
 	</table>	
 	<div class="text-center" id="pageblock">
 		<!-- ajax list -->
-	</div>	
-
-	<!-- Modal -->
-	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-	  <div class="modal-dialog">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-	        <h4 class="modal-title" id="myModalLabel" style="color:black;">Share</h4>
-	      </div>
-	      <div class="modal-body" id="dismodal">
-	        <dl>						                	
-            	<dt></dt>
-			  	<dd style="color:black;"><strong>Please select an editor!</strong></dd>					  	
-			  	<?
-			  	foreach ($add_users as $rows) {
-			  		$usr_id = $rows->id;
-			  		$name = $rows->name;
-			  	?>
-			  	<label class="checkbox" style="color:black;">
-					  <input type="checkbox" id="sel_mem" class="other" value = "<?=$usr_id;?>" conf="true"><?=$name;?>			  	
-			  	</label>    					
-			  	<?
-			  	}
-			  	?>
-			 </dl>
-	      </div>
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default" id="cancel" data-dismiss="modal">Cancel</button>
-	        <button type="button" class="btn btn-primary" id="share" disabled>Share</button>
-	      </div>
-	    </div><!-- /.modal-content -->
-	  </div><!-- /.modal-dialog -->
-	</div><!-- /.modal -->
-
-	<!-- Loading Modal -->
-	<div id="modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-		<br><br><br>
-		<br>
-	  	<div class="modal-body">
-	    	<center><img src="/public/img/loading.gif"/></center>
-	  	</div>	  
-	</div>
-	<!-- Loading Modal End -->
-
+	</div>		
 </div>
 <script>
 var page = '<?=$page;?>';
@@ -150,7 +75,7 @@ function pad(number, length) {
 
 function ajaxPost(url,data){
 	$.post(url,data,function(json) {				
-		//console.log(json['total_count']);
+		console.log(json['list']);
 		page = json['page'];
 
 		$('tbody#list').children().remove();
@@ -158,119 +83,70 @@ function ajaxPost(url,data){
 		var num = (list * page) - (list-1);
 		total_count = json['total_count'];
 		$('li#count').remove();
-		$('ul#pjboard').last().append('<li class="pull-right" id="count"><button class="btn btn-default disabled" style="border-color:#f15e22;">Count : '+total_count+'</button></li>');
-		//$('li#tab_history').next().append('<p>');
+		$('ul#pjboard').last().append('<li class="pull-right" id="count"><button class="btn btn-default disabled" style="border-color:#f15e22;">Count : '+total_count+'</button></li>');		
 
-		if(cate == 'share'){
-			for(var i = 0; i < json['list'].length; i++) {
-				var essay_id = data_list[i]['essay_id'];
-				var task = data_list[i]['type'];
-				var timer = formatTime(data_list[i]['time']);			
+		// todo,com,tbd,history
+		for(var i = 0; i < json['list'].length; i++) {
+			var essay_id = data_list[i]['essay_id'];
+			var task = data_list[i]['type'];
+			var timer = formatTime(data_list[i]['time']);			
+			var prompt = data_list[i]['prompt'];
+			var raw_txt = data_list[i]['raw_txt'];
+			var kind_name = data_list[i]['kind_name'];
 
-				if(data_list[i]['draft'] == 0 || data_list[i]['draft'] == 1 ){
-					var date = data_list[i]['start_date'];				
-				}else if(data_list[i]['draft'] == 1 && data_list[i]['submit'] == 1){
-					var date = data_list[i]['sub_date'];
-				}
-				
-				$('tbody#list').append('<tr id='+i+'><td><label class="checkbox"><input class="box" type="checkbox" value="'+data_list[i]['essay_id']+'">'+num+'</label></td><td>'																				 
-					+data_list[i]['prompt'].replace(/"/gi,'')+'</td><td>'
-					+data_list[i]['kind']+'</td><td>'
-					+date+'</td><td>'
-					+data_list[i]['type']+'</td><td>'
-					+timer+'</td>');
-
-				if(data_list[i]['draft'] == 0){ // new
-					if(json['classify'] == 1){
-						$('tbody#list tr#'+i).append('<td><a href="/text/todo/'+essay_id+'/'+task+'" class="no-uline"><button type="button" class="btn btn-default btn-sm">&nbsp;&nbsp;Revise&nbsp;&nbsp;</button></a></td></tr>');
-					}else{
-						$('tbody#list tr#'+i).append('<td><a href="#" class="no-uline"><button type="button" class="btn btn-default btn-sm" disabled>&nbsp;&nbsp;Revise&nbsp;&nbsp;</button></a></td></tr>');
-					}					
-				}else if(data_list[i]['draft'] == 1 && data_list[i]['submit'] == 0){ //draft
-					if(json['classify'] == 1){
-						$('tbody#list tr#'+i).last().append('<td><a href="/text/draft/'+essay_id+'/'+task+'" class="no-uline"><button type="button" class="btn btn-primary btn-sm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Edit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button></a></td>');
-					}else{
-						$('tbody#list tr#'+i).last().append('<td><a href="/text/admin_eachdone/'+editor_id+'/'+essay_id+'/'+task+'" class="no-uline"><button type="button" class="btn btn-primary btn-sm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Edit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button></a></td>');
-					}					
-				}else if(data_list[i]['submit'] == 1){ //submit
-					if(json['classify'] == 1){
-						$('tbody#list tr#'+i).last().append('<td><a href="/text/edit/'+essay_id+'/'+task+'" class="no-uline"><button type="button" class="btn btn-success btn-sm">Completed</button></a></td>');
-					}else{
-						$('tbody#list tr#'+i).last().append('<td><a href="/text/admin_eachdone/'+editor_id+'/'+essay_id+'/'+task+'" class="no-uline"><button type="button" class="btn btn-success btn-sm">Completed</button></a></td>');	
-					}					
-				}
-				num++;
+			if($.isNumeric(prompt)){
+				prompt = prompt+raw_txt.substr(0,120);
 			}
-		}else{ // todo,com,tbd,history
-			for(var i = 0; i < json['list'].length; i++) {
-				var essay_id = data_list[i]['essay_id'];
-				var task = data_list[i]['type'];
-				var timer = formatTime(data_list[i]['time']);			
 
-				if(data_list[i]['draft'] == 0 || data_list[i]['draft'] == 1 ){
-					var date = data_list[i]['start_date'];				
-				}else if(data_list[i]['draft'] == 1 && data_list[i]['submit'] == 1){
-					var date = data_list[i]['sub_date'];
-				}
-
-				if(data_list[i]['draft'] == 0 && data_list[i]['discuss'] == 'Y'){ // new
-					if(json['classify'] == 1){ // Editor
-						var href = '/text_editor/todo/';
-						var color = 'red';
-						var status = 'New';
-					}else{ // Admin
-						var href = '/text_editor/todo/';
-						var color = 'red';
-						var status = 'New';
-					}					
-				}else if(data_list[i]['draft'] == 1 && data_list[i]['submit'] == 0 && data_list[i]['discuss'] == 'Y'){ //draft
-					if(json['classify'] == 1){ // Editor
-						//$('tbody#list tr#'+i).last().append('<td><a href="/text/draft/'+essay_id+'/'+task+'" class="no-uline"><button type="button" class="btn btn-primary btn-sm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Edit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button></a></td>');
-						var href = '/text_editor/draft/';
-						var color = '#0100FF';
-						var status = 'Edit';
-					}else{ // Admin
-						//$('tbody#list tr#'+i).last().append('<td><a href="/text/admin_eachdone/'+editor_id+'/'+essay_id+'/'+task+'" class="no-uline"><button type="button" class="btn btn-primary btn-sm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Edit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button></a></td>');
-						var href = '/text_editor/admin_eachdone/';
-						var color = '#0100FF';
-						var status = 'Edit';
-					}					
-				}else if(data_list[i]['submit'] == 1){ //submit
-					if(json['classify'] == 1){ // Editor
-						//$('tbody#list tr#'+i).last().append('<td><a href="/text/edit/'+essay_id+'/'+task+'" class="no-uline"><button type="button" class="btn btn-success btn-sm">Completed</button></a></td>');
-						var href = '/text_editor/completed/';
-						var color = '#1DDB16';
-						var status = 'Completed';
-					}else{ // Admin
-						//$('tbody#list tr#'+i).last().append('<td><a href="/text/admin_eachdone/'+editor_id+'/'+essay_id+'/'+task+'" class="no-uline"><button type="button" class="btn btn-success btn-sm">Completed</button></a></td>');	
-						var href = '/text_editor/admin_eachdone/';
-						var color = '#1DDB16';
-						var status = 'Completed';
-					}					
-				}else if(data_list[i]['discuss'] == 'N'){ // T.B.D
-					if(json['classify'] == 1){ // Editor
-						//$('tbody#list tr#'+i).last().append('<td><a href="/text/edit/'+essay_id+'/'+task+'" class="no-uline"><button type="button" class="btn btn-success btn-sm">Completed</button></a></td>');
-						var href = '/text_editor/tbd/';
-						var color = '#FFBB00';
-						var status = 'T.B.D';
-					}else{ // Admin
-						//$('tbody#list tr#'+i).last().append('<td><a href="/text/admin_eachdone/'+editor_id+'/'+essay_id+'/'+task+'" class="no-uline"><button type="button" class="btn btn-success btn-sm">Completed</button></a></td>');	
-						var href = '/text_editor/admin_eachdone/';
-						var color = '#FFBB00';
-						var status = 'T.B.D';
-					}					
-				}
-				
-				$('tbody#list').append('<tr id='+i+' class="clickableRow" href="'+href+essay_id+'/'+task+'/'+pj_id+'"><td class="text-center">'+num+'</td><td>'
-					+data_list[i]['prompt'].replace(/"/gi,'')+'</td><td class="text-center">'
-					+data_list[i]['kind']+'</td><td style="width:90px;">'
-					+date+'</td><td class="text-center">'
-					+data_list[i]['type']+'</td><td class="text-center">'
-					+timer+'<td class="text-center"><h5><font color="'+color+'">'+status+'</font></h5></td></tr>');				
-				num++;
+			if(data_list[i]['draft'] == 0 || data_list[i]['draft'] == 1 ){
+				var date = data_list[i]['start_date'];				
+			}else if(data_list[i]['draft'] == 1 && data_list[i]['submit'] == 1){
+				var date = data_list[i]['sub_date'];
 			}
+
+			if(data_list[i]['draft'] == 0 && data_list[i]['discuss'] == 'Y'){ // new
+				if(json['classify'] == 1){ // Editor
+					var href = '/text_editor/todo/';
+					var color = 'red';
+					var status = 'New';
+				}else{ // Admin
+					var href = '/text_editor/todo/';
+					var color = 'red';
+					var status = 'New';
+				}					
+			}else if(data_list[i]['draft'] == 1 && data_list[i]['submit'] == 0 && data_list[i]['discuss'] == 'Y'){ //draft
+				if(json['classify'] == 1){ // Editor					
+					var href = '/text_editor/draft/';					
+					var status = '<button class="btn btn-primary btn-sm">&nbsp;&nbsp;&nbsp;&nbsp;Edit&nbsp;&nbsp;&nbsp;&nbsp;</button>';
+				}else{ // Admin					
+					var href = '/text_editor/admin_eachdone/';					
+					var status = '<button class="btn btn-primary btn-sm">&nbsp;&nbsp;&nbsp;&nbsp;Edit&nbsp;&nbsp;&nbsp;&nbsp;</button>';
+				}					
+			}else if(data_list[i]['submit'] == 1){ //submit
+				if(json['classify'] == 1){ // Editor					
+					var href = '/text_editor/completed/';					
+					var status = '<button class="btn btn-success btn-sm">Completed</button>';
+				}else{ // Admin					
+					var href = '/text_editor/admin_eachdone/';					
+					var status = '<button class="btn btn-success btn-sm">Completed</button>';
+				}					
+			}else if(data_list[i]['discuss'] == 'N'){ // T.B.D
+				if(json['classify'] == 1){ // Editor					
+					var href = '/text_editor/tbd/';					
+					var status = '<button class="btn btn-warning btn-sm">&nbsp;&nbsp;&nbsp;T.B.D&nbsp;&nbsp;&nbsp;</button>';
+				}else{ // Admin					
+					var href = '/text_editor/admin_eachdone/';					
+					var status = '<button class="btn btn-warning btn-sm">&nbsp;&nbsp;&nbsp;T.B.D&nbsp;&nbsp;&nbsp;</button>';
+				}					
+			}
+						
+			$('tbody#list').append('<tr id='+i+' style="cursor:pointer;" class="clickableRow" href="'+href+essay_id+'/'+task+'/'+pj_id+'"><td class="text-center">'+num+'</td><td>'
+				+prompt.replace(/"/gi,'')+'</td><td class="text-center">'
+				+kind_name.toUpperCase()+'</td><td style="width:90px;">'
+				+date+'</td><td class="text-center">'				
+				+timer+'<td class="text-center">'+status+'</td></tr>');				
+			num++;
 		}		
-		
 		$('div#pageblock').children().remove();
 		
 		pageBlock(page,list,total_count); // page button.
@@ -387,95 +263,5 @@ $('ul.nav').delegate('li.tab_action', 'click', function(){
 //<tbody id="list">
 $('tbody#list').delegate('tr.clickableRow', 'click', function(){		      
     window.document.location = $(this).attr("href");      
-});
-
-
-// Share
-$("#checkAll").click(function() {
-	$('input.box').not(this).prop('checked', this.checked);
-    //체크 되어 있는 값 추출
-    var checkedVals = $('.box:checkbox:checked').map(function() {
-    	return this.value;
-	}).get();
-	console.log(checkedVals);
-    
-	var isChecked = false;
-	$(':checkbox:checked').each(function(i){
-	  isChecked = true;
-	});
-
-	if(isChecked){
-		console.log('abled');
-		$('button#dis_btn').removeAttr('disabled');
-	}else{
-		console.log('disabled');
-		$('button#dis_btn').attr('disabled', 'disabled');	
-	}
-});
-
-
-$('tbody#list').delegate('input.box', 'click', function(){		
-	var isChecked = false;
-	$(':checkbox:checked').each(function(i){
-	  isChecked = true;
-	});
-
-	if(isChecked){
-		console.log('abled');
-		$('button#dis_btn').removeAttr('disabled');
-	}else{
-		console.log('disabled');
-		$('button#dis_btn').attr('disabled', 'disabled');	
-	}
-});   
-
-$('.other').change(function () {
-    var c = this.checked ? false : true;    
-});
-
-
-var maxaids = "1";    
-$(document).on('click', "input[type=checkbox]#sel_mem", function () {    	
-    var bol = $("input:checked#sel_mem").length >= maxaids;
-    $("input[type=checkbox]#sel_mem").not(":checked").attr("disabled", bol);        
-    var conf = $(this).attr('conf');
-    //console.log(conf);           
-    if(conf == 'true'){
-    	$('button#share').removeAttr('disabled');	
-    	console.log($(this).val()); 
-    	$(this).attr('conf','false');
-    }else{
-    	$('button#share').attr('disabled', 'disabled');		
-    	$(this).attr('conf','true');
-    }        
-});
-
-$('#share').click(function(){
-	var checkedVals = $('.box:checkbox:checked').map(function() {
-    	return this.value;
-	}).get();
-	console.log(checkedVals);
-	var select_mem = $('input:checkbox:checked.other').val();
-	console.log(select_mem);
-
-	var data = {
-		share_data : checkedVals.toString(),
-		select_mem : select_mem,
-		editor_id : editor_id,
-		pj_id : pj_id
-	}
-	console.log(data);
-	$('#myModal').children().remove();
-	$('<br><br><br><br><div class="modal-body"><center><img src="/public/img/loading.gif"/></center></div>').appendTo('#myModal');
-
-	$.post('/project/share',data,function(json){
-		var result = json['result'];
-		console.log(result);
-		if(result){
-			window.location.reload(); // 리다이렉트할 주소
-        }else{
-        	alert("DB -> share Error");	            	
-        }                            
-	});
 });
 </script>

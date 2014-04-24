@@ -11,12 +11,13 @@ class Index extends CI_Controller {
 
 	public function index()
 	{	
-		$data['cate'] = '';
-		$this->load->view('head',$data);
+		$usr_id = $this->session->userdata('id');
+		$head['cate'] = '';	
+		$this->load->view('head',$head);
+
 
 		$data['notice'] = $this->all_list->notice();
-		$data['recent_notice'] = $this->all_list->recent_notice();
-		$usr_id = $this->session->userdata('id');
+		$data['recent_notice'] = $this->all_list->recent_notice();		
 		$data['pj_list'] = $this->all_list->get_project($usr_id);				
 		$data['usr_list'] = $this->all_list->all_usr();
 		$this->load->view('index',$data);		

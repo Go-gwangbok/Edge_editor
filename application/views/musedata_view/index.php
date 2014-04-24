@@ -3,132 +3,114 @@
       <ol class="breadcrumb" style="background:white;">
         <li><a href="/">Home</a></li>
         <li class="akacolor">Project</li>   
-      </ol>
-      <h3 style="margin-left:13px;">Muse Project List</h3>
-      <?      
-      if($cate == 'admin'){
-        if(count($all_usr) == 0){
-      ?>
-        <a class="btn btn-default btn-sm pull-right" href="/project/new_pj" id="new_pj" role="button" style="border-color:#6799FF; color:#6799FF; margin-right:15px;" disabled><span class="glyphicon glyphicon-plus"></span> New Project</a>    
-      <?
-        }else{
-      ?>
-        <a class="btn btn-default btn-sm pull-right" href="/project/new_pj" id="new_pj" role="button" style="border-color:#6799FF; color:#6799FF; margin-right:15px;"><span class="glyphicon glyphicon-plus"></span> New Project</a>    
-      <?
-        }
-      }
-      ?>       
-  </div>  
+      </ol>            
+      <h3 style="margin-left:13px;">Muse Project List</h3>  
+  </div>  <!-- Nav or Head title End -->
   <br>    
 
-  
-  <div class="row">
-    <?    
-      foreach ($pjlist as $rows) {
-      $id = $rows->pj_id; // project id
-      $name = $rows->name;
-      $disc = $rows->disc;
-      $date = substr($rows->add_date,0,16);
-      $disc_length = strlen($disc);
-      //$tbd = $rows->tbd;       
-    ?>
-    
-    <div class="col-lg-3" style="margin-bottom:20px;">      
-      <div class="col-lg-12 line">      
-        <h4 style="margin-top:15px;"><?=$name?>
-          <!-- Button trigger modal -->
-          <?
-          if($cate == 'admin'){
-          ?>
-          <button class="btn btn-default btn-xs pull-right" id="pj_del" data-toggle="modal" data-target="#del<?=$id;?>" style="border-color:#BDBDBD; color:#BDBDBD;">
-            <span class="glyphicon glyphicon-trash"></span> 
-          </button> 
-          <? } ?>
-        </h4>
-
-        
-        <?
-        if($disc_length > 115){
-        ?>
-        <p style="height:80px; word-wrap: break-word; width: 230px;"><span><?=substr($disc,0,120).'...'?></span></p>
-        <?
-        }else{
-        ?>        
-        <p style="height:80px; word-wrap: break-word; width: 230px;"><?=$disc?></p>        
-        <?
-        }
-        ?>  
-
-        <br>
-        <p><span>Date : </span><span class="pull-right"><?=$date;?></span></p>     
-          <?
-          if($cate == 'admin'){ //admin
-          ?>
-          <!-- <a class="btn btn-danger btn-sm" href="/project/distribute/<?=$id;?>" role="button">Distribute &raquo;</a> -->
-          <a class="btn btn-default btn-sm pull-right" href="/project/status/<?=$id;?>" role="button">Status &raquo;</a>
-          <a class="btn btn-primary btn-sm" href="/project/import/<?=$id;?>" role="button">Import &raquo;</a>
-          <a class="btn btn-danger btn-sm" href="/project/export/<?=$id;?>" role="button">Export &raquo;</a>
-          <?
-          }else{ // editor
-          ?>
-            <a href="/musedata/project/board/todo/<?=$id;?>/<?=$this->session->userdata('id');?>" role="button">
-              <div class="col-lg-12 line text-danger" style="margin-bottom:1px;">To do</div>
-            </a>                
-          
-          <a href="/musedata/project/board/com/<?=$id;?>/<?=$this->session->userdata('id');?>" role="button">
-            <div class="col-lg-12 line text-success" style="margin-bottom:1px;">Completed</div>
-          </a>        
-          
-          <?
-          if($cate == 'editor'){
-          ?>
-            <a href="/musedata/project/board/tbd/<?=$id;?>/<?=$this->session->userdata('id');?>" role="button" style="width:78px; height:30px;">
-              <div class="col-lg-12 line text-warning" style="margin-bottom:1px;">T.B.D <!-- <span class="badge pull-right"><?=$tbd;?></span> --></div>
-            </a>
-          <?
-          }else if($tbd == 0 && $cate == 'editor'){
-          ?>
-            <a href="/musedata/project/board/tbd/<?=$id;?>/<?=$this->session->userdata('id');?>" role="button" style="width:78px; height:30px;">
-              <div class="col-lg-12 line text-warning" style="margin-bottom:1px;">T.B.D <span class="badge pull-right">00</span></div>
-            </a>
-          <?
-          }
-          ?>
-          <a href="/musedata/project/board/history/<?=$id;?>/<?=$this->session->userdata('id');?>" role="button">
-            <div class="col-lg-12 line" style="margin-bottom:1px;">History</div>
-          </a>
-          <?
-          }
-          ?>        
-        <br>
-      </div> <!--div col-12 -->
-    </div> <!--div col-3 -->
-    <?
-    }
-    ?>        
-  </div> <!-- row -->
-        <!-- Modal -->
-        <div class="modal fade" id="del<?=$id;?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="myModalLabel" style="color:black;">Delete</h4>
-              </div>
-              <div class="modal-body">              
-                  <p style="color:black;"><b><?=$name?></b>&nbsp; Are you sure?</p>              
-                  <p style="color:red;">When a project is deleted, all the data in the project will also be deleted!</p>             
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="del_pj" pjid="<?=$id;?>" >Yes</button>
-              </div>
-            </div><!-- /.modal-content -->
-          </div><!-- /.modal-dialog -->
-        </div><!-- /.modal -->
+  <div class="row" id="chart">    
+    <!-- ajax -->
+  </div>  
 
 </div>
-<script>
+<script src="/public/js/Chart.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  $('div#chart').css('display','none');
+  $('div').fadeIn(1300);          
+
+  var usr_id = "<?=$this->session->userdata('id');?>";
+  console.log(usr_id);
+  $.post('/musedata/project/get_project/',{usr_id:usr_id},function(json){
+    console.log(json['data']);
+    var result = json['data'];
+
+    var options = {
+      //Boolean - Whether we should show a stroke on each segment
+      segmentShowStroke : true,
+      
+      //String - The colour of each segment stroke
+      segmentStrokeColor : "#fff",
+      
+      //Number - The width of each segment stroke
+      segmentStrokeWidth : 2,
+      
+      //The percentage of the chart that we cut out of the middle.
+      percentageInnerCutout : 45,
+      
+      //Boolean - Whether we should animate the chart 
+      animation : true,
+      
+      //Number - Amount of animation steps
+      animationSteps : 100,
+      
+      //String - Animation easing effect
+      animationEasing : "easeOutBounce",
+      
+      //Boolean - Whether we animate the rotation of the Doughnut
+      animateRotate : true,
+
+      //Boolean - Whether we animate scaling the Doughnut from the centre
+      animateScale : true,
+      
+      //Function - Will fire on animation completion.
+      onAnimationComplete : null
+    }    
+
+    $.each(result,function(i,values){
+      var pj_id = values['pj_id'];
+      var pj_name = values['name'];
+      var disc = values['disc'];
+      var completed = values['completed'];
+      var total = values['total_count'];
+      
+      var tbd = values['tbd'];
+      var date = values['add_date'].substr(0,10);
+      var todo = total - tbd - completed;
+      var avg_total = total-tbd
+      var avg = completed/avg_total*100;
+      var kind_name = values['kind_name'];
+
+      if(disc.length > 115){
+        disc = disc.substr(0,115)+'...';
+      }
+      $('div#chart').append('<div class="col-lg-3" style="margin-bottom:20px;">'
+                              +'<div class="col-lg-12 line">'
+                                +'<h5 style="margin-top:10px;">'+pj_name+'</h5>'
+                                +'<h6 class="text-right">'+kind_name.toUpperCase()+'&nbsp;&nbsp;&nbsp;'+date+'</h6>'
+                              +'</div>'                              
+                              +'<div class="col-lg-12 line href" style="height:180px;" href="/musedata/project/board/todo/'+pj_id+'/'+usr_id+'">'
+                                +'<canvas  style="margin-left:28px; margin-top:5px; cursor: pointer;" id="pjc'+i+'" width="170" height="170"></canvas>'
+                                  +'<p style="margin-top:-100px; margin-left:87px; font-size:17px; cursor: pointer;">'+avg.toFixed(1)+'%</p>'
+                                +'</div>'
+                              +'<div class="col-lg-12 line service_bg" style="height:72px;">'
+                                +'<p class="font-white" style="margin-top:5px;">'+disc+'</p>'
+                              +'</div>'
+                            +'</div>');
+
+      var ctx = document.getElementById("pjc"+i).getContext("2d");
+      var data = [
+                  {
+                    value: parseInt(completed),
+                    color:"#F7464A"
+                  },
+                  {
+                    value : parseInt(todo),
+                    color : "#E2EAE9"
+                  }
+
+                ]
+      var myNewChart = new Chart(ctx).Doughnut(data,options);
+
+    }); // each end
+  }); // Post
+}); // ready
+
+$('div').delegate('div.href','click',function(){
+  var href = $(this).attr('href');
+  window.location.href = href;  
+});
+
 $("button#pj_del").mouseover(function(){
   $(this).css("border-color","red");
   $(this).css("color","red");
@@ -158,7 +140,7 @@ $("button#del_pj").click(function(){
   console.log(pjid);
   $.ajax({
         type: "POST",
-        url: '/project/del_project',
+        url: '/musedata/project/del_project',
         data: { pj_id : pjid },
         dataType: 'json',
         success: function(json) {
@@ -176,5 +158,6 @@ $("button#del_pj").click(function(){
         }
     }); 
 });
+
 
 </script>

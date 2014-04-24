@@ -148,6 +148,7 @@ class CI_Upload {
 		{
 			$this->set_error('upload_no_file_selected');
 			return FALSE;
+			
 		}
 
 		// Is the upload path valid?
@@ -188,7 +189,6 @@ class CI_Upload {
 				default :   $this->set_error('upload_no_file_selected');
 					break;
 			}
-
 			return FALSE;
 		}
 

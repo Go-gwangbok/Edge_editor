@@ -24,7 +24,7 @@
 					</tr>
 				</thead>		
 				<tbody id="list">
-					<tr id="new">
+					<tr id="new" style="cursor:pointer;">
 
 					</tr>				
 				</tbody>	
