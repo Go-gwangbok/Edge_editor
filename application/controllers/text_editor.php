@@ -247,16 +247,14 @@ class Text_editor extends CI_Controller {
    Admin	*/ 
 
    function admin_get_datas($cate,$essay_id){
-		if($cate == 'error' || $cate == 'tbd' || $cate == 'history' || $cate == 'admin_export'){
-			$rows = $this->all_list->get_one_essay($essay_id);
+		if($cate == 'error' || $cate == 'tbd' || $cate == 'history' || $cate == 'admin_export'){			
 			$data['cate'] = 'musedata';
 			$this->load->view('head',$data);
-		}elseif ($cate == 'service') {
-			$rows = $this->all_list->service_get_one_essay($essay_id);	
-			$data['cate'] = 'service';
-			$data['kind_name'] = $rows->kind_name; // ex) toefl, essay, toeic			 
+		}elseif ($cate == 'service') {			
+			$data['cate'] = 'service';			
 			$this->load->view('head',$data);			
 		}
+		$rows = $this->all_list->get_one_essay($cate,$essay_id);		
 
 		if($rows == false){
 			return false;			
@@ -264,8 +262,9 @@ class Text_editor extends CI_Controller {
 			$scoring = $rows->scoring;			
 			$score2 = $rows->score2;			
 			$kind = $rows->kind; // ex) toefl, essay, toeic
-			$type = $rows->type;			
+			$type = $rows->type;
 			$data['kind'] = $kind;
+			$data['kind_name'] = $rows->kind_name; // ex) toefl, essay, toeic			 
 
 			$data['tag_templet'] = $this->all_list->get_tag($kind);
 			$data['score_templet'] = $this->all_list->get_scores_temp($kind);		

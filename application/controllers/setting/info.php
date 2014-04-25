@@ -25,8 +25,9 @@ class Info extends CI_Controller {
 
     function getType_data_kind(){
         if($this->session->userdata('is_login')){            
-            $type = $this->input->post('type');
-            $json['data_kind'] = $this->all_list->getDataKind($type);                
+            $task = $this->input->post('task');
+            $from_table = $this->input->post('from_table');
+            $json['data_kind'] = $this->all_list->getDataKind($task,$from_table);
         }else{
             redirect('/');
         }
@@ -151,7 +152,7 @@ class Info extends CI_Controller {
         $this->output->set_content_type('application/json')->set_output(json_encode($json));           
     }
 
-    function templet($type_id,$data_kind_id,$kind){
+    function templet($type_id,$data_kind_id){
         if($this->session->userdata('is_login')){                              
             $data['cate'] = 'setting';
             $this->load->view('head',$data);           
@@ -159,7 +160,7 @@ class Info extends CI_Controller {
             $data['add_tag_data'] = $this->all_list->add_tag_data($data_kind_id);
             $data['add_score_data'] = $this->all_list->add_score_data($data_kind_id);
 
-            $data['kind'] = $kind;
+            //$data['kind'] = $kind;
             $data['kind_id'] = $data_kind_id;
             $data['type_id'] = $type_id;
             $this->load->view('/setting_view/templet',$data);     
@@ -174,6 +175,10 @@ class Info extends CI_Controller {
             $kind_id = $this->input->post('kind_id');
             $type_id = $this->input->post('type_id');
 
+            $get_kind_name = $this->all_list->getTask_kind_name($type_id,$kind_id);
+            $json['kind_name'] = $get_kind_name->kind_name;
+            $json['task_name'] = $get_kind_name->task_name;
+            
             $json['tabs'] = $this->all_list->get_setup_tabs($type_id,$kind_id);
             $json['get_setup_tag'] = $this->all_list->get_setup_tag($kind_id);            
             $json['scores'] = $this->all_list->get_setup_scores($kind_id);

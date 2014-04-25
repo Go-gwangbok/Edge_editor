@@ -118,12 +118,18 @@
 	</div>
 </div>
 <script type="text/javascript">
-$('div#set_type').click(function(){
-	//var set_type = $(this).attr('set');	
-	var set_id = $(this).attr('setid');	
+$('div#set_type').click(function(){	
+	var task_id = $(this).attr('setid');	
 	$('div#set_type').css('opacity',0.4);
 	$(this).css('opacity',1);
-	data = {type : set_id};
+
+	if(task_id == 1){ // Musedata
+		from_table = 'adjust_data';
+	}else{ // Service
+		from_table = 'service_data';
+	}
+
+	data = {task : task_id,from_table : from_table};
 	console.log(data);
 	$.post('/setting/info/getType_data_kind',data,function(json){
 		console.log(json['data_kind']);
@@ -141,7 +147,7 @@ $('div#set_type').click(function(){
 				+'<td class="text-center">'+(i+1)+'</td>'
 				+'<td class="text-center">'+kind+'</td>'
 				+'<td class="text-center">'						
-					+'<a href="/setting/info/templet/'+set_id+'/'+data_kind_id+'/'+kind+'" class="btn btn-primary btn-sm">&nbsp;&nbsp;&nbsp;&nbsp;Edit&nbsp;&nbsp;&nbsp;&nbsp;</a>'
+					+'<a href="/setting/info/templet/'+task_id+'/'+data_kind_id+'" class="btn btn-primary btn-sm">&nbsp;&nbsp;&nbsp;&nbsp;Edit&nbsp;&nbsp;&nbsp;&nbsp;</a>'
 				+'</td>'
 				+'</tr>');	
 		}); // Each end.		

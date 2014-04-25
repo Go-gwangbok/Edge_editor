@@ -4,6 +4,16 @@ class All_list extends CI_Model{
    		return $this->db->query("SELECT * FROM usr WHERE classify = 1 and conf = 0 and active = 0")->result();   		
    	}   	
 
+   	function getTask_kind_name($type,$kind_id){
+   		return $this->db->query("SELECT task.name as task_name,data_kind.kind as kind_name 
+   									FROM connect_templet 
+   									LEFT JOIN data_kind ON data_kind.id = connect_templet.data_kind_id
+   									LEFT JOIN task ON task.id = connect_templet.task_id   									
+   									WHERE connect_templet.data_kind_id = '$kind_id'
+   									AND connect_templet.task_id = '$type;'
+   									ORDER BY connect_templet.task_id")->row();
+   	}
+
 	function get_essay($essay_id,$type){
 		return $this->db->query("SELECT * FROM adjust_data WHERE essay_id in($essay_id) and type = '$type' and active = 0")->result();
 	}
@@ -26,20 +36,15 @@ class All_list extends CI_Model{
 									LIMIT 2")->result();
 	}
 
-	function get_one_essay($essay_id){
-		$query = "SELECT * FROM adjust_data WHERE essay_id = '$essay_id'";
-		$result = $this->db->query($query);
-		if($result->num_rows() > 0){
-			return	$this->db->query($query)->row();
+	function get_one_essay($cate,$essay_id){
+		if($cate == 'service'){
+			$from_table = 'service_data';
 		}else{
-			return false;
+			$from_table = 'adjust_data';
 		}
-	}	
-
-	function service_get_one_essay($essay_id){
-		$query = "SELECT service_data.*, data_kind.kind as kind_name
-					FROM service_data 
-					LEFT JOIN data_kind ON data_kind.id = service_data.kind
+		$query = "SELECT ".$from_table.".*,data_kind.kind as kind_name 
+					FROM ".$from_table." 
+					LEFT JOIN data_kind ON data_kind.id = ".$from_table.".kind
 					WHERE essay_id = '$essay_id'";
 		$result = $this->db->query($query);
 		if($result->num_rows() > 0){
@@ -47,7 +52,7 @@ class All_list extends CI_Model{
 		}else{
 			return false;
 		}
-	}	
+	}		
 
 	function pj_name($id){
    		return $this->db->query("SELECT project.*,data_kind.kind
@@ -487,7 +492,7 @@ class All_list extends CI_Model{
 	}
 
 	function admin_pjlist(){
-		$query = "SELECT connect_usr_pj.pj_id, project.name, project.disc, project.add_date, data_kind.kind,
+		$query = "SELECT connect_usr_pj.pj_id, project.name, project.disc, project.add_date, data_kind.kind,data_kind.id as kind_id,
 					COUNT(adjust_data.essay_id) AS total_count,
 					COUNT( IF( adjust_data.submit =1, 1, NULL ) ) AS completed,
 					COUNT( IF( adjust_data.submit = 0, 1, NULL ) ) AS todo
@@ -852,13 +857,12 @@ class All_list extends CI_Model{
    	// 	return $this->db->query("SELECT * FROM task WHERE id = '$type'")->result();
    	// }
 
-   	function getDataKind($cate_id){
+   	function getDataKind($task_id,$from_table){
    		return $this->db->query("SELECT data_kind.* 
-   									FROM connect_templet 
-   									LEFT JOIN templet_ele ON templet_ele.id = connect_templet.templet_ele_id
-   									LEFT JOIN data_kind ON data_kind.id = connect_templet.data_kind_id
-   									LEFT JOIN task ON task.id = connect_templet.task_id
-   									WHERE connect_templet.task_id = '$cate_id'
+   									FROM ".$from_table."
+   									LEFT JOIN data_kind ON data_kind.id = ".$from_table.".kind
+   									WHERE ".$from_table.".type = '$task_id'
+   									and ".$from_table.".active = 0
    									GROUP BY data_kind.id")->result();
     }
 
@@ -904,8 +908,7 @@ class All_list extends CI_Model{
 		   				return false;
 		   			}
 		   		}
-   			}else{ // 멤버가 1명일때!  				   				   				
-   				//return $pj_id;
+   			}else{ // 멤버가 1명일때!  				   				   				   				
 	   			$essay_data_ins = $this->db->query("INSERT INTO connect_usr_pj(usr_id,pj_id,kind_id,joindate) VALUES($mem_list,$pj_id,$kind,now())");
 	   			if(!$essay_data_ins){
 	   				return false;   						
@@ -914,10 +917,24 @@ class All_list extends CI_Model{
    		}else{
    			return false;
    		}
+
+   		$confirm_templet = $this->db->query("SELECT * FROM connect_templet WHERE data_kind_id = $kind and task_id = 1");
+   		
+   		if(!$confirm_templet->num_rows() > 0){
+   			$get_templet_ele = $this->db->query("SELECT * FROM templet_ele")->result();
+   			foreach ($get_templet_ele as $value) {
+   				$element_id = $value->id;
+
+   				$insert_kind = $this->db->query("INSERT INTO connect_templet(templet_ele_id,data_kind_id,task_id) VALUES($element_id,$kind,1)");
+	   			if(!$insert_kind){
+	   				return false;
+	   			}
+   			}   			
+   		}
    		return true;   			
    	}  
 
-   	function del_project($pj_id){   		
+   	function del_project($pj_id){
 		$project_table = $this->db->query("UPDATE connect_usr_pj SET active = 1 WHERE pj_id = '$pj_id'");
 		if($project_table){
 			$confirm = $this->db->query("SELECT pj_id FROM import_data WHERE pj_id = '$pj_id'");
@@ -987,7 +1004,7 @@ class All_list extends CI_Model{
    		return $this->db->query("SELECT * FROM tags")->result();
    	}
 
-   	function tag_replace($kind,$text){
+   	function tag_replace($text){
    		$get_tag = $this->db->query("SELECT * FROM tags")->result();
    		$patterns_array = array();
    		$replace_array = array();
@@ -1028,7 +1045,7 @@ class All_list extends CI_Model{
    				$kind = $row->kind; // kind_id			
    				$kind_name = $row->kind_name;
 
-   				if($kind_name == 'essay'){
+   				if($kind_name == 'toefl essay'){
    					$sentence = explode('::', $essay);   				
 
 	   				$prompt = mysql_real_escape_string($sentence[0]);
@@ -1038,7 +1055,7 @@ class All_list extends CI_Model{
 	   				$word_count = str_word_count($sentence[1]);   	
 
 	   				// tag_replace
-					$data = $this->tag_replace('essay',$structure);
+					$data = $this->tag_replace($structure);
 					
    				}elseif($kind_name == 'diary'){
    					$sentence = explode('::', $essay);
@@ -1052,7 +1069,7 @@ class All_list extends CI_Model{
 		   				$word_count = str_word_count(strip_tags($essay));					
 							
 						// tag_replace
-						$data = $this->tag_replace('diary',$structure); 
+						$data = $this->tag_replace($structure); 
 						
    					}else{
    						$diary = strip_tags($essay);  						   					
@@ -1069,7 +1086,7 @@ class All_list extends CI_Model{
 		   				$structure = $explode_structure[1];
 
 		   				// tag_replace
-						$data = $this->tag_replace('diary',$structure);						
+						$data = $this->tag_replace($structure);						
    					}  						
    				}else{
    					return false;
@@ -1121,7 +1138,7 @@ class All_list extends CI_Model{
 	   				$kind = $row->kind;
 	   				$kind_name = $row->kind_name;
 
-					if($kind_name == 'essay'){
+					if($kind_name == 'toefl essay'){
 	   					$sentence = explode('::', $essay);   				
 
 		   				$prompt = mysql_real_escape_string($sentence[0]);
@@ -1131,7 +1148,7 @@ class All_list extends CI_Model{
 		   				$word_count = str_word_count($sentence[1]);   	
 
 						// tag_replace
-						$data = $this->tag_replace('essay',$structure);
+						$data = $this->tag_replace($structure);
 	   				}elseif($kind_name == 'diary'){
 
 	   					$sentence = explode('::', $essay);
@@ -1146,7 +1163,7 @@ class All_list extends CI_Model{
 			   				$word_count = str_word_count(strip_tags($essay));
 
 							// tag_replace
-							$data = $this->tag_replace('diary',$structure);						
+							$data = $this->tag_replace($structure);						
    						}else{
    							$diary = strip_tags($essay);
 	   						$explode_editing = explode('&', $diary);	   					
@@ -1161,7 +1178,7 @@ class All_list extends CI_Model{
 			   				$structure = $explode_structure[1];
 
 							// tag_replace
-							$data = $this->tag_replace('diary',$structure);						
+							$data = $this->tag_replace($structure);						
    						}
 	   						
 	   				}else{
@@ -1203,7 +1220,7 @@ class All_list extends CI_Model{
 	   				$kind = $row->kind;
 	   				$kind_name = $row->kind_name; 				   	
 
-					if($kind_name == 'essay'){
+					if($kind_name == 'toefl essay'){
 	   					$sentence = explode('::', $essay);   				
 
 		   				$prompt = mysql_real_escape_string($sentence[0]);
@@ -1213,7 +1230,7 @@ class All_list extends CI_Model{
 		   				$word_count = str_word_count($sentence[1]);   	
 
 						// tag_replace
-						$data = $this->tag_replace('essay',$structure);
+						$data = $this->tag_replace($structure);
 	   				}elseif($kind_name == 'diary'){
 	   					$sentence = explode('::', $essay);
    						$subject_conf = count($sentence);
@@ -1227,7 +1244,7 @@ class All_list extends CI_Model{
 			   				$word_count = str_word_count(strip_tags($essay));
 
 							// tag_replace
-							$data = $this->tag_replace('diary',$structure);						
+							$data = $this->tag_replace($structure);						
    						}else{
    							$diary = strip_tags($essay);
 	   						$explode_editing = explode('&', $diary);	   					
@@ -1242,7 +1259,7 @@ class All_list extends CI_Model{
 			   				$structure = $explode_structure[1];
 
 							// tag_replace
-							$data = $this->tag_replace('diary',$structure);						
+							$data = $this->tag_replace($structure);						
    						}	
 	   				}else{
 	   					return false;
@@ -1286,7 +1303,7 @@ class All_list extends CI_Model{
 	   				$kind = $row->kind;
 	   				$kind_name = $row->kind_name;
 
-					if($kind_name == 'essay'){
+					if($kind_name == 'toefl essay'){
 	   					$sentence = explode('::', $essay);   				
 
 		   				$prompt = mysql_real_escape_string($sentence[0]);
@@ -1296,7 +1313,7 @@ class All_list extends CI_Model{
 		   				$word_count = str_word_count($sentence[1]);   	
 
 						// tag_replace
-						$data = $this->tag_replace('essay',$structure);
+						$data = $this->tag_replace($structure);
 	   				}elseif($kind_name == 'diary'){
 	   					$sentence = explode('::', $essay);
    						$subject_conf = count($sentence);
@@ -1310,7 +1327,7 @@ class All_list extends CI_Model{
 			   				$word_count = str_word_count(strip_tags($essay));
 
 							// tag_replace
-							$data = $this->tag_replace('diary',$structure);						
+							$data = $this->tag_replace($structure);						
    						}else{
    							$diary = strip_tags($essay);
 	   						$explode_editing = explode('&', $diary);	   					
@@ -1325,7 +1342,7 @@ class All_list extends CI_Model{
 			   				$structure = $explode_structure[1];
 
 							// tag_replace
-							$data = $this->tag_replace('diary',$structure);						
+							$data = $this->tag_replace($structure);						
    						}
 	   				}else{
 	   					return false;

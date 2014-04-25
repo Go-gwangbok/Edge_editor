@@ -9,7 +9,7 @@
 	    <h3 class="text-center"><?=$pjName;?></h3>	    
 	    
 	    <div id="error">	 
-	    	<a href="/errordata/export_error/<?=$pj_id;?>"><button class="btn btn-danger pull-left" id="errorbtn" style="margin-top:-10px; margin-left:15px;">Error List<span class="badge" style="background-color:transparent;"><?=$total_count-$export_count;?></span></button></a>
+	    	<a href="/errordata/export_error/<?=$pj_id;?>"><button class="btn btn-danger pull-left" id="errorbtn" style="margin-top:-10px; margin-left:15px;">Problem Log<span class="badge" style="background-color:transparent;"><?=$total_count-$export_count;?></span></button></a>
 			<button class="btn btn-danger pull-right" id="allexport" style="margin-top:-10px; margin-right:15px;"> Export <span class="badge" id="allcount" style="background-color:transparent;"><?=$export_count;?></span><span class="glyphicon glyphicon-download"></span>				
 			</button> 										
 		</div>				

@@ -111,13 +111,12 @@ $("button#submit").click(function(){
 			data: data,
 			dataType: 'json',
 			success: function(json)
-			{
-				console.log(json['result']);
+			{				
 				if(json['result'])
 				{
-					// 정상적으로 처리됨
+					// 정상적으로 처리됨					
 					alert('New project has been created!');
-					window.location.replace('/musedata/project'); // 리다이렉트할 주소
+					window.location.replace("/setting/info/templet/1/"+selVal); // 리다이렉트할 주소
 				}
 				else{
 					alert('all_list_db ==> create_pj Error');

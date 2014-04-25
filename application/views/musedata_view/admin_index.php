@@ -190,7 +190,7 @@ $("a#new_pj").mouseout(function(){
   $(this).css("background","white");
 });
 
-$('div').delegate('button#del_pj','click',function(){
+$(document).delegate('button#del_pj','click',function(){
   var pjid = $(this).attr("pjid");
   
   console.log(pjid);

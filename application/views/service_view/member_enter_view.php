@@ -6,10 +6,10 @@
 		    <li><a href="/service/serviceType/<?=$service_name;?>"><?=ucfirst($service_name);?></a></li>   
 		    <li><a href="/service/enter/<?=$service_name;?>/<?=$int_month;?>/<?=$year;?>"><?=$year.' - '.$str_month?></a></li>   		    
 	    	<li class="akacolor">Completeds</li>   	       	
-	    </ol>
-		<h3 class="text-center"><?=$name;?></h3>
+	    </ol>		
 	</div>	
-	<button class="btn btn-default pull-right" disabled style="border-color:#f15e22;" id="total"></button> 	
+	<h3 class="text-center"><?=$name;?></h3>
+	<button class="btn btn-default pull-right" style="border-color:#f15e22; margin-top:-40px;" id="total" disabled></button> 
 	<br>	
 	<table class="table table-hover">		 		
 	  	<thead>

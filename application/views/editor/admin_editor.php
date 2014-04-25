@@ -20,7 +20,7 @@
         ?>
         <li><a href="/musedata/project/members/<?=$pj_id;?>">Members</a></li>           
         <li><a href="/musedata/project/board/history/<?=$pj_id;?>/<?=$usr_id?>">History</a></li>           
-        <li class="akacolor">Essay</li>      
+        <li class="akacolor"><?=ucfirst($kind_name);?></li>      
         <?
         }else{ // Export
         ?>

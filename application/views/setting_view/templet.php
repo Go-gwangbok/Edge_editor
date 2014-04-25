@@ -6,7 +6,7 @@
         	<li class="akacolor">Templet setting</li>   
     	</ol>                        
   	</div>  <!-- Nav or Head title End -->  
-  	<h3 class="text-center" id="title"><?=strtoupper($kind);?> Templet setting</h3>
+  	<h3 class="text-center" id="title"></h3>
   	<hr>
   	<br>
   	<div class="col-md-12">
@@ -115,15 +115,21 @@
 var kind_id = <?=$kind_id;?>;
 var type_id = '<?=$type_id?>';
 console.log(type_id);
+
+function firstLowstring(value){
+	var str = value.substring(0,1).toUpperCase() + value.substring(1);
+	return str;
+}
+
 $(document).ready(function(){
 	$.post('/setting/info/get_typevals',{kind_id : kind_id,type_id:type_id},function(json){				
 		var tags = json['get_setup_tag'];
 		var scores = json['scores'];
 		var tabs = json['tabs'];
-		console.log(tabs);	
-		console.log(json['get_setup_tag']);		
-		console.log(json['scores']);		
-
+		var kind_name = json['kind_name'];
+		var task_name = json['task_name'];		
+		
+		$('#title').text(firstLowstring(task_name)+' '+ kind_name.toUpperCase()+' Templet setting');
 		$.each(tabs,function(i,values){			
 			var element_id = values['element_id'];
 			var element = values['element'];

@@ -17,9 +17,11 @@
     	   	?>   	   	
 	    </ol> <!-- Navi end -->
 	</div>					
-	<button class="btn btn-default pull-right" disabled style="border-color:#f15e22;" id="total"></button> 
+	<h3 class="text-center"><?=$usr_name;?></h3>	
+	<button class="btn btn-default pull-right" style="border-color:#f15e22; margin-top:-40px;" id="total" disabled></button> 
+	<br>
 	<table class="table table-hover">					
-		<h3 class="text-center"><?=$usr_name;?></h3>	
+		
 	  	<thead>
 			<tr>
 				<th class="text-center">No.</th>

@@ -5,7 +5,7 @@
         <li><a href="/service/">Service</a></li>
         <li><a href="/service/serviceType/<?=$service_name;?>"><?=ucfirst($service_name);?></a></li>   
         <li><a href="/service/enter/writing/<?=$month?>/<?=$year;?>"><?=$year.' - '.$str_month?></a></li>   
-        <li><a href="/service/member_enter/writing/<?=$month?>/<?=$year;?>/<?=$usr_id;?>">Completed</a></li>   
+        <li><a href="/service/member_enter/writing/<?=$month;?>/<?=$year;?>/<?=$usr_id;?>">Completed</a></li>   
         <li class="akacolor"><?=ucfirst($kind_name);?></li>
       </ol> 
   </div> <!-- Navi end -->      
@@ -68,6 +68,9 @@
   <br>
 <div class="tab-content">
   <!-- Original -->
+  <?
+  if($chk_orig == 'Y'){
+  ?>  
    <div class="tab-pane div-box-line active" id="orig">
       <div class="col-md-12" style="margin-top:15px;">                        
         <div>          
@@ -78,6 +81,7 @@
         <br>      
       </div>  <!-- col-md-12 -->
     </div> <!-- tab-pane -->
+    <? } ?>
     <!-- Original end -->
 
     <!-- Error detecting -->
