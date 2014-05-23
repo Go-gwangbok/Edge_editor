@@ -3,21 +3,13 @@
       	<ol class="breadcrumb" style="background:white;">
         	<li><a href="/">Home</a></li>
         	<li><a href="/setting/info">Setting</a></li>   
-        	<li class="akacolor">Templet setting</li>   
+        	<li class="akacolor">Rubric setting</li>   
     	</ol>                        
   	</div>  <!-- Nav or Head title End -->  
   	<h3 class="text-center" id="title"></h3>
-  	<hr>
   	<br>
-  	<div class="col-md-12">
-            <h4>Active Tab Setting</h4>
-	</div>   
-	<div class="row">    
-    	<div class="col-md-12" style="height:37px;" id="tabs">    		
-    		<!-- Ajax -->       			
-		</div>  
-	</div>       
-    <br><br><br>
+  	<hr>
+  	<br>  	  	
   	<div class="col-md-12">
             <h4>Tag Button Setting
             	<button class="btn btn-primary pull-right" data-toggle="modal" data-target="#myModal" style="margin-top:-10px;">Add Tag</button> 
@@ -39,9 +31,10 @@
 	    	<!-- Ajax -->
 	    </div>  
 	</div>
-	<br>
-    <div class="col-md-12">
-    	<button class="btn btn-primary btn-sm pull-right" id="save">SAVE</button>
+	<br><br><br><br>
+	<div class="col-md-12 text-center">
+		<button class="btn btn-default btn-lg" id="savecancel"> Cancel </button>
+    	<button class="btn btn-danger btn-lg" id="save"> SAVE </button>
     </div>	  
     <!-- Tag Modal -->
 	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -55,7 +48,7 @@
 	      	<h5 style="color:black; margin-left:15px;"><strong>추가할 태그를 선택하세요!</strong></h5>
 	      	<br>
 	      	<div class="row">
-		      	<?
+		      	<?php
 		      	foreach ($add_tag_data as $value) {
 		      		$tag_id = $value->id;
 		      		$tag = $value->tag;
@@ -64,7 +57,7 @@
 		      	<input type="checkbox" class="add_tags" id="a<?=$tag_id;?>">	      	
 		      		<span style="color:black;">&lt;<?=strtoupper($tag);?>&gt;</span>
 		      	</div>
-		      	<?
+		      	<?php
 		      	}
 		      	?>	        
 	      	</div>
@@ -89,7 +82,7 @@
 	      	<h5 style="color:black; margin-left:15px;"><strong>추가할 스코어를 선택하세요!</strong></h5>
 	      	<br>
 	      	<div class="row">
-		      	<?
+		      	<?php
 		      	foreach ($add_score_data as $value) {
 		      		$sco_id = $value->id;
 		      		$sco_name = $value->name;
@@ -98,7 +91,7 @@
 		      	<input type="checkbox" class="add_score" id="sc<?=$sco_id;?>">	      	
 		      		<span style="color:black;"> <?=strtoupper($sco_name);?> </span>
 		      	</div>
-		      	<?
+		      	<?php
 		      	}
 		      	?>	        
 	      	</div>	        
@@ -113,8 +106,6 @@
 </div>
 <script type="text/javascript">
 var kind_id = <?=$kind_id;?>;
-var type_id = '<?=$type_id?>';
-console.log(type_id);
 
 function firstLowstring(value){
 	var str = value.substring(0,1).toUpperCase() + value.substring(1);
@@ -122,32 +113,12 @@ function firstLowstring(value){
 }
 
 $(document).ready(function(){
-	$.post('/setting/info/get_typevals',{kind_id : kind_id,type_id:type_id},function(json){				
+	$.post('/setting/info/get_rubric_val',{kind_id : kind_id},function(json){				
 		var tags = json['get_setup_tag'];
-		var scores = json['scores'];
-		var tabs = json['tabs'];
-		var kind_name = json['kind_name'];
-		var task_name = json['task_name'];		
+		var scores = json['scores'];		
+		var kind_name = json['kind_name'];	
 		
-		$('#title').text(firstLowstring(task_name)+' '+ kind_name.toUpperCase()+' Templet setting');
-		$.each(tabs,function(i,values){			
-			var element_id = values['element_id'];
-			var element = values['element'];
-			var view_element = values['view_ele'];
-			var active = values['active']
-
-			if(active == 0){
-				$('div#tabs').append('<div class="col-md-2" style="margin-top:12px;">'
-    									+'<input type="checkbox" class="tabs" id="b'+element_id+'" checked="checked"><br>'
-										+'<span id="tab'+element_id+'" style="margin-right:5px; margin-top:2px; color:black;" status="true">'+view_element.toUpperCase()+'</span>'										
-										+'</div>')				
-			}else{
-				$('div#tabs').append('<div class="col-md-2" style="margin-top:12px;">'
-    									+'<input type="checkbox" class="tabs" id="b'+element_id+'"><br>'
-										+'<span id="tab'+element_id+'" style="margin-right:5px; margin-top:2px; color:black;" status="true">'+view_element.toUpperCase()+'</span>'										
-										+'</div>')								
-			}
-		}); // each end	
+		$('#title').text(kind_name.toUpperCase()+' Rubric setting');
 		
 		$.each(tags,function(i,values){
 			var chk = values['chk'];
@@ -199,8 +170,7 @@ $(document).delegate('button#tag_del','click',function(){
 	var tagid = $(this).attr('tagid');
 	var data = {		
 		tag_id : tagid,
-		kind_id : kind_id,
-		type_id : type_id
+		kind_id : kind_id		
 	}
 	console.log(data);
 	$.post('/setting/info/tag_del',data,function(json){
@@ -250,23 +220,16 @@ $('button#save').click(function(){
 	var checked_scoreVals = $('input.score:checkbox:checked').map(function() {
     	return $(this).attr('id');
 	}).get();
-
-	var checked_tabVals = $('input.tabs:checkbox:checked').map(function() {
-    	return $(this).attr('id');
-	}).get();
-	console.log(checked_tabVals);	
 	console.log(checked_tagVals);	
 	console.log(checked_scoreVals);	
-	
 
 	var data = {
-		kind_id : kind_id,
-		tabs_val : checked_tabVals.toString(),
+		kind_id : kind_id,		
 		tags_val : checked_tagVals.toString(),
 		scores_val : checked_scoreVals.toString()		
 	}
 	console.log(data);
-	$.post('/setting/info/saveSetting',data,function(json){
+	$.post('/setting/info/rubricSaveSetting',data,function(json){
 		console.log(json['result']);
 		if(json['result']){
 			alert('저장되었습니다');	
@@ -327,8 +290,7 @@ $('button#add').click(function(){
 	
 	var data = {
 		kind_id : kind_id,
-		add_tags_id : alltagVals.toString(),
-		type_id : type_id
+		add_tags_id : alltagVals.toString()		
 	}
 	console.log(data);
 	
@@ -350,8 +312,7 @@ $('button#scoadd').click(function(){
 	
 	var data = {
 		kind_id : kind_id,
-		add_sco_id : allscoVals.toString(),
-		type_id : type_id
+		add_sco_id : allscoVals.toString()		
 	}	
 	console.log(data);
 
@@ -365,4 +326,7 @@ $('button#scoadd').click(function(){
 	
 });
 
+$('#savecancel').click(function(){
+	window.history.back(-1);
+});
 </script>

@@ -9,7 +9,7 @@
     </div>     
     <br>    
     <div class="row">
-        <?
+        <?php
         foreach ($services as $value) {
             $ser_name = $value->name;
             $ser_id = $value->id;
@@ -21,7 +21,7 @@
                 <h4 class="text-center"><?=strtoupper($ser_name);?></h4>
             </div>
         </div>
-        <? } ?>        
+        <?php } ?>        
     </div>
 </div>
 <script type="text/javascript">

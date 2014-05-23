@@ -83,13 +83,7 @@ function pad(number, length) {
 }
 
 function ajaxPost(url,data){
-	$.post(url,data,function(json) {		
-		// console.log(json['edi']);
-		// console.log(json['page']);
-		// console.log(json['export_page_count']);
-		// console.log(json['cate']);
-		// console.log(json['history_list']);
-		// console.log(json['done_id']);
+	$.post(url,data,function(json) {				
 		cate = json['cate'];
 		page = json['page'];			
 
@@ -137,7 +131,7 @@ function ajaxPost(url,data){
 			export_page_count = json['export_page_count'];						
 
 			for(var i = 0; i < json['history_list'].length; i++) {
-				var essay_id = history_list[i]['essay_id'];
+				var id = history_list[i]['id'];
 				var task = history_list[i]['type'];
 				var timer = formatTime(history_list[i]['time']);			
 				var prompt = history_list[i]['prompt'];
@@ -155,7 +149,7 @@ function ajaxPost(url,data){
 					var date = history_list[i]['sub_date'];
 				}
 				
-				$('tbody#list').append('<tr class="com" style="cursor:pointer;" id='+i+' href="/text_editor/comp/'+history_list[i]['essay_id']+'/'+task+'"><td>'+num+'</td><td>'																				 
+				$('tbody#list').append('<tr class="com" style="cursor:pointer;" id='+i+' href="/text_editor/comp/'+id+'/'+task+'"><td>'+num+'</td><td>'																				 
 						+prompt.replace(/"/gi,'')+'</td><td>'
 						+history_list[i]['name']+'</td><td>'
 						+kind_name.toUpperCase()+'</td><td>'

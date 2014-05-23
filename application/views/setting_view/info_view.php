@@ -14,12 +14,14 @@
 		<ul class="nav nav-tabs">
 		  <li class="active" id="new_title"><a href="#new" data-toggle="tab">New Editors</a></li>
 		  <li id="active_title"><a href="#active" data-toggle="tab">Active Editors</a></li>	  
-		  <li id="setting_title"><a href="#setting" data-toggle="tab">Templet setting</a></li>	  
+		  <li id="setting_title"><a href="#setting" data-toggle="tab">Tab setting</a></li>	  
+		  <li id="rubric_title"><a href="#tagscore" data-toggle="tab">Rubric setting</a></li>	  
 		</ul>
+
 
 		<!-- Tab panes -->
 		<div class="tab-content">
-		  	<div class="tab-pane active" id="new">		  	
+		  	<div class="tab-pane active" id="new">		  			  		
 				<br>
 				<table class="table table-hover">
 			  	<thead>
@@ -38,6 +40,7 @@
 				</table>
 		  	</div>
 
+		  	<!-- Active editors -->
 		  	<div class="tab-pane" id="active">
 		  		<br>
 				<table class="table table-hover">
@@ -57,10 +60,11 @@
 				</table>
 			</div>	  
 
+			<!-- Tab setting -->
 			<div class="tab-pane" id="setting">
 				<br/><br/>
 				<div class="row">
-					<?
+					<?php
 					foreach ($cateType as $rows) {
 						$type_id = $rows->id;
 						$name = $rows->name;
@@ -75,7 +79,7 @@
 								<h4 class="text-center"><?=strtoupper($name);?></h4>
 							</div>
 						</div>
-						<?
+						<?php
 						}else{
 						?>
 						<div class="col-md-3">						
@@ -85,13 +89,16 @@
 								<h4 class="text-center"><?=strtoupper($name);?></h4>
 							</div>
 						</div>
-						<?
+						<?php
 						}
 					} ?>			  		
 				</div>
 				<br><br>
+				<!-- Add templete setting -->
+				<!-- <button id="w_addbtn" taskid='' class="btn btn-success pull-right" style="display:none; margin-right:100px;">Add Kind</button> -->
+				<br>
 				<div class="row">			  		
-					<div class="col-md-12" id="kind_list">
+					<div class="col-md-12" id="kind_list">						
 						<br>
 						<table class="table table-hover" id="table" style="width:953px; margin-left:90px;">
 						  	<thead>
@@ -109,17 +116,62 @@
 					</div>
 				</div>
 			</div>	  
+			<!-- Tap setting End.-->
+
+			<!-- Rubric setting -->
+		  	<div class="tab-pane" id="tagscore">		  		
+		  		<br>
+				<table class="table table-hover">
+				  	<thead>
+						<tr>
+							<th class="text-center">Num</th>
+							<th class="text-center">Kind</th>							
+							<th class="text-center">Action</th>
+						</tr>
+					</thead>
+					
+					<tbody id="tagscore_list">						
+						<!-- Ajax -->
+					</tbody>
+				</table>
+			</div>	
+			<!-- Rubric setting End.-->
 		</div>
 	</div> <!-- col-md-12 -->
   </div> <!-- Row End -->
 
-	<div id="membersmodal">
-		<!-- Modal -->
+  <!-- Add Kind modal -->
+  	<!-- Modal -->
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+	        <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+	      </div>
+	      <div class="modal-body">
+	        ...
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	        <button type="button" class="btn btn-primary">Save changes</button>
+	      </div>
+	    </div>
+	  </div>
 	</div>
+
+
+	
 </div>
 <script type="text/javascript">
+
+var kinds_array = new Array();
+
 $('div#set_type').click(function(){	
 	var task_id = $(this).attr('setid');	
+	//console.log(task_id);
+	$('button#w_addbtn').css('display','inline-block').attr('taskid',task_id);
+
 	$('div#set_type').css('opacity',0.4);
 	$(this).css('opacity',1);
 
@@ -130,36 +182,55 @@ $('div#set_type').click(function(){
 	}
 
 	data = {task : task_id,from_table : from_table};
-	console.log(data);
+	//console.log(data);
 	$.post('/setting/info/getType_data_kind',data,function(json){
-		console.log(json['data_kind']);
+		//console.log(json['data_kind']);
 		//console.log(set_type);
 		var data_kinds = json['data_kind'];
+		console.log(data_kinds);
 
 		$('table#table').show();
 		$('tbody#set').empty();
 		$('div#seltype').empty();
+		kinds_array = [];
 
 		$.each(data_kinds,function(i,values){
 			var kind = values['kind'];
 			var data_kind_id = values['id'];
-			$('tbody#set').append('<tr>'
+			kinds_array.push(data_kind_id);
+			$('tbody#set').append('<tr href="/setting/info/templet/'+task_id+'/'+data_kind_id+'" style="cursor:pointer;" id="kindhref">'
 				+'<td class="text-center">'+(i+1)+'</td>'
-				+'<td class="text-center">'+kind+'</td>'
+				+'<td class="text-center">'+kind.toUpperCase()+'</td>'
 				+'<td class="text-center">'						
-					+'<a href="/setting/info/templet/'+task_id+'/'+data_kind_id+'" class="btn btn-primary btn-sm">&nbsp;&nbsp;&nbsp;&nbsp;Edit&nbsp;&nbsp;&nbsp;&nbsp;</a>'
+					+'<button class="btn btn-primary btn-sm">&nbsp;&nbsp;&nbsp;&nbsp;Edit&nbsp;&nbsp;&nbsp;&nbsp;</button>'
 				+'</td>'
 				+'</tr>');	
 		}); // Each end.		
 	}); // post End.
 });
 
-$(document).delegate('input.chk_type','click',function () {
-	
+
+
+$('button#w_addbtn').click(function(){	
+	task_id = $(this).attr('taskid');
+
+	kindArray = kinds_array.toString();
+	// console.log(task_id);
+	// console.log(kinds_array);
+
+	data = {task_id : task_id,kind_array : kindArray};
+
+	$.post('/setting/info/addKind',data,function(json){
+		console.log(json['result']);
+
+	});
+	//$('div#myModal').modal('show');
+
 });
 
+
 var cate = '<?=$cate?>';
-console.log(cate);
+//console.log(cate);
 $('li#new_title').click(function(){
 	$('#title').html('New Editors');	
 });
@@ -169,16 +240,21 @@ $('li#active_title').click(function(){
 });
 
 $('li#setting_title').click(function(){
-	$('#title').html('Templet setting');
+	$('#title').html('Templet Setting');
 });
+
+$('li#rubric_title').click(function(){
+	$('#title').html('Rubric Setting');
+});
+
 
 
 $(document).ready(function(){
 	$('table#table').hide();
 	$.post('/setting/info/setting_data',{data:cate},function(json){
 		var new_editors = json['get_editors'];
-		//var data_kinds = json['data_kind'];
-		console.log(new_editors);
+		var data_kinds = json['data_kind'];
+		//console.log(new_editors);
 		//console.log(data_kinds);
 
 		if(new_editors.length > 0){
@@ -237,25 +313,36 @@ $(document).ready(function(){
 
 		}// If end.
 
-		// // Templet Setting.
-		// $.each(data_kinds,function(i,values){
-		// 	var kind = values['kind'];
-		// 	var data_kind_id = values['id'];
+		// Templet Setting.
+		$.each(data_kinds,function(i,values){
+			var kind = values['kind'];
+			var data_kind_id = values['id'];
 
-		// 	$('tbody#set').append('<tr>'
-		// 				+'<td class="text-center">'+(i+1)+'</td>'
-		// 				+'<td class="text-center">'+kind+'</td>'
-		// 				+'<td class="text-center">'						
-		// 					+'<a href="/setting/info/templet/'+data_kind_id+'/'+kind+'" class="btn btn-primary btn-sm">&nbsp;&nbsp;&nbsp;&nbsp;Edit&nbsp;&nbsp;&nbsp;&nbsp;</a>'
-		// 				+'</td>'
-		// 				+'</tr>');	
-		// });
+			$('tbody#tagscore_list').append('<tr id="tagscore_action" style="cursor:pointer;" href="/setting/info/tagScoreSet/'+data_kind_id+'">'
+						+'<td class="text-center">'+(i+1)+'</td>'
+						+'<td class="text-center">'+kind.toUpperCase()+'</td>'
+						+'<td class="text-center">'						
+							+'<button class="btn btn-primary btn-sm">&nbsp;&nbsp;&nbsp;&nbsp;Edit&nbsp;&nbsp;&nbsp;&nbsp;</button>'
+						+'</td>'
+						+'</tr>');	
+		});
 
 	}); // Post End
 }); // Document End
 
+
+// Tab Kind href
+$(document).delegate('tr#kindhref','click',function(){			
+	window.document.location = $(this).attr("href");      
+});
+
 $(document).delegate('tr#active_mem','click',function(){		
-	console.log($(this).attr('href'));
+	//console.log($(this).attr('href'));
+	window.document.location = $(this).attr("href");      
+});
+
+// Tag & Score Setting Button
+$(document).delegate('tr#tagscore_action','click',function(){			
 	window.document.location = $(this).attr("href");      
 });
 
@@ -274,7 +361,7 @@ $(document).delegate('button#accept','click',function(){
 
 $(document).delegate('button#decline','click',function(){
 	var usr_id = $(this).attr('usrid');
-	console.log(usr_id);
+	//console.log(usr_id);
 	$.post('/setting/info/decline',{usr_id:usr_id},function(json){
 		var result = json['result'];
 		console.log(result);

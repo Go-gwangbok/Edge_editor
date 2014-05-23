@@ -78,7 +78,7 @@ function ajaxPost(url,data){
 
 		if(cate == 'tbd'){ // T.B.D
 			for(var i = 0; i < json['list'].length; i++) {
-				var essay_id = data_list[i]['essay_id'];
+				var id = data_list[i]['id'];
 				var task = data_list[i]['type'];
 				var timer = formatTime(data_list[i]['time']);	
 				var prompt = data_list[i]['prompt'];
@@ -96,7 +96,7 @@ function ajaxPost(url,data){
 					var date = data_list[i]['sub_date'];
 				}
 				
-				$('tbody#list').append('<tr id='+i+' class="clickableRow" style="cursor:pointer;" href="/text_editor/essays/tbd/'+essay_id+'/'+kind+'"><td class="text-center">'+num+'</td><td>'																				 
+				$('tbody#list').append('<tr id='+i+' class="clickableRow" style="cursor:pointer;" href="/text_editor/essays/tbd/'+id+'/'+kind+'"><td class="text-center">'+num+'</td><td>'																				 
 					+prompt.replace(/"/gi,'')+'</td><td class="text-center">'
 					+kind_name.toUpperCase()+'</td><td class="text-center">'
 					+date+'</td>'
@@ -105,7 +105,7 @@ function ajaxPost(url,data){
 			}	
 		}else if(cate == 'history'){ //history
 			for(var i = 0; i < json['list'].length; i++) {
-				var essay_id = data_list[i]['essay_id'];				
+				var id = data_list[i]['id'];
 				var timer = formatTime(data_list[i]['time']);			
 				var prompt = data_list[i]['prompt'];
 				var raw_txt = data_list[i]['raw_txt'];
@@ -122,7 +122,7 @@ function ajaxPost(url,data){
 					var date = data_list[i]['sub_date'];
 				}
 				
-				$('tbody#list').append('<tr id='+i+' class="clickableRow" style="cursor:pointer;" href="/text_editor/essays/history/'+essay_id+'"><td class="text-center">'+num+'</td><td>'																				 
+				$('tbody#list').append('<tr id='+i+' class="clickableRow" style="cursor:pointer;" href="/text_editor/essays/history/'+id+'"><td class="text-center">'+num+'</td><td>'																				 
 					+prompt.replace(/"/gi,'')+'</td><td class="text-center">'
 					+kind_name.toUpperCase()+'</td><td class="text-center">'
 					+date+'</td>');						

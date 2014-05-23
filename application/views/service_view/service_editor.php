@@ -13,7 +13,7 @@
   </div>    
   <br>
   <ul class="nav nav-tabs" id="myTab">    
-    <?
+    <?php
     $chk_orig = 'N';
     $chk_detection = 'N';
     $chk_structure = 'N';
@@ -40,11 +40,11 @@
         $active_ele = $element;
       ?>
       <li class="active"><a href="#<?=$element;?>" data-toggle="tab"><?=$view_ele;?></a></li>
-      <?
+      <?php
       }else{
       ?>
       <li><a href="#<?=$element?>" data-toggle="tab"><?=$view_ele;?></a></li>  
-      <?      
+      <?php      
       } 
       $i++;   
     }
@@ -52,12 +52,12 @@
     <!-- Default -->    
     <div id="stopwatch" class="btn btn-default pull-right" disabled>Timer : 00:00 </div>       
     <div class="btn btn-default pull-right" style="margin-right:3px;" disabled>Word count : <?=$word_count?></div>       
-    <?
+    <?php
     if($cate == 'error'){
     ?>
     <button class="btn btn-md btn-danger pull-right" id="not_error" style="margin-right:5px;">Return</button>
     <button class="btn btn-md btn-danger pull-right" id="yes" style="margin-right:5px;">Yes</button>     
-    <?
+    <?php
     }
     ?>    
   </ul>
@@ -67,7 +67,7 @@
    <div class="tab-pane div-box-line active" id="orig">
       <div class="col-md-12" style="margin-top:15px;">                        
         <div>          
-          <?
+          <?php
             echo trim($raw_writing);             
           ?>      
         </div> 
@@ -77,14 +77,14 @@
     <!-- Original end -->
 
     <!-- Error detecting -->
-    <?
+    <?php
     if($chk_detection == 'Y'){
     ?>      
     <div class="tab-pane div-box-line" id="detection">
       <div class="col-md-12" style="margin-top:15px;">   
         <div class="btn-toolbar" data-role="editor-toolbar" data-target="#editor" style="margin-bottom:20px;">
           
-          <?
+          <?php
           if($cate != 'tbd'){
           ?>
           <div class="btn-group">
@@ -97,7 +97,7 @@
             <a class="btn" data-edit="undo" title="Undo (Ctrl/Cmd+Z)" disabled><i class="icon-undo"></i></a>
             <a class="btn" data-edit="redo" title="Redo (Ctrl/Cmd+Y)" disabled><i class="icon-repeat"></i></a>
           </div>            
-        <?
+        <?php
          }else{ // Cate == T.B.D
         ?>
         <div class="btn-group">
@@ -110,13 +110,13 @@
           <a class="btn" data-edit="undo" title="Undo (Ctrl/Cmd+Z)" ><i class="icon-undo"></i></a>
           <a class="btn" data-edit="redo" title="Redo (Ctrl/Cmd+Y)" ><i class="icon-repeat"></i></a>
         </div> 
-        <?
+        <?php
          }
         ?>
         </div> <!-- btn-toolbar -->      
         <!-- Error detecting -->
         <div id="editor">          
-          <?          
+          <?php          
               echo trim($edit_writing);
           ?>      
         </div>
@@ -144,11 +144,11 @@
             <!-- accordion end -->
       </div>  <!-- col-md-12 -->
     </div> <!-- tab-pane -->
-    <? } ?>
+    <?php } ?>
     <!-- Error detecting end -->
 
     <!-- Tagging start -->
-    <?
+    <?php
     if($chk_structure == 'Y'){
     ?>      
     <div class="tab-pane div-box-line" id="structure">
@@ -159,25 +159,25 @@
             <div class="col-md-12"> 
               <div class="col-md-12" style="margin-top:20px; text-align:center" id="confbox">
                 <h5>Confirm&nbsp;&nbsp;    
-                  <?
+                  <?php
                 foreach ($tag_templet as $value) {
                   $tag_id = $value->tag_id;
                   $tag_name = $value->tag;
                 ?>
                 <button id="block" tag="<?=$tag_name;?>" type="button" class="btn btn-default btn-sm" data-toggle="button"><span class="glyphicon glyphicon-tasks"></span> <?=strtoupper($tag_name);?></button>
-                <? } ?>                      
+                <?php } ?>                      
                 </h5>
               </div>
               <hr style="border:1px dashed; border-color: #d6e9c6;">                         
             </div>        
                       
-            <?
+            <?php
             foreach ($tag_templet as $value) {
               $tag_id = $value->tag_id;
               $tag_name = $value->tag;
             ?>
             <button id="tag" tag="<?=strtoupper($tag_name);?>" type="button" class="btn btn-success btn-sm">&lt;<?=strtoupper($tag_name);?>&gt;</button>
-            <? } ?>            
+            <?php } ?>            
 
             <button id="all" type="button" class="btn btn-default btn-danger btn-sm pull-right" click="clear"><span class="glyphicon glyphicon-refresh"></span> Clear All</button>            
             <button id="redo" tag="TR" type="button" class="btn btn-default btn-sm pull-right" style="margin-right:5px;"><span class="glyphicon glyphicon-refresh"></span> Redo</button>
@@ -190,10 +190,10 @@
           <div class="divtagging_box" id="tagging_box"><?=trim($tagging);?></div>                    
         </div>        
       </div>  
-      <? } ?>
+      <?php } ?>
       <!-- Tagging End --> 
 
-      <?
+      <?php
       if($chk_sco1 == 'Y'){
       ?>          
       <!-- Score1 start -->   
@@ -202,7 +202,7 @@
         <div class="col-md-12 ">           
           <div class="col-md-12 ">                         
             <div class="col-md-12 ">  
-            <?
+            <?php
             foreach ($score_templet as $value) {
               $score_id = $value->score_id;
               $score_name = $value->name;
@@ -213,16 +213,16 @@
                 <input type="text" class="form-control score_val" id="<?=strtolower($score_name);?>" placeholder="0">
               </div>
             </div>
-            <? } ?>                                                 
+            <?php } ?>                                                 
             </div>
           </div>
         </div>               
       </div> 
-      <? } ?>
+      <?php } ?>
       <!-- Score1 End -->   
 
       <!-- Score2 start -->   
-      <?
+      <?php
       if($chk_sco2 == 'Y'){
       ?>
       <div class="tab-pane div-box-line " id="sco2">
@@ -230,7 +230,7 @@
         <div class="col-md-12 ">           
           <div class="col-md-12 ">                         
             <div class="col-md-12 ">  
-            <?
+            <?php
             foreach ($score_templet as $value) {
               $score_id = $value->score_id;
               $score_name = $value->name;
@@ -241,22 +241,22 @@
                 <input type="text" class="form-control score_val2" id="<?=strtolower($score_name);?>2" placeholder="0">
               </div>
             </div>
-            <? } ?>                 
+            <?php } ?>                 
             </div>
           </div>
         </div>              
       </div>  
-      <? } ?>
+      <?php } ?>
       <!-- Score2 End -->
 
       <!-- Submit button -->
       <div style="margin-top:8px;">
-        <?
+        <?php
         if($cate == 'tbd'){     
         ?>  
         <button class="btn btn-danger pull-right" id="submit">Submit</button>
         <button class="btn btn-primary" id="draft">Save Draft</button>
-        <?  
+        <?php  
         }
         ?>        
       </div> 
