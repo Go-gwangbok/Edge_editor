@@ -127,7 +127,7 @@ and GPL-3.0 (http://opensource.org/licenses/GPL-3.0) licenses.
           //$(this).stop;
           return $(this.el).html('<FONT COLOR="#FF0000"><h5> -- : -- </h5></font>');          
         }else{
-          return $(this.el).html('<FONT COLOR="#FF0000"><h5>' + (this.leadingZeros(date.hours)) + " : " + (this.leadingZeros(date.min)) + " min " + (this.leadingZeros(date.sec)) + " sec</h5></font>");
+          return $(this.el).html('<FONT COLOR="#FF0000"><h5>' + (this.leadingZeros(date.days)).substring(1) + " days "+ (this.leadingZeros(date.hours)) + " : " + (this.leadingZeros(date.min)) + " min " + (this.leadingZeros(date.sec)) + " sec</h5></font>");
         }
 
         //return $(this.el).html(hours)

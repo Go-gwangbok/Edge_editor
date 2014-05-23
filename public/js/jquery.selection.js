@@ -259,6 +259,7 @@
                             range.setStart(sel.anchorNode, sel.anchorOffset);
                             range.setEnd(sel.focusNode, sel.focusOffset);
                         }
+                        
 
                         return $('<div></div>').append(range.cloneContents()).html();
                     }

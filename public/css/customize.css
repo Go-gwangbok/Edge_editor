@@ -758,4 +758,12 @@ a.noul:hover { text-decoration:none !important }
   opacity: 0.2;    
 }
 
+.service_headlight{
+  background:#f15e22; 
+  color:#fff
+}
 
+
+.edge-table-hover{
+  background :#f5f5f5;
+}

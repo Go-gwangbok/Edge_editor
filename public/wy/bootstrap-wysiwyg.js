@@ -39,7 +39,26 @@
 				var commandArr = commandWithArgs.split(' '),
 					command = commandArr.shift(),
 					args = commandArr.join(' ') + (valueArg || '');
-				document.execCommand(command, 0, args);
+				
+				if (command == "underline")
+				{					
+					if (window.getSelection) {						
+						var selObj = window.getSelection();
+						if (selObj.getRangeAt) {							
+							var selRange = selObj.getRangeAt(0);
+							var selectedText = $('<div></div>').append(selRange.cloneContents()).html();
+							console.log(selectedText);
+							if (selectedText == '') return;
+							var replacedText = "<u>"+selectedText +"//</u>";
+							console.log(replacedText);
+							document.execCommand("insertHtml", 0, replacedText);
+						}
+					}					
+				}
+				else
+				{
+					document.execCommand(command, 0, args);
+				}
 				updateToolbar();
 			},
 			bindHotkeys = function (hotKeys) {
@@ -48,6 +67,7 @@
 						if (editor.attr('contenteditable') && editor.is(':visible')) {
 							e.preventDefault();
 							e.stopPropagation();
+							alert("cmd=" + command);
 							execCommand(command);
 						}
 					}).keyup(hotkey, function (e) {
@@ -106,9 +126,11 @@
 			},			
 			bindToolbar = function (toolbar, options) {
 				toolbar.find(toolbarBtnSelector).click(function () {
+
 					restoreSelection();
 					editor.focus();
 					execCommand($(this).data(options.commandRole));
+					console.log($(this).data(options.commandRole));
 					saveSelection();					
 				});
 				toolbar.find('[data-toggle=dropdown]').click(restoreSelection);
