@@ -67,7 +67,6 @@
 						if (editor.attr('contenteditable') && editor.is(':visible')) {
 							e.preventDefault();
 							e.stopPropagation();
-							alert("cmd=" + command);
 							execCommand(command);
 						}
 					}).keyup(hotkey, function (e) {

@@ -69,13 +69,13 @@ class Errorchk extends CI_Controller {
 
 
 	/* Option 'once' == 하나의 에세이만 검사  'all' == 여러개 검사. */
-	public function error_chk($option,$data_id){ //0 member_list
+	public function error_chk($option, $data_id, $type = 1){ //0 member_list
 		if($this->session->userdata('is_login')){						
 			$error_array = array();			
 			$done_essay = array();
 			$error_array_temp = array();
 			
-			$essays = $this->all_list->get_essay($data_id);			
+			$essays = $this->all_list->get_essay($data_id, $type);			
 
 			foreach ($essays as $values) {
 				$editing = $values->editing;
@@ -85,7 +85,7 @@ class Errorchk extends CI_Controller {
 
 				// Garbage Tag 삭제후 업데이트 해준다!
 				$garbage_data_del = mysql_real_escape_string($editing);
-				$garbage_update = $this->all_list->garbage_data_del($data_id,$garbage_data_del);				
+				$garbage_update = $this->all_list->garbage_data_del($data_id,$garbage_data_del, $type);				
 
 				if($garbage_update){				
 					$s_tagmatch = preg_match('/<s>/',$editing);	
@@ -191,7 +191,7 @@ class Errorchk extends CI_Controller {
 					if($error_count == 0){
 						$replace_data = mysql_real_escape_string($editing);						
 						$before_editing = mysql_real_escape_string($before_editing);
-						$final_update = $this->all_list->ex_editing_update_service($data_id,$replace_data,$before_editing);	
+						$final_update = $this->all_list->ex_editing_update_service($data_id,$replace_data,$before_editing, $type);	
 
 						if($final_update){								
 							array_push($done_essay,$data_id);	
@@ -207,7 +207,7 @@ class Errorchk extends CI_Controller {
 
 						$replace_data = '';
 						$before_editing = mysql_real_escape_string($before_editing);
-						$update = $this->all_list->ex_editing_update_service($data_id,$replace_data,$before_editing);	
+						$update = $this->all_list->ex_editing_update_service($data_id,$replace_data,$before_editing, $type);	
 
 						if($option == 'once'){
 								return $error_array_temp; // true or false

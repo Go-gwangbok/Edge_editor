@@ -23,8 +23,15 @@ class All_list extends CI_Model{
    		return $this->db->query("SELECT * FROM data_kind WHERE id = '$kind_id'")->row();
    	}
 
-	function get_essay($data_id){
-		return $this->db->query("SELECT * FROM adjust_data WHERE id in($data_id)")->result();
+	function get_essay($data_id, $type = 1){
+		if ($type == 1)
+		{
+			return $this->db->query("SELECT * FROM adjust_data WHERE id in($data_id)")->result();
+		}
+		else
+		{
+			return $this->db->query("SELECT * FROM service_data WHERE id in($data_id)")->result();
+		}	
 	}
 
 	function getproject_name($pj_id){
@@ -348,8 +355,16 @@ class All_list extends CI_Model{
    		return true;
    	}
 
-   	function garbage_data_del($data_id,$garbage_data_del){
-   		$result = $this->db->query("UPDATE adjust_data SET editing = '$garbage_data_del' WHERE id = '$data_id'");
+   	function garbage_data_del($data_id,$garbage_data_del, $type = 1){
+   		if ($type == 1)
+   		{
+   			$result = $this->db->query("UPDATE adjust_data SET editing = '$garbage_data_del' WHERE id = '$data_id'");
+   		}
+   		else
+   		{
+   			$result = $this->db->query("UPDATE service_data SET editing = '$garbage_data_del' WHERE id = '$data_id'");
+   		}
+   		
    		return $result;      
    	}   	
 
@@ -389,7 +404,7 @@ class All_list extends CI_Model{
 
 
    	// Error Chk Sql
-	function ex_editing_update_service($essay_id,$replace_data,$before_editing){
+	function ex_editing_update_service($essay_id,$replace_data,$before_editing, $type = 1){
 	   		preg_match_all("|<u>|", $before_editing, $u_matches);
 			preg_match_all("|<strike>|", $before_editing, $s_matches);
 			preg_match_all("|<b>|", $before_editing, $b_matches);
@@ -401,8 +416,17 @@ class All_list extends CI_Model{
 			$org_tag = count($u_matches[0])+count($s_matches[0])+count($b_matches[0]);
 			$replace_tag = count($mod_matches[0])+count($ins_matches[0])+count($del_matches[0]);
 
-	   		$result = $this->db->query("UPDATE adjust_data SET ex_editing = '$replace_data', org_tag = '$org_tag', replace_tag = '$replace_tag' WHERE id = '$essay_id'");
-	   		return $result;      
+
+	   		if ($type == 1)
+	   		{
+	   			$result = $this->db->query("UPDATE adjust_data SET ex_editing = '$replace_data', org_tag = '$org_tag', replace_tag = '$replace_tag' WHERE id = '$essay_id'");
+	   		}
+	   		else
+	   		{
+	   			$result = $this->db->query("UPDATE service_data SET ex_editing = '$replace_data', org_tag = '$org_tag', replace_tag = '$replace_tag' WHERE id = '$essay_id'");
+	   		}
+	   		
+	   		return $result;
 	}
 
 	function error_replace($data_id,$replace_data){
@@ -1710,10 +1734,78 @@ class All_list extends CI_Model{
 		return $this->db->query($query)->result();
 	}
 
+	public function local_save($dic) {
+		$usr_id = $dic['usr_id'];
+		$w_id = $dic['w_id'];
+		$title = $dic['title'];
+		$raw_writing = $dic['raw_writing'];
+		$editing = $dic['editing'];
+		$tagging = $dic['tagging'];
+		$critique = $dic['critique'];
+		$score1 = $dic['score1'];
+		$score2 = $dic['score2'];
+		$word_count = $dic['word_count'];
+		$time = $dic['time'];
+		$kind = $dic['kind'];
+		$type = $dic['type'];
+		
+		$sql = "INSERT INTO adjust_data(
+				usr_id, essay_id, prompt, raw_txt, editing, tagging,
+				critique, scoring, score2, word_count, draft, submit,
+				time, kind, type, sub_date
+				) VALUES (
+				'$usr_id','$w_id',$title,$raw_writing,$editing,$tagging,
+				$critique,$score1,$score2,'$word_count',1,1,
+				$time,$kind,'$type',now())";
+
+		log_message('error', '[DEBUG] local_save sql : ' . $sql);
+
+		return $this->db->query($sql);
+	}
+	/***
 	public function local_save($usr_id,$w_id,$raw_writing,$editing,$tagging,$critique,$title,$kind,$score1,$score2,$word_count,$time,$type){				    
 					//local_save($usr_id,$w_id,$raw_writing,$editing,$tagging,$critique,$title,$kind,$score1,$score1,$time,$type)
 		return $this->db->query("INSERT INTO adjust_data(usr_id,essay_id,prompt,raw_txt,editing,tagging,critique,scoring,score2,word_count,draft,submit,time,kind,type,sub_date) 
 									VALUES('$usr_id','$w_id',$title,$raw_writing,$editing,$tagging,$critique,$score1,$score2,'$word_count',1,1,$time,$kind,'$type',now())");
+	}
+	***/
+
+	public function insert_service_data($dic) {
+		$usr_id = $dic['usr_id'];
+		$w_id = $dic['w_id'];
+		$title = $dic['title'];
+		$raw_writing = $dic['raw_writing'];
+		$editing = $dic['editing'];
+		$tagging = $dic['tagging'];
+		$critique = $dic['critique'];
+		$score1 = $dic['score1'];
+		$score2 = $dic['score2'];
+		$word_count = $dic['word_count'];
+		$time = $dic['time'];
+		$kind = $dic['kind'];
+		$type = $dic['type'];
+		
+		$sql = "INSERT INTO service_data(
+				usr_id, essay_id, prompt, raw_txt, editing, tagging,
+				critique, scoring, score2, word_count, draft, submit,
+				time, kind, type, sub_date
+				) VALUES (
+				'$usr_id','$w_id',$title,$raw_writing,$editing,$tagging,
+				$critique,$score1,$score2,'$word_count',1,1,
+				$time,$kind,'$type',now())";
+
+		log_message('error', '[DEBUG] insert_service_data sql : ' . $sql);
+
+		$ret = $this->db->query($sql);
+
+		if ($ret)
+		{
+			return @mysql_insert_id();
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	public function insert_file($filename, $title){

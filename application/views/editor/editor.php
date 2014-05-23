@@ -449,7 +449,7 @@ $(document).ready(function(){
     var tagOrg = all_tagsArray('org');
     var tagAppear = all_tagsArray('appear');    
     var taggingData = $.trim($('div#tagging_box').html());
-    alert(taggingData);    
+    //alert(taggingData);    
     
     // <IN></IN>, <TR></TR>... 기존에 있던 태그 삭제 후 Mapping한다.       
     $.each(tagOrg,function(i,value){

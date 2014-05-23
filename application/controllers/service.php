@@ -293,30 +293,72 @@ class Service extends CI_Controller {
 		$kind = $this->input->POST('kind');
 		$word_count = $this->input->POST('word_count');
 
-		//local DB save		
+		//local DB save
+		$dic = array();
+		$dic['usr_id']		= $usr_id;
+		$dic['w_id']			= $w_id;
+		$dic['title']			= $title;
+		$dic['raw_writing']		= $raw_writing;
+		$dic['editing']		= $editing;
+		$dic['tagging']		= $tagging;
+		$dic['critique']		= $critique;
+		$dic['score1']		= $score1;
+		$dic['score2']		= $score2;
+		$dic['word_count']		= $word_count;
+		$dic['time']			= $time;
+		$dic['kind']			= $kind;
+		$dic['type']			= $type;
+
+		$query_res = $this->all_list->insert_service_data($dic);
 		//$query_res = $this->all_list->local_save($usr_id,$w_id,$raw_writing,$editing,$tagging,$critique,$title,$kind,$score1,$score2,$word_count,$time,$type);		
-		
-		$data["id"] = $w_id;
-		$data["editing"] = $editing;
-		$data["done"] = $raw_writing;
-		$data["critique"] = $critique;
-		$data["socre"] = $score1;
-		$data["date"] = date("Y-m-d H:i:s", time());
-
-		$sending_data["status"]	= true;
-		$sending_data["data"] = $data;
-
-		$json_data = json_encode($sending_data);
-		log_message('error', $json_data);
 
 		//return;
 
-		$query_res = true;
+		//$query_res = true;
+		//log_message('error', print_r($query_res, 1));
 
 		if($query_res){ // True or false
+			$data_id = $query_res;
+			log_message('error', '[DEBUG] w_submit insert_id = ' . $data_id);
+
 			// Error chk
-			// $errorchk_class = new Errorchk;
-			// $error_chk = $errorchk_class->error_chk('once',$w_id,$type);
+			$errorchk_class = new Errorchk;
+			$error_chk = $errorchk_class->error_chk('once',$data_id,$type);
+
+			$essays = $this->all_list->get_essay($data_id, $type);
+
+			$completed_editing = "";
+			if (count($essays) > 0)
+			{
+				$ex_editing = $essays[0]->ex_editing;
+				log_message('error', '[DEBUG] w_submit ex_editing = ' . $ex_editing);
+
+				if ($ex_editing != "")
+				{
+					$completed_editing = $this->get_completed_editing($ex_editing);
+				}
+			}
+
+			$data = array();
+			$data["id"] = $w_id;
+			$data["editing"] = $editing;
+			if ($completed_editing != "")
+			{
+				$data["done"] = $completed_editing;
+			}
+			else
+			{
+				$data["done"] = $editing;
+			}
+			$data["critique"] = $critique;
+			$data["score"] = $score1;
+			$data["date"] = date("Y-m-d H:i:s", time());
+
+			$sending_data["status"]	= true;
+			$sending_data["data"] = $data;
+
+			$json_data = json_encode($sending_data);
+			log_message('error', $json_data);
 
 			//$access = $this->curl->simple_post('http://54.248.103.31/editor/editing/done', array('token'=>$token, 'id'=>$w_id, 'editing'=>$this->input->POST('editing'), 'critique'=>$this->input->POST('critique')));
 			log_message('error', $json_data);
@@ -523,5 +565,23 @@ class Service extends CI_Controller {
 		$this->output->set_content_type('application/json')->set_output(json_encode($json));
 	}
 
+	function get_completed_editing($str) {
+		$patterns = array("!<del(.*?)<\/del>!is", 
+					"!<ins>!is", 
+					"!</ins>!is", 
+					"/<mod[^>]+\>/i", 
+					"!</mod>!is");
+
+		$replace = array("", 
+					"", 
+					"", 
+					"", 
+					"");
+
+		$str = preg_replace($patterns, $replace, $str);
+		log_message('error', "[debug] get_completed_editing => $str");
+
+		return $str;
+	}
 }
 ?>
