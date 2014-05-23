@@ -7,7 +7,7 @@
   		</ol>		
   		<h3 class="text-center"><?=$pj_name;?></h3>
 		<div class="col-md-6 pull-left">					    			
-			<?
+			<?php
 			if($cate == 'import'){
 			?>
 			<form action="/upload" method="post" enctype="multipart/form-data">
@@ -17,7 +17,7 @@
 				<button class="btn btn-danger btn-xs" type="submit" value="upload" id="upload"/>Upload</button>				
 				<span class="text-danger" style="margin-left:10px;"><?=$error;?></span>			
 			</form>
-			<?
+			<?php
 			}else{
 			?>
 			<form action="/upload/do_upload" method="post" enctype="multipart/form-data">
@@ -26,20 +26,20 @@
 				<button class="btn btn-danger btn-xs" type="submit" value="upload" />Upload</button>				
 				<span class="text-danger" style="margin-left:10px;"><?=$error;?></span>			
 			</form>
-			<? } ?>
+			<?php } ?>
 		</div>
 
 		<div class="col-md-6 pull-right">					
 			<p class="text-danger pull-right"><strong>Essay Count : </strong><?=$cou = $count->count;?>&nbsp;&nbsp;&nbsp;
-			<?
+			<?php
 			if($cou == 0){
 			?>
 			<button type="button"  class="btn btn-danger btn-sm" disabled>Equal Distribute</button>
-			<?
+			<?php
 			}else{
 			?>
 			<button type="button" id="distribute" class="btn btn-danger btn-sm">Equal Distribute</button>
-			<?
+			<?php
 			}
 			?>				
 			</p>			
@@ -67,7 +67,7 @@
 				</tr>
 			</thead>
 			<tbody>	
-				<?
+				<?php
 				$i = 1;
 				foreach ($list as $value) {					
 					$essay = $value->essay;
@@ -85,7 +85,7 @@
 					<td class="text-center"><?=strtoupper($kind);?></td>
 					<td><?=$date;?></td>
 				</tr>	
-				<?
+				<?php
 				$i++;
 				}
 				?>
@@ -105,7 +105,7 @@
 		        <dl>						                	
                 	<dt></dt>
 				  	<dd style="color:black;"><strong>Please select an editor!</strong></dd>					  	
-				  	<?
+				  	<?php
 				  	foreach ($edi as $rows) {
 				  		$usr_id = $rows->usr_id;
 				  		$name = $rows->name;
@@ -113,7 +113,7 @@
 				  	<label class="checkbox" style="color:black;">
     					  <input type="checkbox" id="sel_mem" class="other" value = "<?=$usr_id;?>" conf="true"><?=$name;?>			  	
 				  	</label>    					
-				  	<?
+				  	<?php
 				  	}
 				  	?>
 				 </dl>

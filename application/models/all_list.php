@@ -1,4 +1,4 @@
-<?
+<?php
 class All_list extends CI_Model{
 	function get_cate($service_id,$cate){
 		return $this->db->query("SELECT * FROM data_kind WHERE service_id = '$service_id' and service_cate_name = '$cate'")->result();
@@ -15,7 +15,7 @@ class All_list extends CI_Model{
    									LEFT JOIN data_kind ON data_kind.id = connect_templet.data_kind_id
    									LEFT JOIN task ON task.id = connect_templet.task_id   									
    									WHERE connect_templet.data_kind_id = '$kind_id'
-   									AND connect_templet.task_id = '$type;'
+   									AND connect_templet.task_id = '$type'
    									ORDER BY connect_templet.task_id")->row();
    	}
 
@@ -349,7 +349,8 @@ class All_list extends CI_Model{
    	}
 
    	function garbage_data_del($data_id,$garbage_data_del){
-   		return $this->db->query("UPDATE adjust_data SET editing = '$garbage_data_del' WHERE id = '$data_id'");   		
+   		$result = $this->db->query("UPDATE adjust_data SET editing = '$garbage_data_del' WHERE id = '$data_id'");
+   		return $result;      
    	}   	
 
 
@@ -400,8 +401,8 @@ class All_list extends CI_Model{
 			$org_tag = count($u_matches[0])+count($s_matches[0])+count($b_matches[0]);
 			$replace_tag = count($mod_matches[0])+count($ins_matches[0])+count($del_matches[0]);
 
-	   		return $this->db->query("UPDATE adjust_data SET ex_editing = '$replace_data', org_tag = '$org_tag', replace_tag = '$replace_tag' WHERE id = '$essay_id'");
-	   		
+	   		$result = $this->db->query("UPDATE adjust_data SET ex_editing = '$replace_data', org_tag = '$org_tag', replace_tag = '$replace_tag' WHERE id = '$essay_id'");
+	   		return $result;      
 	}
 
 	function error_replace($data_id,$replace_data){
@@ -411,8 +412,11 @@ class All_list extends CI_Model{
 
 			$replace_tag = count($mod_matches[0])+count($ins_matches[0])+count($del_matches[0]);
 
-	   		return $this->db->query("UPDATE adjust_data SET ex_editing = '$replace_data', replace_tag = '$replace_tag' WHERE id = '$data_id'");	   		
+	   		$result = $this->db->query("UPDATE adjust_data SET ex_editing = '$replace_data', replace_tag = '$replace_tag' WHERE id = '$data_id'");
+	   		return $result;      
 	}
+
+
 
 
 
@@ -855,12 +859,19 @@ class All_list extends CI_Model{
    	// }
 
    	function getDataKind($task_id,$from_table){
+   		// return $this->db->query("SELECT data_kind.* 
+   		// 							FROM ".$from_table."
+   		// 							LEFT JOIN data_kind ON data_kind.id = ".$from_table.".kind
+   		// 							WHERE ".$from_table.".type = '$task_id'
+   		// 							and ".$from_table.".active = 0
+   		// 							GROUP BY data_kind.id")->result();
+
    		return $this->db->query("SELECT data_kind.* 
-   									FROM ".$from_table."
-   									LEFT JOIN data_kind ON data_kind.id = ".$from_table.".kind
-   									WHERE ".$from_table.".type = '$task_id'
-   									and ".$from_table.".active = 0
-   									GROUP BY data_kind.id")->result();
+									FROM connect_templet
+									LEFT JOIN data_kind ON data_kind.id = connect_templet.data_kind_id
+									LEFT JOIN task ON task.id = connect_templet.id
+									WHERE connect_templet.task_id = '$task_id'
+									group by data_kind.id")->result();
     }
 
     function get_setup_tabs($type_id,$kind_id){
@@ -1699,8 +1710,10 @@ class All_list extends CI_Model{
 		return $this->db->query($query)->result();
 	}
 
-	public function local_save($usr_id,$w_id,$raw_writing,$editing,$tagging,$critique,$title,$kind,$scoring,$time,$type){				    
-		return $this->db->query("INSERT INTO adjust_data(usr_id,essay_id,prompt,raw_txt,editing,tagging,critique,draft,submit,kind,type,sub_date,time,scoring) VALUES('$usr_id','$w_id',$title,$raw_writing,$editing,$tagging,$critique,1,1,$kind,'$type',now(),'$time','$scoring')");
+	public function local_save($usr_id,$w_id,$raw_writing,$editing,$tagging,$critique,$title,$kind,$score1,$score2,$word_count,$time,$type){				    
+					//local_save($usr_id,$w_id,$raw_writing,$editing,$tagging,$critique,$title,$kind,$score1,$score1,$time,$type)
+		return $this->db->query("INSERT INTO adjust_data(usr_id,essay_id,prompt,raw_txt,editing,tagging,critique,scoring,score2,word_count,draft,submit,time,kind,type,sub_date) 
+									VALUES('$usr_id','$w_id',$title,$raw_writing,$editing,$tagging,$critique,$score1,$score2,'$word_count',1,1,$time,$kind,'$type',now())");
 	}
 
 	public function insert_file($filename, $title){

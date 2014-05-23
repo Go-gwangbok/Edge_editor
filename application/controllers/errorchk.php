@@ -63,6 +63,7 @@ class Errorchk extends CI_Controller {
 		for($i=1; $i<sizeof($text_array); $i++) {
 			$arr[] = trim(substr($text_array[$i], 0, strpos($text_array[$i], $needle2)));
 		}
+
 		return $arr;		
 	}		
 
@@ -119,16 +120,35 @@ class Errorchk extends CI_Controller {
 						// Count End
 
 						foreach ($content_count as $value) { // Error sentence chk
+							//log_message('error', "[DEBUG] content_count => $value");
+							$token = explode('//', $value); 
+
+							if (count($token) != 2)
+							{
+								array_push($error_array_temp, '&ltu&gt'.$value.'&lt/u&gt');
+								log_message('error', "[error] <u> tagging error : $value");
+							} 
+							else if (trim($token[0]) == "" || trim($token[1] == ""))
+							{
+								array_push($error_array_temp, '&ltu&gt'.$value.'&lt/u&gt');
+								// log_message('error', "[error] <u> tagging error : $value");								
+							}
+
+							/***
 							preg_match_all('/\/\//', $value, $matche_count);										
-							
+							log_message('error', "[DEBUG] matche_count => " . count($matche_count[0]));
 							// u 태그안에 슬라스가 없거나 1개 이상이면 에러!
 							if(count($matche_count[0]) != 1){ 
 								array_push($error_array_temp, '&ltu&gt'.$value.'&lt/u&gt');
+								log_message('error', "[error] $value");
 							}
+
+
 								
 							// }else if(count($matche_count[0]) > 1){						
 							// 	array_push($error_array_temp, '&ltu&gt'.$value.'&lt/u&gt');						
 							// }
+							***/
 						}	
 
 						// 에디팅 한것중에 전체 slash 카운트.
@@ -222,11 +242,15 @@ class Errorchk extends CI_Controller {
 			$data_id = $this->input->post('data_id');
 			$type = $this->input->post('type');						
 
+			//log_message('error', '[debug] 1. error_chk_post edting : ' . $editing);
 			$editing = $this->garbageTag_replace($editing);
+			//log_message('error', '[debug] 2. error_chk_post edting : ' . $editing);
 
 			// Garbage Tag 삭제후 업데이트 해준다!			
 			$garbage_data_del = mysql_real_escape_string($editing);
-			$this->all_list->garbage_data_del($data_id,$type,$garbage_data_del);				
+			//log_message('error', '[debug] 3. error_chk_post garbage_data_del : ' . $garbage_data_del);
+			$this->all_list->garbage_data_del($data_id,$garbage_data_del);
+			//$this->all_list->garbage_data_del($data_id,$type,$garbage_data_del);				
 
 			$s_tagmatch = preg_match('/<s>/',$editing);	
 
@@ -261,6 +285,20 @@ class Errorchk extends CI_Controller {
 				// Count End
 
 				foreach ($content_count as $value) { // Error sentence chk
+					$token = explode('//', $value); 
+
+					if (count($token) != 2)
+					{
+						array_push($error_array_temp, '&ltu&gt'.$value.'&lt/u&gt');
+						log_message('error', "[error] <u> tagging error : $value");
+					} 
+					else if (trim($token[0]) == "" || trim($token[1] == ""))
+					{
+						array_push($error_array_temp, '&ltu&gt'.$value.'&lt/u&gt');
+						log_message('error', "[error] <u> tagging error : $value");								
+					}
+
+					/***
 					preg_match_all('/\/\//', $value, $matche_count);										
 					
 					// u 태그안에 슬라스가 없거나 1개 이상이면 에러!
@@ -270,6 +308,7 @@ class Errorchk extends CI_Controller {
 					// }else if(count($matche_count[0]) > 1){						
 					// 	array_push($error_array_temp, '&ltu&gt'.$value.'&lt/u&gt');						
 					// }
+					***/
 				}				
 
 				// 에디팅 한것중에 전체 슬아이스 갯수 카운트.
@@ -314,7 +353,10 @@ class Errorchk extends CI_Controller {
 			$error_count = count($error_array_temp); 
 			if($error_count == 0){
 				// Error를 고쳤으면 정확한 replace 태그에 대한 카운터를 넣는다!
-				$replace_data = mysql_real_escape_string($editing);										
+				$replace_data = mysql_real_escape_string($editing);
+
+				//log_message('error', '[debug] 3. replace_data : ' . $replace_data);
+										
 				$json['result'] = $this->all_list->error_replace($data_id,$replace_data,$type);
 			}else{ // 에러 에세이 경우!				
 				$json['result'] = $error_array_temp; // true or false				

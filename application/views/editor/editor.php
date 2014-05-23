@@ -2,36 +2,36 @@
   <div class="row">   
     <ol class="breadcrumb" style="background:white;">
           <li><a href="/">Home</a></li>                   
-          <?
+          <?php
             if($cate == 'writing'){
           ?>
             <li><a href="/service">Service</a></li>                         
             <li class="akacolor">Writing</li>
-          <?
+          <?php
             }elseif($cate == 'todo' || $cate == 'draft'){
           ?>
             <li><a href="/musedata/project/">Project</a></li>   
             <li><a href="/musedata/project/board/<?=$cate;?>/<?=$pj_id?>/<?=$this->session->userdata('id');?>"><?=$pjname;?></a></li>   
             <li class="akacolor">Todo</li>                         
-          <?
+          <?php
             }elseif($cate == 'com'){
           ?>
             <li><a href="/musedata/project/">Project</a></li>   
             <li><a href="/musedata/project/board/<?=$cate;?>/<?=$pj_id?>/<?=$this->session->userdata('id');?>"><?=$pjname;?></a></li>   
             <li class="akacolor">Completed</li>                         
-          <?
+          <?php
             }elseif($cate == 'tbd'){
           ?>             
             <li><a href="/musedata/project/">Project</a></li>   
             <li><a href="/musedata/project/board/<?=$cate;?>/<?=$pj_id?>/<?=$this->session->userdata('id');?>"><?=$pjname;?></a></li>    
             <li class="akacolor">T.B.D</li>                         
-          <?
+          <?php
             }elseif($cate == 'history'){
           ?>
             <li><a href="/musedata/project/">Project</a></li>   
             <li><a href="/musedata/project/board/<?=$cate;?>/<?=$pj_id?>/<?=$this->session->userdata('id');?>"><?=$pjname;?></a></li>   
             <li class="akacolor">History</li>
-          <?
+          <?php
             }                          
           ?>            
       </ol> <!-- Navi end -->
@@ -47,7 +47,7 @@
   <br>
 
   <ul class="nav nav-tabs" id="myTab">    
-    <?
+    <?php
     $chk_orig = 'N';
     $chk_detection = 'N';
     $chk_structure = 'N';
@@ -74,11 +74,11 @@
         $active_ele = $element;
       ?>
       <li class="active"><a href="#<?=$element;?>" data-toggle="tab"><?=$view_ele;?></a></li>
-      <?
+      <?php
       }else{
       ?>
       <li><a href="#<?=$element?>" data-toggle="tab"><?=$view_ele;?></a></li>  
-      <?      
+      <?php      
       } 
       $i++;   
     }
@@ -86,21 +86,21 @@
     <!-- Default -->    
     <div id="stopwatch" class="btn btn-default pull-right" disabled>Timer : 00:00</div>
     <div class="btn btn-default pull-right" style="margin-right:3px;" disabled>Word count : <?=$word_count;?></div>
-    <?
+    <?php
     if($cate != 'writing') { // Editor 하지만, Edge Writing에서 넘어온것은 표시안함!
       if($error_chk == 'RE' && $submit != 1){
       ?>
         <button class="btn btn-danger pull-right" id="errorlist" style="margin-right:10px;" disabled>Return</button>
-      <?
+      <?php
       }elseif($submit != 1){
       ?>
         <button class="btn btn-danger pull-right" id="errorlist" style="margin-right:10px;">Error</button>
-      <?
+      <?php
       }      
       if($discuss == 'Y' && $submit != 1){
       ?>
         <button class="btn btn-warning pull-right" id="discuss" style="margin-right:10px;">T.B.D</button>
-      <?
+      <?php
       }      
     }
     ?>   
@@ -108,25 +108,25 @@
   <br>
 <div class="tab-content">
   <!-- Original -->
-  <?
+  <?php  
   if($chk_orig == 'Y'){
   ?>  
    <div class="tab-pane div-box-line active" id="orig">
       <div class="col-md-12" style="margin-top:15px;">                
         
         <div>          
-          <?
+          <?php
             echo trim($re_raw_writing);             
           ?>      
         </div> 
         <br>      
       </div>  <!-- col-md-12 -->
     </div> <!-- tab-pane -->
-  <? } ?> <!-- Original end -->
+  <?php } ?> <!-- Original end -->
 
     
     <!-- Error detecting -->
-    <?
+    <?php    
     if($chk_detection == 'Y'){
     ?>      
     <div class="tab-pane div-box-line" id="detection">
@@ -148,7 +148,7 @@
         </div> <!-- btn-toolbar -->
 
         <div id="editor">          
-          <?
+          <?php
             // Draft essay          
             if($cate == 'com' || $cate == 'draft' || $cate == 'tbd'){          
               echo trim($edit_writing);
@@ -172,15 +172,15 @@
                 <!-- Critique -->
                 <div id="collapseOne" class="panel-collapse collapse in">
                   <div class="panel-body">
-                    <? // Draft essay
+                    <?php // Draft essay
                     if($cate == 'com' || $cate == 'draft' || $cate == 'tbd'){
                     ?>
                       <textarea class="border text_box" id="critique" style="width:100%;" rows="7"><?=trim($critique);?></textarea>              
-                    <?
+                    <?php
                     }else{ // New essay or T.B.D          
                     ?>
                       <textarea class="border text_box" id="critique" style="width:100%;" rows="7"></textarea>           
-                    <? } ?>   
+                    <?php } ?>   
                   </div>
                 </div>            
               </div>           
@@ -189,11 +189,11 @@
             <!-- accordion end -->
       </div>  <!-- col-md-12 -->
     </div> <!-- tab-pane -->
-    <? } ?>
+    <?php } ?>
     <!-- Error detecting end -->    
 
     <!-- Tagging start -->
-    <?
+    <?php
     if($chk_structure == 'Y'){
     ?>      
     <div class="tab-pane div-box-line" id="structure">        
@@ -203,14 +203,14 @@
           <div class="col-md-12"> 
             <div class="col-md-12" style="margin-top:20px; text-align:center" id="confbox">
               <h5>Confirm&nbsp;&nbsp;   
-               <?
+               <?php
                 foreach ($tag_templet as $value) {
                   $tag_id = $value->tag_id;
                   $tag_name = $value->tag;
                   $appear_tag = $value->appear;
                 ?>
                 <button id="block" tag="<?=$tag_name;?>" type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-tasks"></span> <?=strtoupper($appear_tag)?></button>
-                <? } ?>                      
+                <?php } ?>                      
                 <!-- <button id="block" tag="in" type="button" class="btn btn-default btn-sm" data-toggle="button"><span class="glyphicon glyphicon-tasks"></span> IN</button> -->                  
               </h5>
             </div>
@@ -218,14 +218,14 @@
           </div>       
 
           <!-- Tagging -->
-          <?
+          <?php
           foreach ($tag_templet as $value) {
             $tag_id = $value->tag_id;
             $tag_name = $value->tag;
             $appear_tag = $value->appear;
           ?>
           <button id="tag" tag="<?=strtolower($tag_name);?>" appear="<?=strtoupper($appear_tag);?>" type="button" class="btn btn-success btn-sm">&lt;<?=strtoupper($appear_tag);?>&gt;</button>
-          <? } ?>                      
+          <?php } ?>                      
           <!-- <button id="tag" tag="IN" type="button" class="btn btn-success btn-sm">&lt;IN&gt;</button> -->            
           <button id="all" type="button" class="btn btn-default btn-danger btn-sm pull-right" click="clear"><span class="glyphicon glyphicon-refresh"></span> Clear All</button>            
           <button id="redo" type="button" class="btn btn-default btn-sm pull-right" style="margin-right:5px;"><span class="glyphicon glyphicon-refresh"></span> Redo</button>
@@ -235,23 +235,23 @@
     </div> <!-- col-md-12 -->              
     <hr class="text-box-hr">              
     <div class="col-md-12" id="hrline">                    
-      <?
+      <?php
       if($cate == 'com' || $cate == 'draft' || $cate == 'tbd'){
       ?>
       <div class="divtagging_box" id="tagging_box"><?=trim($tagging);?></div>          
-      <?
+      <?php
       }else{ // New or Writing
       ?>
       <div class="divtagging_box" id="tagging_box"><?=trim($writing);?></div>          
-      <?
+      <?php
       }
       ?>             
     </div>        
   </div> 
-  <? } ?>
+  <?php } ?>
   <!-- Tagging End -->
   
-  <?
+  <?php
   if($chk_sco1 == 'Y'){
   ?>          
   <!-- Score1 start -->   
@@ -260,7 +260,7 @@
     <div class="col-md-12 ">           
       <div class="col-md-12 ">                         
         <div class="col-md-12 ">  
-        <?
+        <?php
         foreach ($score_templet as $value) {
           $score_id = $value->score_id;
           $score_name = $value->name;
@@ -271,17 +271,17 @@
             <input type="text" class="form-control score_val1" id="<?=strtolower($score_name);?>1" placeholder="0">
           </div>
         </div>
-        <? } ?>                 
+        <?php } ?>                 
         </div>
       </div>
     </div>              
   </div>  
-  <? } ?>
+  <?php } ?>
   <!-- Score1 End -->
 
 
   <!-- Score2 start -->   
-  <?
+  <?php
   if($chk_sco2 == 'Y'){
   ?>      
   <div class="tab-pane div-box-line " id="sco2">
@@ -289,7 +289,7 @@
     <div class="col-md-12 ">           
       <div class="col-md-12 ">                         
         <div class="col-md-12 ">  
-        <?
+        <?php
         foreach ($score_templet as $value) {
           $score_id = $value->score_id;
           $score_name = $value->name;
@@ -300,53 +300,43 @@
             <input type="text" class="form-control score_val2" id="<?=strtolower($score_name);?>2" placeholder="0">
           </div>
         </div>
-        <? } ?>                 
+        <?php } ?>                 
         </div>
       </div>
     </div>              
   </div>  
-  <? } ?>
+  <?php } ?>
   <!-- Score2 End -->
 
     <!-- Submit button -->
     <div style="margin-top:8px;">
-      <?
+      <?php
       if($this->session->userdata('classify') == 1 && $cate == 'draft' || $cate == 'todo' || $cate == 'pj_draft' || $cate == 'tbd'){     
       ?>  
       <button class="btn btn-danger pull-right" id="submit">Submit</button>
       <button class="btn btn-primary" id="draft">Save Draft</button>
-      <?  
+      <?php  
       }elseif($this->session->userdata('classify') == 1 && $cate == 'com'){          
       ?>
       <button class="btn btn-danger pull-right" id="editSubmit">Submit</button>
-      <?
+      <?php
       }elseif($this->session->userdata('classify') == 1 && $cate == 'writing'){
       ?>  
       <button class="btn btn-danger pull-right" id="w_submit" disabled>Submit</button>
-      <?
+      <?php
       }
       ?>   
     </div> 
-    <!-- <button id="abc">tag</button>
-    <textarea rows="20" cols="150" id="dd">Some people say that to communicate with others more effectively, people should meet others, which means face to face communication. However, I think that when we should communicate others, other than face to face communication, other types of communications are better for some reasons below.
-
-First, through the types of communication such as email, telephone, or on the Internet, people save their money to some extent. In the case of the Internet, by the means of email, we do not have to pay any money when sending a letter regardless of location, where we are. If we should meet someone face to face, for instance, we should travel by using a car or taking public transportation, which requires a lot of money, especially if the destination is far away from the departure. In my case, I am a student in Korea and I am not making money, so to meet my friend in America, I meet my people using Internet telephone program, Skype, which enables us to communicate with each other. We can talk freely, without any fee, facing to face with the help of computer monitor, as if we just meet on the place.
-
-Secondly, we can communicate at any time with convenience. When we meet a person at a certain place, we should make an appointment prior to the day, checking whether there is no schedule and the day is proper to meet. However, by using some communicate ways such as email we can convey our intention efficiently to others without restriction of time. Furthermore, the message delivered person is not disturbed as well because we can check email at any time by using computers or smart phone. Both senders and the delivered can benefit from such types of communications. In the cases that we need to talk or convey trivial things such as prepare some food before I arrive, or please wait for me at the bus station with umbrella, people do not have to meet each other face to face, they can just use their telephones, which is time saving, much more efficient and proper way.
-
-In conclusion, we can communicate better with others using convenient types of communication, which enables us not only to save time but also money.
-    </textarea> -->
-
-    
-
     <!-- hidden data -->
     <form> 
       <input type="hidden" id="raw_writing" value="<?=$writing;?>">
       <input type="hidden" id="re_raw_writing" value="<?=$re_raw_writing;?>">
       <input type="hidden" id="edit_writing" value="<?=$edit_writing;?>">
+      <input type="hidden" id="h_title" value="<?=$title;?>">
       <input type="hidden" id="writing" value="<?=$writing;?>">
       <input type="hidden" id="h_critique" value="<?=$critique;?>">      
-      <input type="hidden" id="h_tagging" value="<?=$tagging;?>">      
+      <input type="hidden" id="h_tagging" value="<?=$tagging;?>">
+      <input type="hidden" id="score_templet" value="<?=$score_templet;?>">      
     </form>  
   </div>  
 </div>   
@@ -371,10 +361,10 @@ console.log(cate);
 
 function getAnchorOffset() {
   if (window.getSelection) {                      //only work if supported
-   var selection = window.getSelection ();      //get the selection object     
-   var anchorOffsetProp = selection.anchorOffset;   //get the offset
-   console.log( "Anchor Offset: \n" + anchorOffsetProp.toString());                                 
-   }
+     var selection = window.getSelection ();      //get the selection object     
+     var anchorOffsetProp = selection.anchorOffset;   //get the offset
+     console.log( "Anchor Offset: \n" + anchorOffsetProp.toString());                                 
+     }
 } 
 
 (function($) { 
@@ -432,7 +422,7 @@ function getAnchorOffset() {
 //     .selection('insert', {text: '</strong>', mode: 'after'});
 // });
 var tagging_action_array = new Array();  
-$(document).ready(function(){    
+$(document).ready(function(){      
   var active_ele = '<?=$active_ele;?>';
   $('div#'+active_ele).addClass('active');
   
@@ -458,13 +448,15 @@ $(document).ready(function(){
     $('span').removeAttr('tag');
     var tagOrg = all_tagsArray('org');
     var tagAppear = all_tagsArray('appear');    
-    var taggingData = $.trim($('div#tagging_box').html());    
+    var taggingData = $.trim($('div#tagging_box').html());
+    alert(taggingData);    
     
     // <IN></IN>, <TR></TR>... 기존에 있던 태그 삭제 후 Mapping한다.       
     $.each(tagOrg,function(i,value){
       var className = value;          
       var spanCount = $('span.'+className).length;    
-      
+      var span_str = '<span class="'+className+'">';
+
       for(j = 0; j < spanCount; j++){
         var taggingData = $.trim($('div#tagging_box').html());    
         if(spanCount > 1){            
@@ -475,17 +467,17 @@ $(document).ready(function(){
           get_span_replace = get_span.replace('&lt;'+tagAppear[i]+'&gt;',''); // 앞 태그
           get_span_replace = get_span_replace.replace('&lt;/'+tagAppear[i]+'&gt;',''); // 뒤 태그            
           if(j == 0){
-            taggingData = taggingData.replace($('span.'+className+':eq('+j+')').html(),'&lt;'+tagAppear[i]+'&gt;'+get_span_replace+'&lt;/'+tagAppear[i]+'&gt;');
+            taggingData = taggingData.replace(span_str + $('span.'+className+':eq('+j+')').html(), span_str + '&lt;'+tagAppear[i]+'&gt;'+get_span_replace+'&lt;/'+tagAppear[i]+'&gt;');
           }else{
-            taggingData = taggingData.replace($('span.'+className+':eq('+j+')').html(),'&lt;'+tagAppear[i]+(j+1)+'&gt;'+get_span_replace+'&lt;/'+tagAppear[i]+(j+1)+'&gt;');
+            taggingData = taggingData.replace(span_str + $('span.'+className+':eq('+j+')').html(), span_str + '&lt;'+tagAppear[i]+(j+1)+'&gt;'+get_span_replace+'&lt;/'+tagAppear[i]+(j+1)+'&gt;');
           }          
           $.trim($('div#tagging_box').html(taggingData));          
         }else{
           taggingData = taggingData.replace('&lt;'+tagAppear[i]+'&gt;',''); // 앞 태그
-          taggingData = taggingData.replace('&lt;/'+tagAppear[i]+'&gt;',''); // 뒤 태그  
+          taggingData = taggingData.replace('&lt;/'+tagAppear[i]+'&gt;',''); // 뒤 태그
           $.trim($('div#tagging_box').html(taggingData));
-          var get_span = $('span.'+className+':eq('+j+')').html();
-          taggingData = taggingData.replace(get_span,'&lt;'+tagAppear[i]+'&gt;'+get_span+'&lt;/'+tagAppear[i]+'&gt;');          
+          var get_span = $('span.'+className+':eq('+j+')').html();          
+          taggingData = taggingData.replace(span_str + get_span, span_str + '&lt;'+tagAppear[i]+'&gt;'+get_span+'&lt;/'+tagAppear[i]+'&gt;');          
           $.trim($('div#tagging_box').html(taggingData));
         } // If end.                 
       } // For end. 
@@ -557,22 +549,194 @@ var Example1 = new (function() {
 });
 
 
+function selectionGet()
+{
+  // for webkit, mozilla, opera
+  if (window.getSelection)
+    return window.getSelection();
+  // for ie
+  else if (document.selection && document.selection.createRange && document.selection.type != "None")
+    return document.selection.createRange();
+}
 
+function checkValidationOfSelectedText(selectedText)
+{
+  var all_tag_array = all_tagsArray('appear'); // Array 
+  var all_orgtag = all_tagsArray('org'); // Array  
+  
+  var tagging = $.trim($('div#tagging_box').html());
+
+  var result = true;
+
+  $.each(all_tag_array,function(i,value)
+  {
+    var tag = value;
+    var re = new RegExp('span class="'+all_orgtag[i]+'"', "ig"); 
+
+    var match = tagging.match(re);
+    if(match != null)
+    {
+      for(j = 0; j < match.length; j++)
+      {
+        var startRe, endRe, startMatchCnt, endMatchCnt;
+
+        if (j == 0)
+        {
+          startRe = new RegExp('&lt;'+ tag +'&gt;', "ig");
+          endRe = new RegExp('&lt;/'+ tag +'&gt;', "ig");          
+        }
+        else
+        {
+          startRe = new RegExp('&lt;'+ tag + (j+1) + '&gt;', "ig");
+          endRe = new RegExp('&lt;/'+ tag + (j+1) + '&gt;', "ig");          
+        }
+
+        var startMatch = selectedText.match(startRe);
+        var endMatch = selectedText.match(endRe);
+
+        startMatchCnt = endMatchCnt = 0;
+
+        if (startMatch != null && startMatch.length > 0)
+        {
+          startMatchCnt = startMatch.length;
+        }
+        if (endMatch != null && endMatch.length > 0)
+        {
+          endMatchCnt = endMatch.length;
+        }
+        //alert("tag : " + tag + ", start: " + startMatchCnt + ", end: " + endMatchCnt);
+        if (startMatchCnt != endMatchCnt)
+        {
+            result = false;
+            break;
+        }
+      }
+    }
+  });
+
+  return result;
+}
+
+// for redo & undo of tagging_action_array
+var undo_num = 1;
+var redo_num = 0;
 
 // Tag Wrap
 $('button#tag').click(function(){  
   $('span').removeAttr('style');        
   var tag = $(this).attr('tag'); // Original Tag name
   var get_appear_tag = $(this).attr('appear'); // Appear Tag name
-  var select_text = $.selection('html');
+  //var select_text = $.selection('html');
+  //alert(select_text);
   // var select_a = $.selection('html');
   // console.log(select_a); 
   
-  console.log($("div#tagging_box").html().indexOf(select_text));
+  //console.log($("div#tagging_box").html().indexOf(select_text));
   //console.log($("div#tagging_box").html().anchorOffset(select_text));
   
+    var div = $("div#tagging_box");  
+    var tagging_data = $("div#tagging_box").html(); 
 
-  
+    var reg = new RegExp('span class="'+tag+'"', "ig");  
+    var match_reg = tagging_data.match(reg);
+
+    var tTag = "span";
+    var tAttr = "class";
+    var tVal = tag;
+
+    // for webkit, mozilla, opera     
+    if (window.getSelection)
+    {
+        var selObj = selectionGet(), selRange, newElement, documentFragment;
+
+        if (selObj.anchorNode && selObj.getRangeAt)
+        {
+            selRange = selObj.getRangeAt(0);
+
+            //var selectedText = selRange.toString();
+
+            var selectedText = $('<div></div>').append(selRange.cloneContents()).html();
+
+            //alert("selectedText : " + selectedText);
+
+            if(selectedText == '')
+            {
+                alert('selection Error : text is not selected');
+                return;
+            }
+
+            //result = checkValidationOfSelectedText(selectedText);
+            //alert(result);
+            if (!checkValidationOfSelectedText(selectedText))
+            {
+                alert('selection Error : selection range is invalid');
+                return;
+            }
+
+            // create to new element
+            newElement = document.createElement(tTag);
+
+            // extract to the selected text
+            documentFragment = selRange.extractContents();
+
+            // add the contents to the new element
+            newElement.appendChild(documentFragment);
+
+      var replaced_text = "";
+            if(match_reg != null)
+            {  // 적어도 두번째 같은 태그를 사용함!
+                var match_reg_cnt = match_reg.length;    
+                replaced_text = '&#60'+get_appear_tag+(match_reg_cnt+1)+'&#62'+selectedText+'&#60/'+get_appear_tag+(match_reg_cnt+1)+'&#62';
+            }
+            else
+            { // 같은 태그를 한번도 사용한적이 없음!
+                replaced_text = '&#60'+get_appear_tag+'&#62'+selectedText+'&#60/'+get_appear_tag+'&#62';
+            }
+            //alert(replaced_text);
+
+            newElement.innerHTML = replaced_text;
+            
+            // add the attribute to the new element
+            $(newElement).attr(tAttr,tVal);
+
+            selRange.insertNode(newElement);
+            selObj.removeAllRanges();
+
+            // if the attribute is "style", change styles to around tags
+            //if(tAttr=="style")
+            //  affectStyleAround($(newElement),tVal);
+            // for other attributes
+            //else
+            //  affectStyleAround($(newElement),false);
+        }
+    }
+    // for ie
+    else if (document.selection && document.selection.createRange && document.selection.type != "None")
+    {
+        var range = document.selection.createRange();
+        var selectedText = range.htmlText;
+
+        var newText = '<'+tTag+' '+tAttr+'="'+tVal+'">'+selectedText+'</'+tTag+'>';
+    
+        document.selection.createRange().pasteHTML(newText);
+    }
+
+    var replace_tagging_text = $("div#tagging_box").html(); 
+    while (undo_num > 1)
+    {
+        tagging_action_array.pop();
+        undo_num--;
+    }
+
+    tagging_action_array.push(replace_tagging_text); // Replace 될때 마다 push.
+    undo_num = 1;
+    $('button#undo').attr('disabled',false);    
+    $('button#redo').attr('disabled',true);
+
+  return;
+
+
+  /***
   if(select_text == ''){
     alert('selection Error');
   }else{
@@ -593,28 +757,27 @@ $('button#tag').click(function(){
     $('button#undo').attr('disabled',false);    
     $('button#redo').attr('disabled',true);   
   }    
+  ***/
 });
 
 //Error Undo
-var ii = 1;
-var redo_num = 0;
 
 $('button#undo').click(function(){  
   
   console.log('-------undo--------');
   
   var array_num = tagging_action_array.length - 1;    
-  var num = array_num - ii;
+  var num = array_num - undo_num;
   $('div#tagging_box').html(tagging_action_array[num]);
   if( num > 0){
   $('button#redo').attr('disabled',false);    
-    ii++;      
+    undo_num++;      
     redo_num = num;
   }else if(num == 0){
     $(this).attr('disabled',true);
     $('button#redo').attr('disabled',false);    
     redo_num = 0;
-    ii = array_num; //num을 0으로 만들기 위해.
+    undo_num = array_num; //num을 0으로 만들기 위해.
   }    
 });
 
@@ -631,7 +794,7 @@ $('button#redo').click(function(){
   }else if(num == array_num){
     $(this).attr('disabled',true);
     $('button#undo').attr('disabled',false);    
-    ii = 1;
+    undo_num = 1;
   }  
 });
 
@@ -761,7 +924,8 @@ function get_save_data(){
   $('span').removeAttr('style'); // Confirm으로 인해 span css를 삭제하고 DB에 저장한다!
   $('br').removeAttr('style'); // Confirm으로 인해 br css를 삭제하고 DB에 저장한다!
   if(chk_structure == 'Y'){            
-    var tagging = $.trim($('div#tagging_box').html());    
+    var tagging = $.trim($('div#tagging_box').html());
+    console.log(tagging);    
   }else{
     if(cate == 'draft' || cate == 'com' || cate == 'tbd'){
       var tagging = $.trim($('input#h_tagging').val());
@@ -870,8 +1034,8 @@ $('button#submit').click(function()
     dataType: 'json',
     success: function(json)
     { 
-      //console.log(json['error_chk']);
-      //console.log(json['status']);
+      console.log(json['error_chk']);
+      console.log(json['status']);
 
       if(json['error_chk'] == 'garbage_update_error'){
         alert('garbage_update_error');
@@ -888,8 +1052,6 @@ $('button#submit').click(function()
           alert('all_list --> draft DB Error');
         }  
       }
-
-      
     }
   });
 });
@@ -940,59 +1102,27 @@ $('#critique').on("propertychange input textInput", function() {
 });
 
 // Service Submit.
-$("button#w_submit").click(function(){  
-  var token = '<?=$token;?>';
-  var service_id = <?=$id;?>;
-  
-  var editing = $.trim($('div#editor').html());
-  var raw_writing = $('input#raw_writing').val(); 
-  var critique = $('textarea#critique').val();    
-  var tagging = $('div#tagging_box').html();
-  var kind = '<?=$kind;?>';
-  var title = $('dd#prompt').text();
+$("button#w_submit").click(function(){    
 
-  // Score
-  var score_obj = make_obj_score('score_val'); // Score1
-  var score1 = JSON.stringify(score_obj);    
+  var data = get_save_data();  
+  data['token'] = '<?=$token;?>';  
+  data['kind'] = '<?=$kind?>';
+  data['raw_writing'] = $('input#raw_writing').val();
+  data['title'] = $('input#h_title').val();
+  data['word_count'] = '<?=$word_count?>';
+  console.log(data);
 
-  var score_obj2 = make_obj_score('score_val2'); // Score1
-  var score2 = JSON.stringify(score_obj2);    
-
-  Example1.resetStopwatch(); // stop timer
-  var time = $('div#stopwatch').text().substr(8);  
-  var min = parseInt(time.substr(0,2));
-  var second = parseInt(time.substr(3));
-
-  min = min * 6000;
-  second = second * 100;
-  var total_time = min+second;  
-  //console.log(total_time); 
-
-  var submit_data = {
-    token: token,
-    w_id: service_id,
-    time : total_time,
-    kind: kind,
-    title: title,    
-    editing: editing,
-    critique: critique,
-    tagging: tagging,
-    raw_writing : raw_writing,
-    scoring : score1,
-    score2 : score2,
-  };
-  //console.log(submit_data); 
   $.ajax({    
     url: '/service/w_submit',
     type: 'POST',         
-    data: submit_data,
+    data: data,
     dataType: 'json',
     success: function(json){      
       var access = json['result'];      
       //console.log(access);                  
       if(access == true){  
         alert('It’s been successfully processed!');
-        window.history.back();
+        window.location.href = '/service';
         //window.location = "/essaylist/done";
       }else if(access == 'localdb'){
         alert('local db insert error');

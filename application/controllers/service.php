@@ -158,11 +158,14 @@ class Service extends CI_Controller {
 			
 			// success -> token
 			$token = $access_status['data']['token'];
+
+			log_message('error', "token : $token");
 			
 			// re_curl
 			$result_data = $this->curl->simple_post('http://54.248.103.31/editor/get', array('token'=>$token));
 
 
+			//log_message('error', "result_data : $result_data");
 			/** "is_24hr":"1" == true  "0" == 'false'   "is_critique":"1" == true  "0" == 'false' **/
 			
 			// $result_data = '{
@@ -216,7 +219,7 @@ class Service extends CI_Controller {
 	}
 
 	function get_templet_ele($kind){
-		return $this->all_list->get_templet_ele($kind);
+		return $this->all_list->get_templet_ele(2, $kind);
 	}
 
 	public function writing(){
@@ -226,48 +229,44 @@ class Service extends CI_Controller {
 
 			/** service_view/index 에서 form으로 전송된값 **/
 			$token = $this->input->post('token');
-			$w_id = $this->input->post('w_id');
+			$w_id = $this->input->post('w_id'); // Writing service data_id.
 			$title = $this->input->post('title');
-			$writing = $this->input->post('writing');
-			$is_critique = $this->input->post('is_critique');		
-			$kind = $this->input->post('kind');
+			$writing = $this->input->post('writing');			
+			$kind_id = $this->input->post('kind_id');			
+			$word_count = $this->input->post('word_count');
 
-			// $scoring = $rows->scoring;			
-			// $score2 = $rows->score2;			
-			// $kind = $rows->kind; // ex) toefl, essay, toeic
-			// $data['kind'] = $kind;
+			$data['tag_templet'] = $this->all_list->get_tag($kind_id);
+			$data['score_templet'] = $this->all_list->get_scores_temp($kind_id);		
 
-			$data['tag_templet'] = $this->all_list->get_tag($kind);
-			$data['score_templet'] = $this->all_list->get_scores_temp($kind);		
-
-			$data['templet'] = $this->get_templet_ele($kind);
+			$data['templet'] = $this->get_templet_ele($kind_id);
 			//$score1 = $this->score_pattern_replace($scoring);			
 			$data['score1'] = '';	
 
 			//$score2 = $this->score_pattern_replace($score2);
 			$data['score2'] = '';				
 
-			$data['title'] = str_replace('"', '', $title);
+			$data['title'] = $title;
 			$data['raw_writing'] = $writing;
 			$data['writing'] = $writing;
 			$data['re_raw_writing'] = preg_replace("/[\n\r]/","<br>", $writing); //Tagging 할때 쓰임! All clear
 			$data['token'] = $token;
-			$data['id'] = $w_id;
-			$data['is_critique'] = $is_critique;
+			$data['id'] = $w_id; // Writing service data_id.			
 			$data['critique'] = '';
-			$data['kind'] = $kind;
-			$data['type'] = '';
-			$data['conf'] = true;
-			$data['error_chk'] = '';
-			$data['submit'] = '';
-			$data['discuss'] = '';
+			$data['kind'] = $kind_id;
+			$data['type'] = '2';
+			//$data['conf'] = true;
+			$data['error_chk'] = 'N'; // Y or N
+			$data['submit'] = '0'; // 1 or 2
+			$data['discuss'] = 'Y'; // Y or N
 			$data['time'] = 0;
 			$data['cate'] = 'writing';
 			$data['pj_id'] = '';
-			$data['word_count'] = '';
+			$data['word_count'] = $word_count;
+			$data['edit_writing'] = '';
+			$data['tagging'] = $writing;
 			//$data['classify'] = 'new';
 
-			$this->load->view('/service_view/service_editor',$data);		
+			$this->load->view('/editor/editor',$data);		
 			$this->load->view('footer');					
 		}else{
 			redirect('/');
@@ -275,28 +274,55 @@ class Service extends CI_Controller {
 	}	
 
 	public function w_submit(){
+		log_message('error', "w_submit called!!!");
+
 		$usr_id = $this->session->userdata('id');
 		$token = $this->input->POST('token');
-		$w_id = $this->input->POST('w_id');	
-		$time = $this->input->POST('time');			
-		$kind = $this->db->escape($this->input->POST('kind'));
+		$w_id = $this->input->POST('data_id');	
+		$time = $this->input->POST('time');							
+		$type = $this->input->POST('type');
+
 		$title = $this->db->escape($this->input->POST('title'));
 		$editing = $this->db->escape($this->input->POST('editing'));
+		$raw_writing = $this->db->escape($this->input->POST('raw_writing'));
 		$critique = $this->db->escape($this->input->POST('critique'));
-		$tagging = $this->db->escape($this->input->POST('tagging'));
-		$raw_writing = $this->db->escape($this->input->post('raw_writing'));		
-		$type = 'writing';
-		$scoring = $this->input->post('scoring');		
+		$tagging = $this->db->escape($this->input->POST('tagging'));		
+		
+		$score1 = $this->db->escape($this->input->post('score1'));		
+		$score2 = $this->db->escape($this->input->post('score2'));		
+		$kind = $this->input->POST('kind');
+		$word_count = $this->input->POST('word_count');
 
 		//local DB save		
-		$query_res = $this->all_list->local_save($usr_id,$w_id,$raw_writing,$editing,$tagging,$critique,$title,$kind,$scoring,$time,$type);		
-				
+		//$query_res = $this->all_list->local_save($usr_id,$w_id,$raw_writing,$editing,$tagging,$critique,$title,$kind,$score1,$score2,$word_count,$time,$type);		
+		
+		$data["id"] = $w_id;
+		$data["editing"] = $editing;
+		$data["done"] = $raw_writing;
+		$data["critique"] = $critique;
+		$data["socre"] = $score1;
+		$data["date"] = date("Y-m-d H:i:s", time());
+
+		$sending_data["status"]	= true;
+		$sending_data["data"] = $data;
+
+		$json_data = json_encode($sending_data);
+		log_message('error', $json_data);
+
+		//return;
+
+		$query_res = true;
+
 		if($query_res){ // True or false
 			// Error chk
-			$errorchk_class = new Errorchk;
-			$error_chk = $errorchk_class->error_chk('once',$w_id,$type);
+			// $errorchk_class = new Errorchk;
+			// $error_chk = $errorchk_class->error_chk('once',$w_id,$type);
 
-			$access = $this->curl->simple_post('http://54.248.103.31/editor/editing/done', array('token'=>$token, 'id'=>$w_id, 'editing'=>$this->input->POST('editing'), 'critique'=>$this->input->POST('critique')));
+			//$access = $this->curl->simple_post('http://54.248.103.31/editor/editing/done', array('token'=>$token, 'id'=>$w_id, 'editing'=>$this->input->POST('editing'), 'critique'=>$this->input->POST('critique')));
+			log_message('error', $json_data);
+			log_message('error', "token : $token");
+			$access = $this->curl->simple_post('http://54.248.103.31/editor/editing/done', array('token'=>$token, 'id'=>$w_id, 'data'=>$json_data));
+			log_message('error', $access);
 
 			// $access = '{
 			// 		    "status": true,
@@ -312,7 +338,7 @@ class Service extends CI_Controller {
 			}else{			
 				$json['result'] = 'curl';							
 			}
-			$json['error_chk'] = $error_chk;	
+			//$json['error_chk'] = $error_chk;	
 		}else{
 			$json['result'] = 'localdb';
 		}				

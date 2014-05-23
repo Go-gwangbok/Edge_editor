@@ -6,15 +6,15 @@
         <li class="akacolor">Members</li>   
       </ol>                  	
       	<h3 style="margin-left:13px;"><?=$pjName?>
-      		<?      	         	
+      		<?php      	         	
 	      	if($error_count->count == 0){
 	      	?>
 	      		<button class="btn btn-danger btn-sm pull-right" id="errorlist" disabled style="margin-right:15px;"><span class="glyphicon glyphicon-bullhorn"></span>&nbsp;Error List</button>
-	      	<?
+	      	<?php
 	      	}else{
 	      	?>
 	      		<a href="/musedata/project/errorlist/<?=$pj_id;?>"><button class="btn btn-danger btn-sm pull-right" id="errorlist" style="margin-right:15px;"><span class="glyphicon glyphicon-bullhorn"></span>&nbsp;Error List<span class="badge" style="background-color:transparent;"><?=$error_count->count;?></span></button></a>
-	      	<?
+	      	<?php
 	      	}			        
 		    
 		    if(count($add_users) > 0){
@@ -22,17 +22,17 @@
 		    <button class="btn btn-default btn-sm pull-right" id="add" data-toggle="modal" data-target="#adduser" style="border-color:#6799FF; color:#6799FF; margin-right:15px;">
 		      &nbsp;&nbsp;<span class="glyphicon glyphicon-plus"></span>&nbsp; <span class="glyphicon glyphicon-user"></span>&nbsp;&nbsp; 
 		    </button> 
-		    <?}else{?>
+		    <?php }else{?>
 		    <button class="btn btn-default btn-sm pull-right" id="add" data-toggle="modal" data-target="#adduser" style="border-color:#6799FF; color:#6799FF; margin-right:15px;" disabled>
 		      &nbsp;&nbsp;<span class="glyphicon glyphicon-plus"></span>&nbsp; <span class="glyphicon glyphicon-user"></span>&nbsp;&nbsp; 
 		    </button> 
-		    <? } ?>
+		    <?php } ?>
     	</h3>  		
     </div>
 
     <div class="row">
     	<br>
-    	<?    	
+    	<?php    	
     	foreach ($memlist as $value) {
     		$usr_name = $value->name;
     		$usr_id = $value->usr_id; // project id		    		    
@@ -58,7 +58,7 @@
     				<span class="glyphicon glyphicon-trash pull-right"></span>
     			</button>
                 <!-- Share -->
-                <?
+                <?php
                 if($share > 0){
                 ?>
                     <a href="/musedata/project/share/<?=$pj_id;?>/<?=$usr_id;?>" style="text-decoration:none;">
@@ -66,7 +66,7 @@
                             <span class="glyphicon glyphicon-share"></span> Share
                         </button>
                     </a>
-                <?
+                <?php
                 }else{
                 ?>
                     <a href="/" style="text-decoration:none;">
@@ -74,14 +74,14 @@
                             <span class="glyphicon glyphicon-share"></span> Share
                         </button>
                     </a>
-                <? } ?>
+                <?php } ?>
                 <!-- Share End-->
     			<p class="text-right" style="margin-top:6px;"><font color="#fff" size="2px"><?=$date;?></font></p>
     		</div>    		
     		<div class="col-md-12 line" style="height:110px; margin-bottom:20px;">
     			<font size="2px;">Completed (<?=$done_count;?>)</font>
     			<div class="col-md-12 line" id="progressbar" style="margin-top:-1px;">
-    				<?
+    				<?php
     				if($pecent < 10 && $pecent > 1){
     					echo '<div id="progress10" style="width:'.$pecent.'%;">    					    							
     						</div><span class="pull-right" style="margin-top:-17px;"><font color="black" size="2px">'.$pecent_other.'%</font></span>';
@@ -148,7 +148,7 @@
     			</div>    			
     		</div>
     	</div>
-    	<?
+    	<?php
     	}
     	?>
     </div>
@@ -164,7 +164,7 @@
 		    <div class="modal-body">
 		      <dl>			        
 		        <dt style="color:black;">Choose your editor!</dt>
-		        <?
+		        <?php
 			        foreach ($add_users as $rows) {
 			        	$usr_id = $rows->id;
 			        	$usr_name = $rows->name;
@@ -174,7 +174,7 @@
 		        		<input type="checkbox" class="select_user" value="<?=$usr_id;?>"><strong><?=$usr_name;?></strong>
 		        	</label>
 		        </dd>             
-		        <? } ?>
+		        <?php } ?>
 		        
 		      </dl>
 		    </div>

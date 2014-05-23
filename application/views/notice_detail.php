@@ -23,7 +23,7 @@
   		
   	</div>
   	<!-- del button -->
-  	<?
+  	<?php
   	if($this->session->userdata('classify') == 0){
   	?>  	
   	<div class="pull-right">
@@ -52,7 +52,7 @@
 		</div>
 		<!-- /.modal End -->
   	</div>
-  	<?
+  	<?php
   	}
   	?>
 </div>

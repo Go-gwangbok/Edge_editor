@@ -203,7 +203,7 @@ class Text_editor extends CI_Controller {
 				$json['error_chk'] = $error_chk;	
 				//$json['error_chk'] = 'a';	
 				
-				if($error_chk){ 
+				if($error_chk == 'true'){ 
 					$json['status'] = $error_chk;
 				}else{ // false 라면 DB error_count 에 1을 증가 시킨다.
 					$error_count_up = $this->all_list->error_count_up($usr_id,$pj_id);

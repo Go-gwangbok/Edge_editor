@@ -4,14 +4,14 @@
 	        	<li><a href="/">Home</a></li>	        	
 	        	<li class="akacolor">Notice</li>   
 	    </ol>
-		<?
+		<?php
 		if($this->session->userdata('classify') == 0){
 		?>
 			<div>
 				<h3 class="text-center">Notices</h3>
 				<a href="/notice/write" class="btn btn-default btn-sm pull-right" id="write" style="margin-right:15px; border-color:#6799FF; color:#6799FF; margin-right:15px;">&nbsp;<span class="glyphicon glyphicon-pencil"></span>&nbsp;&nbsp;Write&nbsp;&nbsp;</a>
 			</div>
-		<? } ?>
+		<?php } ?>
 	</div>
 	<br>	
 		<table class="table table-hover">
@@ -24,7 +24,7 @@
 		</thead>
 		
 		<tbody>			
-			<?
+			<?php
 			$num = 1;
 			foreach ($list as $value) {
 				$title = $value->title;
@@ -37,7 +37,7 @@
 			<td><a href="/notice/contents/<?=$id;?>"><?=$title?></a></td>
 			<td class="text-center"><?=substr($date,0,-3)?></td>
 			</tr>
-			<?$num++; } ?>		
+			<?php $num++; } ?>		
 		</tbody>
 		</table>
 

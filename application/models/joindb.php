@@ -1,4 +1,4 @@
-<?
+<?php
 class JoinDb extends CI_Model{
 	
 	function sign_in($email,$pass){

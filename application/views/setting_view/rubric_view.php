@@ -48,7 +48,7 @@
 	      	<h5 style="color:black; margin-left:15px;"><strong>추가할 태그를 선택하세요!</strong></h5>
 	      	<br>
 	      	<div class="row">
-		      	<?
+		      	<?php
 		      	foreach ($add_tag_data as $value) {
 		      		$tag_id = $value->id;
 		      		$tag = $value->tag;
@@ -57,7 +57,7 @@
 		      	<input type="checkbox" class="add_tags" id="a<?=$tag_id;?>">	      	
 		      		<span style="color:black;">&lt;<?=strtoupper($tag);?>&gt;</span>
 		      	</div>
-		      	<?
+		      	<?php
 		      	}
 		      	?>	        
 	      	</div>
@@ -82,7 +82,7 @@
 	      	<h5 style="color:black; margin-left:15px;"><strong>추가할 스코어를 선택하세요!</strong></h5>
 	      	<br>
 	      	<div class="row">
-		      	<?
+		      	<?php
 		      	foreach ($add_score_data as $value) {
 		      		$sco_id = $value->id;
 		      		$sco_name = $value->name;
@@ -91,7 +91,7 @@
 		      	<input type="checkbox" class="add_score" id="sc<?=$sco_id;?>">	      	
 		      		<span style="color:black;"> <?=strtoupper($sco_name);?> </span>
 		      	</div>
-		      	<?
+		      	<?php
 		      	}
 		      	?>	        
 	      	</div>	        

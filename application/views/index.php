@@ -5,7 +5,7 @@
     <br>
     <h1 style="margin-left:40px; color:white;">Administrator<span style="font-size:18px;">2.0</span></h1>    
     <br>
-    <?
+    <?php
     if(!$this->session->userdata('is_login')){
     ?>   
     <form class="form-inline" style="margin-left:40px;" role="form">                        
@@ -20,7 +20,7 @@
 
   </div>
 </div>
-<? }else{ ?>
+<?php }else{ ?>
     </div>
 </div>
 <br>
@@ -41,7 +41,7 @@
                     <div class="widget stacked">
                         
                         <div class="widget-header">
-                            <?
+                            <?php
                             if($this->session->userdata('is_login')){
                                 if($this->session->userdata('classify') == 0){ //admin
                                     if($recent_notice != false){                                
@@ -51,7 +51,7 @@
                                     <a href="/notice/write" class="btn btn-xs btn-default pull-right"><b><span class="glyphicon glyphicon-pushpin"></span>&nbsp;&nbsp;Write</b></a>
                                 </h4>   
                                 
-                                <?
+                                <?php
                                 }else{ // notice가 아무것도 없을때!
                                 ?>
                                 
@@ -59,7 +59,7 @@
                                     <a href="/notice/write" class="btn btn-xs btn-default pull-right"><b><span class="glyphicon glyphicon-pushpin"></span>&nbsp;&nbsp;Write</b></a>
                                 </h4>   
                                 
-                                <?
+                                <?php
                                     }
                                 }else{ //editor
                                     if($recent_notice != false){
@@ -69,7 +69,7 @@
                                     <span class="glyphicon glyphicon-align-justify"></span>&nbsp;Recent notice&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-size:13px;"><?=substr($recent_notice->date,0,-3);?></span>                              
                                 </h4>    
                                 
-                                <?
+                                <?php
                                 }else{
                                 ?>
                                 
@@ -77,7 +77,7 @@
                                     <span class="glyphicon glyphicon-align-justify"></span>&nbsp;Recent notice&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-size:13px;"></span>                              
                                 </h4>    
 
-                                <?
+                                <?php
                                     }
                                 }// not login
                             }else{
@@ -85,24 +85,24 @@
                                 ?>
                                 <h4><span class="glyphicon glyphicon-align-justify"></span>&nbsp;Recent notice&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-size:13px; text-align:right;"><?=substr($recent_notice->date,0,-3);?></span>                                
                                 </h4>    
-                                <?
+                                <?php
                                 }else{
                                 ?>
                                 <h4><span class="glyphicon glyphicon-align-justify"></span>&nbsp;Recent notice&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-size:13px; text-align:right;"></span>                                
                                 </h4>    
-                                <?
+                                <?php
                                 }
                             }?>
                         </div> <!-- /widget-header -->
                         
                         <div class="widget-content">
                             <dl>
-                                <?
+                                <?php
                                 if($recent_notice != false){
                                 ?>
                                 <dt><h4><?=substr($recent_notice->title,0,85).'...';?></h4></dt>
                                 <dd><?=$recent_notice->contents;?></dd>
-                                <? } ?> <!-- notice가 아무것도 없을때! -->
+                                <?php } ?> <!-- notice가 아무것도 없을때! -->
                             </dl>
                         </div> <!-- /widget-content -->
                     
@@ -114,22 +114,22 @@
                     <div class="widget widget-nopad stacked">
                                 
                         <div class="widget-header">
-                            <?
+                            <?php
                             if($this->session->userdata('is_login')){                              
                             ?>
                             <h4><span class="glyphicon glyphicon-list"></span>&nbsp;Notices
                                 <a href="/notice" class="btn btn-xs btn-default pull-right"><b><span class="glyphicon glyphicon-list"></span>&nbsp;&nbsp;More</b></a>
                             </h4>
 
-                            <?}else{?>
+                            <?php }else{?>
                             <h4><span class="glyphicon glyphicon-list"></span>&nbsp;Notices</h4>
-                            <?}?>
+                            <?php }?>
                         </div> <!-- /widget-header -->
                         
                         <div class="widget-content">
                             
                             <ul class="news-items">
-                                <?
+                                <?php
                                 foreach ($notice as $value) {
                                     $title = strip_tags($value->title);
                                     $contents = strip_tags($value->contents);
@@ -147,7 +147,7 @@
                                         <b><span class="news-item-day "><?=substr($date,0,-3);?></span></b>
                                     </div>
                                 </li><br/>
-                                <?
+                                <?php
                                 }
                                 ?>                              
                             </ul>
@@ -164,15 +164,15 @@
                     <div class="widget stacked">
                             
                         <div class="widget-header"> 
-                            <?
+                            <?php
                             if($this->session->userdata('classify') == 0){ //admin
                             ?>
                                 <h4><span class="glyphicon glyphicon-list-alt"></span>&nbsp;Quick Shortcuts<span></span></h4>
-                            <?
+                            <?php
                             }else{
                             ?>
                                 <h4><span class="glyphicon glyphicon-list-alt"></span>&nbsp;Project<span><a href="/musedata/project"><button class="btn btn-default btn-xs pull-right">More</button></a></span></h4>
-                            <?
+                            <?php
                             }
                             ?>                           
                             
@@ -180,7 +180,7 @@
                         
                         <div class="widget-content" style="margin-top:15px;">                            
                             <div class="pull-center">                                
-                                <?
+                                <?php
                                 if($this->session->userdata('is_login')){                                
                                     if($this->session->userdata('classify') == 0){ //admin
                                     ?>
@@ -202,7 +202,7 @@
                                     <br>
                                     <br>
                                     <br>                                    
-                                    <?
+                                    <?php
                                     }else{ // Editor
                                         $usr_id = $this->session->userdata('id');
                                         
@@ -230,11 +230,11 @@
                                                 <h5 class="text-center comp" style="width:98px; margin-top:7%;" href="/musedata/project/board/com/<?=$pj_id;?>/<?=$usr_id?>">Completed</h5>
                                             </div>
                                         </div>                                        
-                                    <?
+                                    <?php
                                         }    
                                     ?>
                                     <br><br><br><br><br><br>
-                                    <?                               
+                                    <?php                               
                                     }                                                                        
                                 }?>                                
                             </div> <!-- /shortcuts -->                          
@@ -253,7 +253,7 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div id="area-chart" class="chart-holder " style="height:210px; padding-top:40px;">                                    
-                                        <?
+                                        <?php
                                         if($this->session->userdata('is_login')){
                                             if($this->session->userdata('classify') == 0){ // admin
                                         ?>
@@ -268,7 +268,7 @@
                                             <dt>TOTAL</dt>
                                             <dd id="total"></dd>
                                         </dl>
-                                        <?
+                                        <?php
                                             }else{ // editor
                                         ?>
                                           <dl class="dl-horizontal text-center" style="padding-right:10pxl">                                            
@@ -282,7 +282,7 @@
                                             <dt>TOTAL</dt>
                                             <dd id="total"></dd>
                                         </dl>
-                                        <?
+                                        <?php
                                             }
                                         }else{
                                         ?>
@@ -296,7 +296,7 @@
                                             <dt>TOTAL</dt>
                                             <dd>0</dd>
                                         </dl>
-                                        <?
+                                        <?php
                                         }
                                         ?>
                                         
@@ -336,7 +336,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?
+                                    <?php
                                     foreach ($usr_list as $value) {
                                         $name = $value->name;
                                         $email = $value->email;
@@ -350,7 +350,7 @@
                                             </a>
                                         </td> -->
                                     </tr>
-                                    <?
+                                    <?php
                                     }
                                     ?>
                                  </tbody>
@@ -371,7 +371,7 @@
     </div> <!-- row -->
 
 </div> <!-- container -->
-<? } ?>
+<?php } ?>
 <!-- javascript -->     
 <script src="/public/js/Chart.js"></script>
 <script type="text/javascript">

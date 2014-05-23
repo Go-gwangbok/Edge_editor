@@ -10,12 +10,12 @@
     </div> 
     <div class="col-md-12 text-center" style="margin-top:-43px;">
         <select>   
-        <?
+        <?php
         foreach ($all_year as $value) {
             $year = $value->year;
         ?>
         <option value="<?=$year;?>"><?=$year?></option>
-        <?
+        <?php
         }
         ?>  
         </select>           

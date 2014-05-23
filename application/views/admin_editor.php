@@ -3,30 +3,30 @@
     <ol class="breadcrumb" style="background:white;">
         <li><a href="/">Home</a></li>                   
         <li><a href="/musedata/project/">Project</a></li>   
-        <?        
+        <?php        
         if($cate == 'error'){ // Error List
         ?>
         <li><a href="/musedata/project/members/<?=$pj_id;?>">Members</a></li>   
         <li><a href="/musedata/project/errorlist/<?=$pj_id;?>">Error List</a></li>   
         <li class="akacolor">Error Essay</li>      
-        <?
+        <?php
         }elseif($cate == 'tbd'){ // Project in T.B.D
         ?>
         <li><a href="/musedata/project/members/<?=$pj_id;?>">Members</a></li>           
         <li><a href="/musedata/project/board/tbd/<?=$pj_id;?>/<?=$usr_id?>">T.B.D</a></li>           
         <li class="akacolor">Essay</li>      
-        <?
+        <?php
         }elseif($cate == 'history'){ // Project in T.B.D
         ?>
         <li><a href="/musedata/project/members/<?=$pj_id;?>">Members</a></li>           
         <li><a href="/musedata/project/board/history/<?=$pj_id;?>/<?=$usr_id?>">History</a></li>           
         <li class="akacolor">Essay</li>      
-        <?
+        <?php
         }else{ // Export
         ?>
         <li><a href="/musedata/project/export/<?=$pj_id;?>">Export</a></li>             
         <li class="akacolor">Completed</li>         
-        <?
+        <?php
         }
         ?>       
       </ol> 
@@ -45,12 +45,12 @@
     <li><a href="#scoring" data-toggle="tab">Scoring</a></li>        
     <div id="stopwatch" class="btn btn-default pull-right" disabled>Timer : 00:00</div>       
     <div class="btn btn-default pull-right" style="margin-right:3px;" disabled>Word count : <?=$word_count?></div>       
-    <?
+    <?php
     if($cate == 'error'){
     ?>
     <button class="btn btn-md btn-danger pull-right" id="not_error" style="margin-right:5px;">Return</button>
     <button class="btn btn-md btn-danger pull-right" id="yes" style="margin-right:5px;">Yes</button>     
-    <?
+    <?php
     }
     ?>    
   </ul>
@@ -60,7 +60,7 @@
    <div class="tab-pane div-box-line active" id="orig">
       <div class="col-md-12" style="margin-top:15px;">                        
         <div>          
-          <?
+          <?php
             echo trim($raw_writing);             
           ?>      
         </div> 
@@ -73,7 +73,7 @@
       <div class="col-md-12" style="margin-top:15px;">   
         <div class="btn-toolbar" data-role="editor-toolbar" data-target="#editor" style="margin-bottom:20px;">
           
-          <?
+          <?php
           if($cate != 'tbd'){
           ?>
           <div class="btn-group">
@@ -81,7 +81,7 @@
             <a class="btn" data-edit="underline" title="Underline (Ctrl/Cmd+U)" disabled><span class="glyphicon glyphicon-refresh"></span> MOD</a>        
             <a class="btn" data-edit="bold" title="Bold (Ctrl/Cmd+B)" disabled><span class="glyphicon glyphicon-pencil"></span> INS</a>            
           </div>    
-        <?
+        <?php
          }else{ // Cate == T.B.D
         ?>
         <div class="btn-group">
@@ -89,13 +89,13 @@
           <a class="btn" data-edit="underline" title="Underline (Ctrl/Cmd+U)" ><span class="glyphicon glyphicon-refresh"></span> MOD</a>        
           <a class="btn" data-edit="bold" title="Bold (Ctrl/Cmd+B)" ><span class="glyphicon glyphicon-pencil"></span> INS</a>            
         </div>
-        <?
+        <?php
          }
         ?>
         </div> <!-- btn-toolbar -->      
         <!-- Error detecting -->
         <div id="editor">          
-          <?
+          <?php
               echo trim($edit_writing);
           ?>      
         </div>
@@ -178,7 +178,7 @@
             <div class="col-md-12 ">           
               <div class="col-md-12 ">                         
                 <div class="col-md-12 ">  
-                <?                
+                <?php                
                   $explode = explode(',', $scoring);
                   foreach ($explode as $row) {                      
                     $array = explode(':', $row);
@@ -229,7 +229,7 @@
                       <input type="text" class="form-control" id="<?=strtolower($key);?>" placeholder="0" value="<?=$value;?>">
                     </div>
                   </div>
-                  <?
+                  <?php
                   } // foreach end.
                   ?>                   
                 </div>
@@ -238,12 +238,12 @@
       </div>   
 
       <div style="margin-top:8px;">
-        <?
+        <?php
         if($cate == 'tbd'){     
         ?>  
         <button class="btn btn-danger pull-right" id="submit">Submit</button>
         <button class="btn btn-primary" id="draft">Save Draft</button>
-        <?  
+        <?php  
         }
         ?>        
       </div> 

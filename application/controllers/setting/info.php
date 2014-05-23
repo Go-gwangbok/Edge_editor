@@ -308,6 +308,19 @@ class Info extends CI_Controller {
         $this->output->set_content_type('application/json')->set_output(json_encode($json));
     }
 
+    function addKind(){
+        if($this->session->userdata('is_login')){        
+            $task_id = $this->input->post('task_id');
+            $kind_array = $this->input->post('kind_array');
+                        
+            $json['result'] = $kind_array;
+        }else{
+            redirect('/');
+        }  
+        $this->output->set_content_type('application/json')->set_output(json_encode($json));
+
+    }
+
 
 }
 

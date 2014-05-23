@@ -222,37 +222,44 @@ class Errordata extends CI_Controller {
 			// $obj_error_chk = new Errorchk;
 			// $result = $obj_error_chk->error_chk_post('once',$essay_id,$type);
 
-			$rows = $this->all_list->get_essay($essay_id,$type);			
+			$rows = $this->all_list->get_essay($essay_id,$type);
 
-			$editing = $rows[0]->editing;
+			if ($rows != null && count($rows) > 0)
+			{
+				$editing = $rows[0]->editing;
 
-			$string = preg_replace("/<u style[^>]*>/i", '<u>', $editing);
-			//<span id="3b3477c9-a1b1-451a-9d6f-630deead0a37" ginger_software_uiphraseguid="1513b3f1-481b-402d-aac3-f65b3f641b2e" class="GINGER_SOFTWARE_mark">
-   			$string = preg_replace("/<span style[^>]*>/i", '', $string); //span 테그 제거!
-   			$string = preg_replace("/<span id=[^>]*>/i", '', $string); //span 테그 제거!
-   			$string = str_replace('</span>', '',$string); //span 테그 제거!
+				$string = preg_replace("/<u style[^>]*>/i", '<u>', $editing);
+				//<span id="3b3477c9-a1b1-451a-9d6f-630deead0a37" ginger_software_uiphraseguid="1513b3f1-481b-402d-aac3-f65b3f641b2e" class="GINGER_SOFTWARE_mark">
+	   			$string = preg_replace("/<span style[^>]*>/i", '', $string); //span 테그 제거!
+	   			$string = preg_replace("/<span id=[^>]*>/i", '', $string); //span 테그 제거!
+	   			$string = str_replace('</span>', '',$string); //span 테그 제거!
 
-   			$string = preg_replace("/<b style[^>]*>/i", '<b>', $string);
-   			$string = preg_replace("/<stringike style[^>]*>/i", '<strike>', $string);
-   			$string = preg_replace("/<s style[^>]*>/i", '<s>', $string);
-   			$string = preg_replace("/<br style[^>]*>/i", '<br>', $string);				
+	   			$string = preg_replace("/<b style[^>]*>/i", '<b>', $string);
+	   			$string = preg_replace("/<stringike style[^>]*>/i", '<strike>', $string);
+	   			$string = preg_replace("/<s style[^>]*>/i", '<s>', $string);
+	   			$string = preg_replace("/<br style[^>]*>/i", '<br>', $string);				
 
-   			$string = preg_replace('/<span[^>]+\>/i','',$string); 
-			$string = preg_replace('/<font[^>]+\>/i','',$string); //font 테그 제거!							
-			$string = str_replace('</font>', '',$string);
-			$string = str_replace('</span>', '',$string);	
-			
-			$string = str_replace('&nbsp;', ' ',$string);
-			$string = str_replace('“', '"',$string);
-			$string = str_replace('”', '"',$string); // “ ” Del				
-			$string = str_replace("’", "'", $string); // ’ Del				
-			$string = str_replace("`", "'", $string); // ` Del
+	   			$string = preg_replace('/<span[^>]+\>/i','',$string); 
+				$string = preg_replace('/<font[^>]+\>/i','',$string); //font 테그 제거!							
+				$string = str_replace('</font>', '',$string);
+				$string = str_replace('</span>', '',$string);	
+				
+				$string = str_replace('&nbsp;', ' ',$string);
+				$string = str_replace('“', '"',$string);
+				$string = str_replace('”', '"',$string); // “ ” Del				
+				$string = str_replace("’", "'", $string); // ’ Del				
+				$string = str_replace("`", "'", $string); // ` Del
 
-			$patterns = array('(<s>)','(</s>)'); // <s> 태그는 <strike> 태그가 오류난 것이다! 이것을 <strike>로 돌려줘야 한다!
-			$replace = array("<strike>","</strike>");
-			$editing = preg_replace($patterns, $replace, $string);			
+				$patterns = array('(<s>)','(</s>)'); // <s> 태그는 <strike> 태그가 오류난 것이다! 이것을 <strike>로 돌려줘야 한다!
+				$replace = array("<strike>","</strike>");
+				$editing = preg_replace($patterns, $replace, $string);	
 
-			$data['editing'] = $editing;
+				$data['editing'] = $editing;
+			}
+			else
+			{
+				$data['editing'] = '';
+			}
 
 			$data['cate'] = 'service_error_edit';			
 			$data['month'] = $month;

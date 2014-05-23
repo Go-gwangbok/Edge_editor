@@ -16,7 +16,7 @@
 	  		<div class="row" style="margin-bottom:10px;">  
 	  			<label class="col-sm-1 control-label"></label>
 			    <label for="inputEmail3" class="col-sm-2 control-label">Task</label>
-			    <?
+			    <?php
 			    foreach ($task_list as $value) {
 			    	$task_name = $value->name;
 			    	$task_id = $value->id;
@@ -26,7 +26,7 @@
 						<input type="checkbox" class="task" id="t<?=$task_id;?>" value="<?=$task_id;?>" task="<?=$task_name;?>"> <?=ucfirst($task_name);?>
 					</label>
 				</div>
-			    <? } ?>			
+			    <?php } ?>			
 	    	</div>  
 	    	
 	    	<div class="row" id="desc" style="margin-bottom:10px; display:none">  

@@ -38,12 +38,13 @@
     <script src="/public/js/bootstrap-select.js"></script>       
     <script src="/public/js/jquery.selection.js"></script>
     
-    <?
+    <?php    
     if($this->session->userdata('classify') == 1 && $this->session->userdata('service') == 'true'){
-    ?>
+      if($cate != 'service'){ ?>    
     <script src="/public/js/service_chk.js"></script>
-    <? } ?>        
+    <?php } } ?>   
     <script src="/public/js/countdown.js"></script>     
+    
   </head>
   
 <body>
@@ -55,9 +56,8 @@
     
     <div class="navbar-collapse collapse">          
       <ul class="nav navbar-nav">
-      <?
-      if($this->session->userdata('is_login')){      
-        
+      <?php
+      if($this->session->userdata('is_login')){              
         if($cate == 'musedata'){                  
           if($this->session->userdata('classify') == 0){
           ?>
@@ -65,22 +65,22 @@
             <li id="service_chk"><a href="/service">Service</a></li>            
             <li><a href="/setting/info">Setting</a></li>
             <li><a href="/notice">Notice</a></li>            
-          <?
+          <?php
           }else{
             if($this->session->userdata('musedata') == 'true'){
 
           ?>
             <li class="active"><a href="/musedata/project">Data</a></li>
-          <?
+          <?php
             }
             if($this->session->userdata('service') == 'true'){
           ?>
             <li id="service_chk"><a href="/service">Service</a></li>
-          <?
+          <?php
             }
           ?>         
             <li><a href="/notice">Notice</a></li>            
-          <?
+          <?php
           }               
         }elseif($cate == 'service'){        
           if($this->session->userdata('classify') == 0){ // ADmin
@@ -89,21 +89,21 @@
           <li class="active" id="service_chk"><a href="/service">Service</a></li>              
           <li><a href="/setting/info">Setting</a></li>
           <li><a href="/notice">Notice</a></li>            
-          <?
+          <?php
           }else{ // Editor
             if($this->session->userdata('musedata') == 'true'){
             ?>
               <li><a href="/musedata/project">Data</a></li>
-            <?
+            <?php
             }
             if($this->session->userdata('service') == 'true'){
             ?>
               <li class="active" id="service_chk"><a href="/service">Service</a></li>
-            <?
+            <?php
             }
             ?>            
             <li><a href="/notice">Notice</a></li>                    
-          <?
+          <?php
           }                          
         }elseif($cate == 'setting'){        
           if($this->session->userdata('classify') == 0){ // Admin
@@ -112,7 +112,7 @@
           <li><a href="/service">Service</a></li>              
           <li class="active"><a href="/setting/info">Setting</a></li>
           <li><a href="/notice">Notice</a></li>            
-          <?
+          <?php
           }                          
         }else if($cate == 'notice'){ // Notice head
           if($this->session->userdata('classify') == 0){ // Admin
@@ -121,21 +121,21 @@
             <li><a href="/service">Service</a></li>              
             <li><a href="/setting/info">Setting</a></li>
             <li class="active"><a href="/notice">Notice</a></li>            
-          <?
+          <?php
           }else{ // Editor
             if($this->session->userdata('musedata') == 'true'){
           ?>
             <li><a href="/musedata/project">Data</a></li>
-          <?
+          <?php
             }
             if($this->session->userdata('service') == 'true'){
           ?>
             <li id="service_chk"><a href="/service">Service</a></li>
-          <?
+          <?php
             }
           ?>
             <li class="active"><a href="/notice">Notice</a></li>            
-          <?
+          <?php
           }                                 
         }else{ // index head    
           if($this->session->userdata('classify') == 0) { // Admin
@@ -145,21 +145,21 @@
             <li><a href="/setting/info">Setting</a></li>              
             <li><a href="/notice">Notice</a></li>  
             <!-- <li><a href="/pay/pay">Pay</a></li>           -->
-          <?
+          <?php
           }else{ // Editor
             if($this->session->userdata('musedata') == 'true'){
             ?>
               <li><a href="/musedata/project">Data</a></li>
-            <?
+            <?php
             }
             if($this->session->userdata('service') == 'true'){
             ?>
               <li id="service_chk"><a href="/service">Service</a></li>            
-            <?
+            <?php
             }
           ?>                     
             <li><a href="/notice">Notice</a></li>            
-          <?
+          <?php
           }                                      
         }
         ?>
@@ -168,7 +168,7 @@
           <span class="glyphicon glyphicon-user"></span>&nbsp;&nbsp;<?=$this->session->userdata('nickname');?>&nbsp;&nbsp;
           <a href="/sign/logout" class="btn btn-success">Logout</a>          
         </form>
-      <?
+      <?php
       }else{ // Not Sign in     
         ?>
         <li><a href="/">Data</a></li>
@@ -178,7 +178,7 @@
         <form class="navbar-form navbar-right">
           <a href="index.php/signup" class="btn btn-success">Sign Up</a>          
         </form>
-      <?      
+      <?php      
       } 
       ?> 
     </div><!--/.navbar-collapse -->            
