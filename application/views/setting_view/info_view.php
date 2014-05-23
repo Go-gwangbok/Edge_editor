@@ -14,7 +14,8 @@
 		<ul class="nav nav-tabs">
 		  <li class="active" id="new_title"><a href="#new" data-toggle="tab">New Editors</a></li>
 		  <li id="active_title"><a href="#active" data-toggle="tab">Active Editors</a></li>	  
-		  <li id="setting_title"><a href="#setting" data-toggle="tab">Templet setting</a></li>	  
+		  <li id="setting_title"><a href="#setting" data-toggle="tab">Tab setting</a></li>	  
+		  <li id="rubric_title"><a href="#tagscore" data-toggle="tab">Rubric setting</a></li>	  
 		</ul>
 
 		<!-- Tab panes -->
@@ -38,6 +39,7 @@
 				</table>
 		  	</div>
 
+		  	<!-- Active editors -->
 		  	<div class="tab-pane" id="active">
 		  		<br>
 				<table class="table table-hover">
@@ -57,6 +59,7 @@
 				</table>
 			</div>	  
 
+			<!-- Templet setting -->
 			<div class="tab-pane" id="setting">
 				<br/><br/>
 				<div class="row">
@@ -109,6 +112,26 @@
 					</div>
 				</div>
 			</div>	  
+			<!-- Templet setting End.-->
+
+			<!-- Active editors -->
+		  	<div class="tab-pane" id="tagscore">
+		  		<br>
+				<table class="table table-hover">
+				  	<thead>
+						<tr>
+							<th class="text-center">Num</th>
+							<th class="text-center">Kind</th>							
+							<th class="text-center">Action</th>
+						</tr>
+					</thead>
+					
+					<tbody id="tagscore_list">						
+						<!-- Ajax -->
+					</tbody>
+				</table>
+			</div>	
+			<!-- Active editors End.-->
 		</div>
 	</div> <!-- col-md-12 -->
   </div> <!-- Row End -->
@@ -143,19 +166,15 @@ $('div#set_type').click(function(){
 		$.each(data_kinds,function(i,values){
 			var kind = values['kind'];
 			var data_kind_id = values['id'];
-			$('tbody#set').append('<tr>'
+			$('tbody#set').append('<tr href="/setting/info/templet/'+task_id+'/'+data_kind_id+'" style="cursor:pointer;" id="kindhref">'
 				+'<td class="text-center">'+(i+1)+'</td>'
-				+'<td class="text-center">'+kind+'</td>'
+				+'<td class="text-center">'+kind.toUpperCase()+'</td>'
 				+'<td class="text-center">'						
-					+'<a href="/setting/info/templet/'+task_id+'/'+data_kind_id+'" class="btn btn-primary btn-sm">&nbsp;&nbsp;&nbsp;&nbsp;Edit&nbsp;&nbsp;&nbsp;&nbsp;</a>'
+					+'<button class="btn btn-primary btn-sm">&nbsp;&nbsp;&nbsp;&nbsp;Edit&nbsp;&nbsp;&nbsp;&nbsp;</button>'
 				+'</td>'
 				+'</tr>');	
 		}); // Each end.		
 	}); // post End.
-});
-
-$(document).delegate('input.chk_type','click',function () {
-	
 });
 
 var cate = '<?=$cate?>';
@@ -169,15 +188,20 @@ $('li#active_title').click(function(){
 });
 
 $('li#setting_title').click(function(){
-	$('#title').html('Templet setting');
+	$('#title').html('Templet Setting');
 });
+
+$('li#rubric_title').click(function(){
+	$('#title').html('Rubric Setting');
+});
+
 
 
 $(document).ready(function(){
 	$('table#table').hide();
 	$.post('/setting/info/setting_data',{data:cate},function(json){
 		var new_editors = json['get_editors'];
-		//var data_kinds = json['data_kind'];
+		var data_kinds = json['data_kind'];
 		console.log(new_editors);
 		//console.log(data_kinds);
 
@@ -237,25 +261,36 @@ $(document).ready(function(){
 
 		}// If end.
 
-		// // Templet Setting.
-		// $.each(data_kinds,function(i,values){
-		// 	var kind = values['kind'];
-		// 	var data_kind_id = values['id'];
+		// Templet Setting.
+		$.each(data_kinds,function(i,values){
+			var kind = values['kind'];
+			var data_kind_id = values['id'];
 
-		// 	$('tbody#set').append('<tr>'
-		// 				+'<td class="text-center">'+(i+1)+'</td>'
-		// 				+'<td class="text-center">'+kind+'</td>'
-		// 				+'<td class="text-center">'						
-		// 					+'<a href="/setting/info/templet/'+data_kind_id+'/'+kind+'" class="btn btn-primary btn-sm">&nbsp;&nbsp;&nbsp;&nbsp;Edit&nbsp;&nbsp;&nbsp;&nbsp;</a>'
-		// 				+'</td>'
-		// 				+'</tr>');	
-		// });
+			$('tbody#tagscore_list').append('<tr id="tagscore_action" style="cursor:pointer;" href="/setting/info/tagScoreSet/'+data_kind_id+'">'
+						+'<td class="text-center">'+(i+1)+'</td>'
+						+'<td class="text-center">'+kind.toUpperCase()+'</td>'
+						+'<td class="text-center">'						
+							+'<button class="btn btn-primary btn-sm">&nbsp;&nbsp;&nbsp;&nbsp;Edit&nbsp;&nbsp;&nbsp;&nbsp;</button>'
+						+'</td>'
+						+'</tr>');	
+		});
 
 	}); // Post End
 }); // Document End
 
+
+// Tab Kind href
+$(document).delegate('tr#kindhref','click',function(){			
+	window.document.location = $(this).attr("href");      
+});
+
 $(document).delegate('tr#active_mem','click',function(){		
-	console.log($(this).attr('href'));
+	//console.log($(this).attr('href'));
+	window.document.location = $(this).attr("href");      
+});
+
+// Tag & Score Setting Button
+$(document).delegate('tr#tagscore_action','click',function(){			
 	window.document.location = $(this).attr("href");      
 });
 

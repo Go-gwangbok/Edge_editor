@@ -1,4 +1,4 @@
-<div class="container" style="margin-top:-15px;">
+<div class="container" style="margin-top:-15px;">	
 	<div class="row">		
 		<ol class="breadcrumb" style="background:white;">
 	        	<li><a href="/">Home</a></li>	        	
@@ -40,9 +40,19 @@
 			<?$num++; } ?>		
 		</tbody>
 		</table>
+
+		<?php echo form_open_multipart('http://54.248.103.31/cate/do_upload');?>
+
+		<input type="file" name="userfile" size="20" />
+		<input type="hidden" name="email" value="<?=$this->session->userdata('email');?>" />
+		<input type="hidden" name="current_url" value="<?=current_url();?>" />		
+		<br />
+		<input type="submit" value="upload" />		
+		</form>
 	
 </div>
 <script>
+
 $("a#write").mouseover(function(){
   $(this).css("border-color","#4374D9");
   $(this).css("color","#4374D9");

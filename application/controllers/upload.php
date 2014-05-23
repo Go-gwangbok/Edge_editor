@@ -49,7 +49,7 @@ class Upload extends CI_Controller {
 				$find_kind = $this->all_list->find_kind($kind);
 				$kind_id = $find_kind->id;
 
-				if($kind == 'essay' && $pj_kind == 'essay'){ // 종류가 에세이 일경우!
+				if($kind == 'toefl' && $pj_kind == 'toefl'){ // 종류가 에세이 일경우!
 
 					for($i = 1; $i < $data_cou; $i++){									
 						$data_replace = $data[$i];						

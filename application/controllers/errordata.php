@@ -121,9 +121,9 @@ class Errordata extends CI_Controller {
 
 	public function error_yes(){
 		if($this->session->userdata('is_login')){			
-			$essay_id = $this->input->post('essay_id');			
+			$data_id = $this->input->post('data_id');			
 
-			$result = $this->all_list->error_yes($essay_id);
+			$result = $this->all_list->error_yes($data_id);
 			$json['result'] = $result;
 		}else{
 			redirect('/');
@@ -133,9 +133,9 @@ class Errordata extends CI_Controller {
 
 	public function error_return(){ 
 		if($this->session->userdata('is_login')){			
-			$essay_id = $this->input->post('essay_id');
+			$data_id = $this->input->post('data_id');
 
-			$result = $this->all_list->error_return($essay_id);
+			$result = $this->all_list->error_return($data_id);
 			$json['result'] = $result;
 		}else{
 			redirect('/');
@@ -143,12 +143,12 @@ class Errordata extends CI_Controller {
 		$this->output->set_content_type('application/json')->set_output(json_encode($json));
 	}
 
-	function error_edit($essay_id,$type){
+	function error_edit($data_id,$type){
 		if($this->session->userdata('is_login')){			
 			$data['cate'] = 'musedata';
 			$this->load->view('head',$data);					
 
-			$rows = $this->all_list->get_essay($essay_id,$type);			
+			$rows = $this->all_list->get_essay($data_id);			
 			$editing = $rows[0]->editing;
 
 			$string = preg_replace("/<u style[^>]*>/i", '<u>', $editing);
@@ -182,7 +182,7 @@ class Errordata extends CI_Controller {
 
 			$data['cate'] = 'error_edit';
 			$data['pj_id'] = $rows[0]->pj_id;
-			$data['essay_id'] = $essay_id;
+			$data['data_id'] = $data_id;
 			$data['type'] = $type;
 
 			$this->load->view('/error/error_edit_view',$data);		

@@ -100,7 +100,7 @@ function ajaxPost(url,data){
 		$('button#total').append('<font color="red">Count : '+total_count+'</font>');
 		//$('li#tab_history').next().append('<p>');		
 		for(var i = 0; i < json['list'].length; i++) {
-			var essay_id = data_list[i]['essay_id'];
+			var id = data_list[i]['id'];
 			var task = data_list[i]['type'];
 			var timer = formatTime(data_list[i]['time']);
 			var prompt = data_list[i]['prompt'];
@@ -117,7 +117,7 @@ function ajaxPost(url,data){
 				var date = data_list[i]['sub_date'];
 			}
 			
-			$('tbody#list').append('<tr id='+i+'><td class="text-center"><label class="checkbox"><input class="box" type="checkbox" value="'+data_list[i]['essay_id']+'">'+num+'</label></td><td>'																				 
+			$('tbody#list').append('<tr id='+i+'><td class="text-center"><label class="checkbox"><input class="box" type="checkbox" value="'+id+'">'+num+'</label></td><td>'																				 
 				+prompt.replace(/"/gi,'')+'</td><td class="text-center">'
 				+kind_name.toUpperCase()+'</td><td class="text-center">'
 				+date+'</td>');

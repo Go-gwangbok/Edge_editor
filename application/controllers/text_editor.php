@@ -26,11 +26,7 @@ class Text_editor extends CI_Controller {
 		$this->load->view('head',$data);
 		$usr_id = $this->session->userdata('id');
 		
-		if($cate == 'draft' || $cate == 'tbd'){
-			$datas = $this->all_list->get_one_essay($essay_id);	
-		}elseif ($cate == 'com') {
-			$datas = $this->all_list->get_one_essay($essay_id);			
-		}
+		$datas = $this->all_list->get_one_essay($cate,$essay_id);	
 		
 		$pjname = $this->all_list->getproject_name($pj_id);				
 		$scoring = $datas->scoring;
@@ -203,9 +199,11 @@ class Text_editor extends CI_Controller {
 			
 			if($result){	
 				$errorchk_class = new Errorchk;
-				$error_chk = $errorchk_class->error_chk('once',$essay_id,$type);
+				$error_chk = $errorchk_class->error_chk('once',$data_id);
 				$json['error_chk'] = $error_chk;	
-				if($error_chk == 'true'){ 
+				//$json['error_chk'] = 'a';	
+				
+				if($error_chk){ 
 					$json['status'] = $error_chk;
 				}else{ // false 라면 DB error_count 에 1을 증가 시킨다.
 					$error_count_up = $this->all_list->error_count_up($usr_id,$pj_id);
@@ -246,7 +244,7 @@ class Text_editor extends CI_Controller {
 /* ======================================================================================================================== 
    Admin	*/ 
 
-   function admin_get_datas($cate,$essay_id){
+   function admin_get_datas($cate,$data_id){
 		if($cate == 'error' || $cate == 'tbd' || $cate == 'history' || $cate == 'admin_export'){			
 			$data['cate'] = 'musedata';
 			$this->load->view('head',$data);
@@ -254,7 +252,7 @@ class Text_editor extends CI_Controller {
 			$data['cate'] = 'service';			
 			$this->load->view('head',$data);			
 		}
-		$rows = $this->all_list->get_one_essay($cate,$essay_id);		
+		$rows = $this->all_list->get_one_essay($cate,$data_id);		
 
 		if($rows == false){
 			return false;			
@@ -317,16 +315,16 @@ class Text_editor extends CI_Controller {
 			
 			$data['time'] = $rows->time;
 			$data['cate'] = $cate;
-			$data['essay_id'] = $essay_id;			
+			$data['data_id'] = $data_id;			
 			$data['usr_id'] = $rows->usr_id;
 
 			return $data;
 		}		
 	}
 
-	public function essays($cate,$essay_id){
+	public function essays($cate,$id){
 		if($this->session->userdata('is_login')){
-			$data = $this->admin_get_datas($cate,$essay_id);					
+			$data = $this->admin_get_datas($cate,$id);					
 			if($data){
 				$this->load->view('/editor/admin_editor',$data);
 			}else{
@@ -338,9 +336,9 @@ class Text_editor extends CI_Controller {
 		}
 	}
 
-	public function error($essay_id,$type){
+	public function error($id,$type){
 		if($this->session->userdata('is_login')){			
-			$data = $this->admin_get_datas('error',$essay_id);
+			$data = $this->admin_get_datas('error',$id);
 
 			if($data){
 				$this->load->view('/editor/admin_editor',$data);
@@ -353,9 +351,9 @@ class Text_editor extends CI_Controller {
 		}
 	}
 
-	public function comp($essay_id,$type){
+	public function comp($id,$type){
 		if($this->session->userdata('is_login')){				
-			$data = $this->admin_get_datas('admin_export',$essay_id,$type);		
+			$data = $this->admin_get_datas('admin_export',$id,$type);
 			
 			if($data){
 				$this->load->view('/editor/admin_editor',$data);
@@ -369,10 +367,9 @@ class Text_editor extends CI_Controller {
 		}
 	}
 
-	public function service_comp($service_name,$essay_id,$month,$year){
+	public function service_comp($service_name,$id,$month,$year){
 		if($this->session->userdata('is_login')){	
-			$data = $this->admin_get_datas('service',$essay_id);		
-			//$rows = $this->all_list->get_admin_comp($essay_id);
+			$data = $this->admin_get_datas('service',$id);					
 
 			$row = $this->all_list->get_serviceId_num($service_name);
 			$service_id = $row->id;

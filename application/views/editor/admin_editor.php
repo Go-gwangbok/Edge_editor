@@ -769,9 +769,9 @@ $('button#submit').click(function()
 
 // Error Yes Button
 $('button#yes').click(function(){
-  var essay_id = '<?=$essay_id;?>'; 
+  var data_id = '<?=$data_id;?>'; 
   data = {
-    essay_id : essay_id 
+    data_id : data_id 
   }
   console.log(data);
   $.post('/errordata/error_yes',data,function(json){
@@ -786,9 +786,9 @@ $('button#yes').click(function(){
 
 // Error return button
 $('button#not_error').click(function(){
-  var essay_id = '<?=$essay_id;?>';  
+  var data_id = '<?=$data_id;?>';  
   data = {
-    essay_id : essay_id    
+    data_id : data_id    
   }
   console.log(data);
 

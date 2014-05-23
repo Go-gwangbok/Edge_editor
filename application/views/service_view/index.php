@@ -84,7 +84,7 @@ $('tbody#list').delegate('tr.clickableRow', 'click', function()
 			dataType: 'json',
 			success: function(json){
 			var	access = JSON.parse(json['result']);			
-			//console.log(access['status']);									
+			console.log(access['status']);									
 			if(access['status']){											
 			    $('<form action="/service/writing" method="POST"/>')
 		        .append($('<input type="hidden" name="token" value="' + token + '">'))

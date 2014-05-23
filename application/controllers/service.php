@@ -143,7 +143,7 @@ class Service extends CI_Controller {
 	{
 		$secret = 'isdyf3584MjAI419BPuJ5V6X3YT3rU3C';
 		$email = $this->session->userdata('email');		
-		$access = $this->curl->simple_post('http://ec2-54-199-4-169.ap-northeast-1.compute.amazonaws.com/editor/auth', array('secret'=>$secret,'email'=>$email));
+		$access = $this->curl->simple_post('http://54.248.103.31/editor/auth', array('secret'=>$secret,'email'=>$email));
 
 		// $access = '{
 		// 		    "status": true,
@@ -160,7 +160,7 @@ class Service extends CI_Controller {
 			$token = $access_status['data']['token'];
 			
 			// re_curl
-			$result_data = $this->curl->simple_post('http://ec2-54-199-4-169.ap-northeast-1.compute.amazonaws.com/editor/get', array('token'=>$token));
+			$result_data = $this->curl->simple_post('http://54.248.103.31/editor/get', array('token'=>$token));
 
 
 			/** "is_24hr":"1" == true  "0" == 'false'   "is_critique":"1" == true  "0" == 'false' **/
@@ -194,7 +194,7 @@ class Service extends CI_Controller {
 		$token = $this->input->post('token');
 		$w_id = $this->input->post('w_id');		
 
-		$access = $this->curl->simple_post('http://ec2-54-199-4-169.ap-northeast-1.compute.amazonaws.com/editor/editing/start', array('token'=>$token,'id'=>$w_id));
+		$access = $this->curl->simple_post('http://54.248.103.31/editor/editing/start', array('token'=>$token,'id'=>$w_id));
 
 		// $access = '{
 		// 		    "status": true,
@@ -296,7 +296,7 @@ class Service extends CI_Controller {
 			$errorchk_class = new Errorchk;
 			$error_chk = $errorchk_class->error_chk('once',$w_id,$type);
 
-			$access = $this->curl->simple_post('http://ec2-54-199-4-169.ap-northeast-1.compute.amazonaws.com/editor/editing/done', array('token'=>$token, 'id'=>$w_id, 'editing'=>$this->input->POST('editing'), 'critique'=>$this->input->POST('critique')));
+			$access = $this->curl->simple_post('http://54.248.103.31/editor/editing/done', array('token'=>$token, 'id'=>$w_id, 'editing'=>$this->input->POST('editing'), 'critique'=>$this->input->POST('critique')));
 
 			// $access = '{
 			// 		    "status": true,

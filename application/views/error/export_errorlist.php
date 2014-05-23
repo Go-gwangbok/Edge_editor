@@ -95,7 +95,7 @@ function ajaxPost(url,data){
 		data_count = json['data_count'];	
 		$('tbody#list').children().remove();
 		for(var i = 0; i < json['data_list'].length; i++) {
-			var essay_id = data_list[i]['essay_id'];
+			var id = data_list[i]['id'];
 			var task = data_list[i]['type'];			
 			var raw_txt = data_list[i]['raw_txt'];
 			var prompt = data_list[i]['prompt'];
@@ -105,7 +105,7 @@ function ajaxPost(url,data){
 				prompt = prompt+raw_txt.substr(0,120);
 			}
 			
-			$('tbody#list').append('<tr id='+i+' class="rowbtn" style="cursor:pointer;" href="/errordata/error_edit/'+data_list[i]['essay_id']+'/'+data_list[i]['type']+'"><td class="text-center">'+num+'</td><td>'																				 
+			$('tbody#list').append('<tr id='+i+' class="rowbtn" style="cursor:pointer;" href="/errordata/error_edit/'+id+'/'+task+'"><td class="text-center">'+num+'</td><td>'																				 
 					+prompt.replace(/"/gi,'')+'</td><td class="text-center">'
 					+data_list[i]['name']+'</td><td class="text-center">'
 					+kind_name.toUpperCase()+'</td><td style="width:95px;" class="text-center">'

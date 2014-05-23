@@ -567,9 +567,9 @@ class Project extends CI_Controller {
 
 	public function error(){ //error 신고 입력! DB--> error_essay //0
 		if($this->session->userdata('is_login')){			
-			$essay_id = $this->input->post('essay_id');
+			$data_id = $this->input->post('data_id');
 			
-			$result = $this->all_list->error_proc($essay_id);
+			$result = $this->all_list->error_proc($data_id);
 			$json['result'] = $result;
 		}else{
 			redirect('/');
@@ -597,9 +597,9 @@ class Project extends CI_Controller {
 
 	public function discuss(){ //error 신고 입력! DB--> error_essay //0
 		if($this->session->userdata('is_login')){			
-			$essay_id = $this->input->post('essay_id');			
+			$id = $this->input->post('data_id');			
 
-			$result = $this->all_list->discuss_proc($essay_id);
+			$result = $this->all_list->discuss_proc($id);
 			$json['result'] = $result;
 		}else{
 			redirect('/');

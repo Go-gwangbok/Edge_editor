@@ -327,6 +327,17 @@
       }
       ?>   
     </div> 
+    <!-- <button id="abc">tag</button>
+    <textarea rows="20" cols="150" id="dd">Some people say that to communicate with others more effectively, people should meet others, which means face to face communication. However, I think that when we should communicate others, other than face to face communication, other types of communications are better for some reasons below.
+
+First, through the types of communication such as email, telephone, or on the Internet, people save their money to some extent. In the case of the Internet, by the means of email, we do not have to pay any money when sending a letter regardless of location, where we are. If we should meet someone face to face, for instance, we should travel by using a car or taking public transportation, which requires a lot of money, especially if the destination is far away from the departure. In my case, I am a student in Korea and I am not making money, so to meet my friend in America, I meet my people using Internet telephone program, Skype, which enables us to communicate with each other. We can talk freely, without any fee, facing to face with the help of computer monitor, as if we just meet on the place.
+
+Secondly, we can communicate at any time with convenience. When we meet a person at a certain place, we should make an appointment prior to the day, checking whether there is no schedule and the day is proper to meet. However, by using some communicate ways such as email we can convey our intention efficiently to others without restriction of time. Furthermore, the message delivered person is not disturbed as well because we can check email at any time by using computers or smart phone. Both senders and the delivered can benefit from such types of communications. In the cases that we need to talk or convey trivial things such as prepare some food before I arrive, or please wait for me at the bus station with umbrella, people do not have to meet each other face to face, they can just use their telephones, which is time saving, much more efficient and proper way.
+
+In conclusion, we can communicate better with others using convenient types of communication, which enables us not only to save time but also money.
+    </textarea> -->
+
+    
 
     <!-- hidden data -->
     <form> 
@@ -335,8 +346,7 @@
       <input type="hidden" id="edit_writing" value="<?=$edit_writing;?>">
       <input type="hidden" id="writing" value="<?=$writing;?>">
       <input type="hidden" id="h_critique" value="<?=$critique;?>">      
-      <input type="hidden" id="h_tagging" value="<?=$tagging;?>">
-      <input type="hidden" id="score_templet" value="<?=$score_templet;?>">      
+      <input type="hidden" id="h_tagging" value="<?=$tagging;?>">      
     </form>  
   </div>  
 </div>   
@@ -345,6 +355,7 @@
 <script src="/public/wy/external/google-code-prettify/prettify.js"></script> 
 <script src="/public/wy/bootstrap-wysiwyg.js"></script>
 <script src="/public/js/jquery.timer.js"></script>
+<script src="/public/js/jquery.cleditor.js"></script>
 <script type="text/javascript" >
 var chk_orig = '<?=$chk_orig;?>';
 var chk_detection = '<?=$chk_detection;?>';
@@ -358,6 +369,68 @@ var score = '<?=$score1?>';
 var score_second = '<?=$score2?>';
 console.log(cate);
 
+function getAnchorOffset() {
+  if (window.getSelection) {                      //only work if supported
+   var selection = window.getSelection ();      //get the selection object     
+   var anchorOffsetProp = selection.anchorOffset;   //get the offset
+   console.log( "Anchor Offset: \n" + anchorOffsetProp.toString());                                 
+   }
+} 
+
+(function($) { 
+  // Define the hello button
+  $.cleditor.buttons.hello = {
+    name: "hello",
+    image: "hello.gif",
+    title: "Hello World",
+    command: "inserthtml",
+    popupName: "hello",
+    popupClass: "cleditorPrompt",
+    popupContent: "Enter your name:<br><input type=text size=10><br><input type=button value=Submit>",
+    buttonClick: helloClick
+  };
+ 
+  // Add the button to the default controls before the bold button
+  $.cleditor.defaultOptions.controls = $.cleditor.defaultOptions.controls
+    .replace("bold", "hello bold");
+ 
+  // Handle the hello button click event
+  function helloClick(e, data) {
+ 
+    // Wire up the submit button click event
+    $(data.popup).children(":button")
+      .unbind("click")
+      .bind("click", function(e) {
+ 
+        // Get the editor
+        var editor = data.editor;
+ 
+        // Get the entered name
+        var name = $(data.popup).find(":text").val();
+ 
+        // Insert some html into the document
+        var html = "Hello " + name;
+        editor.execCommand(data.command, html, null, data.button);
+ 
+        // Hide the popup and set focus back to the editor
+        editor.hidePopups();
+        editor.focus();
+ 
+      });
+ 
+  }
+ 
+})(jQuery);      
+
+// $('button#abc').click(function(){
+//   $('#dd')
+//     // insert before string '<strong>'
+//     // <strong> を選択テキストの前に挿入
+//     .selection('insert', {text: '<strong style="color:red;">', mode: 'before'})
+//     // insert after string '</strong>'
+//     // </strong> を選択テキストの後に挿入
+//     .selection('insert', {text: '</strong>', mode: 'after'});
+// });
 var tagging_action_array = new Array();  
 $(document).ready(function(){    
   var active_ele = '<?=$active_ele;?>';
@@ -483,18 +556,27 @@ var Example1 = new (function() {
     $(init);          
 });
 
+
+
+
 // Tag Wrap
 $('button#tag').click(function(){  
   $('span').removeAttr('style');        
   var tag = $(this).attr('tag'); // Original Tag name
   var get_appear_tag = $(this).attr('appear'); // Appear Tag name
   var select_text = $.selection('html');
-  //console.log(select_text);  
+  // var select_a = $.selection('html');
+  // console.log(select_a); 
+  
+  console.log($("div#tagging_box").html().indexOf(select_text));
+  //console.log($("div#tagging_box").html().anchorOffset(select_text));
+  
+
   
   if(select_text == ''){
     alert('selection Error');
   }else{
-    var div = $("div#tagging_box");  
+    var div = $("div#tagging_box");    
     var tagging_data = $("div#tagging_box").html(); 
 
     var reg = new RegExp('span class="'+tag+'"', "ig");  
@@ -788,18 +870,26 @@ $('button#submit').click(function()
     dataType: 'json',
     success: function(json)
     { 
-      console.log(json['error_chk']);
-      console.log(json['status']);
+      //console.log(json['error_chk']);
+      //console.log(json['status']);
 
-      if(json['status'])
-      {
-        // 정상적으로 처리됨
-        alert('It’s been successfully processed!');
-        window.history.back();
-        //window.location.replace('/essaylist'); // 리다이렉트할 주소
+      if(json['error_chk'] == 'garbage_update_error'){
+        alert('garbage_update_error');
+      }else if(json['error_chk'] == 'final_update_error'){
+        alert('final_update_error');
       }else{
-        alert('all_list --> draft DB Error');
+        if(json['status'])
+        {
+          // 정상적으로 처리됨
+          alert('It’s been successfully processed!');
+          window.history.back();
+          //window.location.replace('/essaylist'); // 리다이렉트할 주소
+        }else{
+          alert('all_list --> draft DB Error');
+        }  
       }
+
+      
     }
   });
 });
@@ -917,7 +1007,7 @@ $("button#w_submit").click(function(){
 $('button#errorlist').click(function(){
   console.log('error');
   var error_data = {            
-    essay_id: <?=$id;?>    
+    data_id: <?=$id;?>    
   }
   console.log(error_data);
   $.post('/musedata/project/error',error_data,function(json){            
@@ -932,8 +1022,9 @@ $('button#errorlist').click(function(){
 // To be discuss button
 $('button#discuss').click(function(){  
   var data = {            
-    essay_id : <?=$id;?>    
+    data_id : <?=$id;?>    
   }  
+  console.log(data);
   $.post('/musedata/project/discuss',data,function(json){          
     if(json['result']){        
         window.location = "/musedata/project/board/<?=$cate;?>/<?=$pj_id?>/<?=$this->session->userdata('id')?>";

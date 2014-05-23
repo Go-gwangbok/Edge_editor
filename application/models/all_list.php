@@ -1,5 +1,10 @@
 <?
 class All_list extends CI_Model{
+	function get_cate($service_id,$cate){
+		return $this->db->query("SELECT * FROM data_kind WHERE service_id = '$service_id' and service_cate_name = '$cate'")->result();
+
+	}
+
 	function all_usr(){
    		return $this->db->query("SELECT * FROM usr WHERE classify = 1 and conf = 0 and active = 0")->result();   		
    	}   	
@@ -14,8 +19,12 @@ class All_list extends CI_Model{
    									ORDER BY connect_templet.task_id")->row();
    	}
 
-	function get_essay($essay_id,$type){
-		return $this->db->query("SELECT * FROM adjust_data WHERE essay_id in($essay_id) and type = '$type' and active = 0")->result();
+   	function get_kind_name($kind_id){
+   		return $this->db->query("SELECT * FROM data_kind WHERE id = '$kind_id'")->row();
+   	}
+
+	function get_essay($data_id){
+		return $this->db->query("SELECT * FROM adjust_data WHERE id in($data_id)")->result();
 	}
 
 	function getproject_name($pj_id){
@@ -28,15 +37,14 @@ class All_list extends CI_Model{
 									LEFT JOIN project ON adjust_data.pj_id = project.id
 									LEFT JOIN usr ON adjust_data.usr_id = usr.id
 									WHERE adjust_data.usr_id =  '$usr_id'
-									AND adjust_data.active =0
-									AND adjust_data.essay_id !=0
+									AND adjust_data.active =0									
 									and adjust_data.pj_active = 0
 									GROUP BY project.id
 									ORDER by project.add_date desc
 									LIMIT 2")->result();
 	}
 
-	function get_one_essay($cate,$essay_id){
+	function get_one_essay($cate,$id){
 		if($cate == 'service'){
 			$from_table = 'service_data';
 		}else{
@@ -45,7 +53,7 @@ class All_list extends CI_Model{
 		$query = "SELECT ".$from_table.".*,data_kind.kind as kind_name 
 					FROM ".$from_table." 
 					LEFT JOIN data_kind ON data_kind.id = ".$from_table.".kind
-					WHERE essay_id = '$essay_id'";
+					WHERE ".$from_table.".id = '$id'";
 		$result = $this->db->query($query);
 		if($result->num_rows() > 0){
 			return	$this->db->query($query)->row();
@@ -340,9 +348,8 @@ class All_list extends CI_Model{
    		return true;
    	}
 
-   	function garbage_data_del($essay_id,$type,$garbage_data_del){
-   		$result = $this->db->query("UPDATE adjust_data SET editing = '$garbage_data_del' WHERE essay_id = '$essay_id' and type = '$type'");
-   		return $result;      
+   	function garbage_data_del($data_id,$garbage_data_del){
+   		return $this->db->query("UPDATE adjust_data SET editing = '$garbage_data_del' WHERE id = '$data_id'");   		
    	}   	
 
 
@@ -381,7 +388,7 @@ class All_list extends CI_Model{
 
 
    	// Error Chk Sql
-	function ex_editing_update_service($essay_id,$replace_data,$before_editing,$type){
+	function ex_editing_update_service($essay_id,$replace_data,$before_editing){
 	   		preg_match_all("|<u>|", $before_editing, $u_matches);
 			preg_match_all("|<strike>|", $before_editing, $s_matches);
 			preg_match_all("|<b>|", $before_editing, $b_matches);
@@ -393,22 +400,19 @@ class All_list extends CI_Model{
 			$org_tag = count($u_matches[0])+count($s_matches[0])+count($b_matches[0]);
 			$replace_tag = count($mod_matches[0])+count($ins_matches[0])+count($del_matches[0]);
 
-	   		$result = $this->db->query("UPDATE adjust_data SET ex_editing = '$replace_data', org_tag = '$org_tag', replace_tag = '$replace_tag' WHERE essay_id = '$essay_id' and type = '$type'");
-	   		return $result;      
+	   		return $this->db->query("UPDATE adjust_data SET ex_editing = '$replace_data', org_tag = '$org_tag', replace_tag = '$replace_tag' WHERE id = '$essay_id'");
+	   		
 	}
 
-	function error_replace($essay_id,$replace_data,$type){
+	function error_replace($data_id,$replace_data){
 			preg_match_all("|</mod>|", $replace_data, $mod_matches);
 			preg_match_all("|</ins>|", $replace_data, $ins_matches);
 			preg_match_all("|</del>|", $replace_data, $del_matches);   			
 
 			$replace_tag = count($mod_matches[0])+count($ins_matches[0])+count($del_matches[0]);
 
-	   		$result = $this->db->query("UPDATE adjust_data SET ex_editing = '$replace_data', replace_tag = '$replace_tag' WHERE essay_id = '$essay_id' and type = '$type'");
-	   		return $result;      
+	   		return $this->db->query("UPDATE adjust_data SET ex_editing = '$replace_data', replace_tag = '$replace_tag' WHERE id = '$data_id'");	   		
 	}
-
-
 
 
 
@@ -602,8 +606,8 @@ class All_list extends CI_Model{
    		return $this->db->query("SELECT * FROM usr WHERE active = 0 and classify = 1 ORDER BY date desc")->result();
    	}	
 
-   	function data_kind($type){
-   		return $this->db->query("SELECT * FROM data_kind WHERE $type = 'Y'")->result();
+   	function data_kind(){
+   		return $this->db->query("SELECT * FROM data_kind")->result();
    	}
 
 	function new_editor_accept($usr_id){
@@ -630,8 +634,8 @@ class All_list extends CI_Model{
    		
    	}
 
-   	function member_edit_save($usr_id,$task_ids,$type,$start,$end,$pay){
-   		$tasks = explode(',',$task_ids);
+   	function member_edit_save($usr_id,$task_ids,$type,$start,$end,$pay,$editor_desc,$email){
+   		$tasks = explode(',',$task_ids);   		
 
    		$usr_task_confirm = $this->db->query("SELECT * FROM connect_usr_task WHERE usr_id = '$usr_id'");
 
@@ -673,27 +677,21 @@ class All_list extends CI_Model{
    				return false;
    			} 			
 
-   		}else{ // New editor 이거나 한번도 셋팅을 하지 않은 Editor.
-
-   			if($tasks){
-   				foreach ($tasks as $value) {
-   					$insert_task = $this->db->query("INSERT INTO connect_usr_task(usr_id,task_id,joindate) VALUES('$usr_id','$value',now())");
-			 		if(!$insert_task){
-			 			return false;
-			 		}		
-   				}
-   			}else{
-   				$insert_task = $this->db->query("INSERT INTO connect_usr_task(usr_id,task_id,joindate) VALUES('$usr_id','$task_ids',now())");
+   		}else{ // New editor 이거나 한번도 셋팅을 하지 않은 Editor.   		
+   			
+			foreach ($tasks as $value) {
+				$insert_task = $this->db->query("INSERT INTO connect_usr_task(usr_id,task_id,joindate) VALUES('$usr_id','$value',now())");
 		 		if(!$insert_task){
 		 			return false;
 		 		}		
-   			}   			
-   		}
+			}
+		}
 
-   		$option_update = $this->db->query("UPDATE usr SET type = '$type', pay = '$pay', start = '$start', end = '$end' WHERE id = '$usr_id'");
-   		if($option_update){
-   			return true;	
-   		}   		
+   		if(in_array('2',$tasks,true)){ // Writing 서비스를 이용하는 경우!
+   			return $this->db->query("UPDATE usr SET type = '$type', pay = '$pay', start = '$start', end = '$end', description = $editor_desc WHERE id = '$usr_id'");	   			
+   		}else{ // Writing 서비스를 이용하지 않는경우!
+   			return $this->db->query("UPDATE usr SET type = '$type', pay = '$pay', start = '$start', end = '$end' WHERE id = '$usr_id'");
+   		}
    	}   	
 
    	function get_setup_tag($kind_id){
@@ -711,24 +709,20 @@ class All_list extends CI_Model{
    									LEFT JOIN data_kind ON data_kind.id = connect_score.data_kind_id
    									LEFT JOIN score_type ON score_type.id = connect_score.score_type_id
    									WHERE data_kind.id = '$kind_id'
-   									and connect_score.active = 0")->result();
-   		// return $this->db->query("SELECT score_type.*,data_kind.kind
-					// 					FROM data_kind 
-					// 					left join score_type on score_type.data_kind_id = data_kind.id
-					// 					WHERE data_kind.id = '$kind_id' and active = 0")->result();
+   									and connect_score.active = 0")->result();   		
    	}
    	
-   	function setting_add_sco($type_id,$kind_id,$add_sco_id){
+   	function setting_add_sco($kind_id,$add_sco_id){
    		$scos = explode(',', $add_sco_id);
    		foreach ($scos as $sco_id) {
-   			$tag_confirm = $this->db->query("SELECT * FROM connect_score WHERE score_type_id = '$sco_id' and data_kind_id = '$kind_id' and task_id = '$type_id'");
+   			$tag_confirm = $this->db->query("SELECT * FROM connect_score WHERE score_type_id = '$sco_id' and data_kind_id = '$kind_id'");
    			if($tag_confirm->num_rows() > 0){
-   				$update = $this->db->query("UPDATE connect_score SET chk = 'Y',active = 0,action_time = now() WHERE score_type_id = '$sco_id' and data_kind_id = '$kind_id' and task_id = '$type_id'");
+   				$update = $this->db->query("UPDATE connect_score SET chk = 'Y',active = 0,action_time = now() WHERE score_type_id = '$sco_id' and data_kind_id = '$kind_id'");
    				if(!$update){
 	   				return false;
 	   			}
    			}else{
-	   			$ins = $this->db->query("INSERT INTO connect_score(score_type_id,data_kind_id,task_id,action_time) VALUES('$sco_id','$kind_id','$type_id',now())");	
+	   			$ins = $this->db->query("INSERT INTO connect_score(score_type_id,data_kind_id,action_time) VALUES('$sco_id','$kind_id',now())");	
 	   			if(!$ins){
 	   				return false;
 	   			}
@@ -742,17 +736,17 @@ class All_list extends CI_Model{
    		return $this->db->query("UPDATE connect_score SET active = 1,chk = 'N' WHERE score_type_id = '$sco_id' and data_kind_id = '$kind_id'");
    	}
 
-   	function setting_add_tag($type_id,$kind_id,$add_tags_id){
+   	function setting_add_tag($kind_id,$add_tags_id){
    		$tags = explode(',', $add_tags_id);
    		foreach ($tags as $tag_id) {
-   			$tag_confirm = $this->db->query("SELECT * FROM connect_tags WHERE tags_id = '$tag_id' and data_kind_id = '$kind_id' and task_id = '$type_id'");
+   			$tag_confirm = $this->db->query("SELECT * FROM connect_tags WHERE tags_id = '$tag_id' and data_kind_id = '$kind_id'");
    			if($tag_confirm->num_rows() > 0){
-   				$update = $this->db->query("UPDATE connect_tags SET chk = 'Y',active = 0,action_time = now() WHERE tags_id = '$tag_id' and data_kind_id = '$kind_id' and task_id = '$type_id'");
+   				$update = $this->db->query("UPDATE connect_tags SET chk = 'Y',active = 0,action_time = now() WHERE tags_id = '$tag_id' and data_kind_id = '$kind_id'");
    				if(!$update){
 	   				return false;
 	   			}
    			}else{
-   				$ins = $this->db->query("INSERT INTO connect_tags(tags_id,data_kind_id,task_id,action_time) VALUES('$tag_id','$kind_id','$type_id',now())");	
+   				$ins = $this->db->query("INSERT INTO connect_tags(tags_id,data_kind_id,action_time) VALUES('$tag_id','$kind_id',now())");	
 	   			if(!$ins){
 	   				return false;
 	   			}
@@ -761,9 +755,9 @@ class All_list extends CI_Model{
    		return true;   		
    	}
 
-   	function setting_tag_del($type_id,$tag_id,$kind_id){
+   	function setting_tag_del($tag_id,$kind_id){
    		$tag_id = substr($tag_id, 1);
-   		return $this->db->query("UPDATE connect_tags SET active = 1,chk = 'N', action_time = now() WHERE tags_id = '$tag_id' and data_kind_id = '$kind_id' and task_id = '$type_id'");
+   		return $this->db->query("UPDATE connect_tags SET active = 1,chk = 'N', action_time = now() WHERE tags_id = '$tag_id' and data_kind_id = '$kind_id'");
    	}   	
 
    	function get_tag($kind){
@@ -797,22 +791,25 @@ class All_list extends CI_Model{
 									AND connect_templet.active = 0")->result();
 	}   	
 
-   	function saveSetting($kind_id,$tabs_val,$tags_val,$scores_val){   		
+   	function saveSetting($type_id,$kind_id,$tabs_val){   		
    		//Tab Save   		
    		if($tabs_val != ''){ 
-   			$all_tab_updata = $this->db->query("UPDATE connect_templet SET active = '1' WHERE active = 0 and data_kind_id = '$kind_id'");
+   			$all_tab_updata = $this->db->query("UPDATE connect_templet SET active = '1' WHERE active = 0 and data_kind_id = '$kind_id' and task_id = '$type_id'");
    			if($all_tab_updata){
-   				$tab_array = explode(',', $tabs_val); // tr,co,is,ex
+   				$tab_array = explode(',', $tabs_val); // original,detecting,score...
 		   		foreach ($tab_array as $value) {
 		   			$tab_id = substr($value,1);		
 		   			// 체크되어진 값만 다시 Y로 변경한다!   			
-		   			$this->db->query("UPDATE connect_templet SET active = 0 WHERE templet_ele_id = '$tab_id' and data_kind_id = '$kind_id'");	
+		   			$this->db->query("UPDATE connect_templet SET active = 0 WHERE templet_ele_id = '$tab_id' and data_kind_id = '$kind_id' and task_id = '$type_id'");	
 		   		}
    			}	
    		}else{
    			return false;
-   		}
-   		
+   		}   		
+   		return true;
+   	}
+
+   	function rubricSaveSetting($kind_id,$tags_val,$scores_val){   		   		
    		// Tag Save   		
    		if($tags_val != ''){ 
    			$all_tag_updata = $this->db->query("UPDATE connect_tags SET chk = 'N' WHERE active = 0 and data_kind_id = '$kind_id'");
@@ -1045,7 +1042,7 @@ class All_list extends CI_Model{
    				$kind = $row->kind; // kind_id			
    				$kind_name = $row->kind_name;
 
-   				if($kind_name == 'toefl essay'){
+   				if($kind_name == 'toefl'){
    					$sentence = explode('::', $essay);   				
 
 	   				$prompt = mysql_real_escape_string($sentence[0]);
@@ -1138,7 +1135,7 @@ class All_list extends CI_Model{
 	   				$kind = $row->kind;
 	   				$kind_name = $row->kind_name;
 
-					if($kind_name == 'toefl essay'){
+					if($kind_name == 'toefl'){
 	   					$sentence = explode('::', $essay);   				
 
 		   				$prompt = mysql_real_escape_string($sentence[0]);
@@ -1220,7 +1217,7 @@ class All_list extends CI_Model{
 	   				$kind = $row->kind;
 	   				$kind_name = $row->kind_name; 				   	
 
-					if($kind_name == 'toefl essay'){
+					if($kind_name == 'toefl'){
 	   					$sentence = explode('::', $essay);   				
 
 		   				$prompt = mysql_real_escape_string($sentence[0]);
@@ -1303,7 +1300,7 @@ class All_list extends CI_Model{
 	   				$kind = $row->kind;
 	   				$kind_name = $row->kind_name;
 
-					if($kind_name == 'toefl essay'){
+					if($kind_name == 'toefl'){
 	   					$sentence = explode('::', $essay);   				
 
 		   				$prompt = mysql_real_escape_string($sentence[0]);
@@ -2003,18 +2000,18 @@ class All_list extends CI_Model{
 			$datas = explode(',', $share_data);
 
    			foreach ($datas as $data) {
-   				$query = $this->db->query("SELECT * FROM adjust_data WHERE usr_id = '$editor_id' and pj_id = '$pj_id' and essay_id = '$data' and pj_active = 0 and active = 0");
+   				$query = $this->db->query("SELECT * FROM adjust_data WHERE usr_id = '$editor_id' and pj_id = '$pj_id' and id = '$data' and pj_active = 0 and active = 0");
    				if($query->num_rows() > 0){
-   					$this->db->query("UPDATE adjust_data SET usr_id = '$select_mem' WHERE usr_id = '$editor_id' and pj_id = '$pj_id' and essay_id = '$data' and pj_active = 0 and active = 0");   					
+   					$this->db->query("UPDATE adjust_data SET usr_id = '$select_mem' WHERE usr_id = '$editor_id' and pj_id = '$pj_id' and id = '$data' and pj_active = 0 and active = 0");   					
    				}else{
    					return false;
    				}
    			}
    			return true;
 		}else{ // 데이터가 1개 일때!
-			$query = $this->db->query("SELECT * FROM adjust_data WHERE usr_id = '$editor_id' and pj_id = '$pj_id' and essay_id = '$share_data' and pj_active = 0 and active = 0");
+			$query = $this->db->query("SELECT * FROM adjust_data WHERE usr_id = '$editor_id' and pj_id = '$pj_id' and id = '$share_data' and pj_active = 0 and active = 0");
 			if($query->num_rows() > 0){
-				$update = $this->db->query("UPDATE adjust_data SET usr_id = '$select_mem' WHERE usr_id = '$editor_id' and pj_id = '$pj_id' and essay_id = '$share_data' and pj_active = 0 and active = 0");
+				$update = $this->db->query("UPDATE adjust_data SET usr_id = '$select_mem' WHERE usr_id = '$editor_id' and pj_id = '$pj_id' and id = '$share_data' and pj_active = 0 and active = 0");
 				if($update){
 					return true;
 				}else{
@@ -2027,15 +2024,8 @@ class All_list extends CI_Model{
    	}
 
    	// Project import Error list
-   	function error_proc($essay_id){   		
-   		$query = $this->db->query("SELECT * FROM adjust_data WHERE essay_id = '$essay_id' and pj_active = 0 and active = 0");
-   		
-   		if($query->num_rows() > 0){   			
-			return $this->db->query("UPDATE adjust_data SET pj_active = 1, sub_date = now(), discuss = 'Y', error = 'Y' WHERE essay_id = '$essay_id'");
-			 
-   		}else{
-   			return false;   			
-   		}
+   	function error_proc($data_id){   		   		
+		return $this->db->query("UPDATE adjust_data SET pj_active = 1, sub_date = now(), discuss = 'Y', error = 'Y' WHERE id = '$data_id'");
    	}
 
    	function error_count($id){
@@ -2053,12 +2043,12 @@ class All_list extends CI_Model{
 									LIMIT $limit,$list")->result();
    	}
 
-   	function error_return($essay_id){   		
-   		return $this->db->query("UPDATE adjust_data SET error = 'RE', pj_active = 0 WHERE essay_id = '$essay_id'");
+   	function error_return($data_id){   		
+   		return $this->db->query("UPDATE adjust_data SET error = 'RE', pj_active = 0 WHERE id = '$data_id'");
    	}
 
-   	function error_yes($essay_id){
-   		return $this->db->query("UPDATE adjust_data SET active = 1 WHERE essay_id = '$essay_id'");
+   	function error_yes($data_id){
+   		return $this->db->query("UPDATE adjust_data SET active = 1 WHERE id = '$data_id'");
    	}
  
 
@@ -2069,15 +2059,9 @@ class All_list extends CI_Model{
 
    	}   	  	
 
-   	public function discuss_proc($essay_id){
-   		$query = $this->db->query("SELECT * FROM adjust_data WHERE essay_id = '$essay_id' and pj_active = 0 and active = 0 and discuss = 'Y'");
+   	public function discuss_proc($id){   		
+		return $this->db->query("UPDATE adjust_data SET discuss = 'N' WHERE id = '$id'");   			
    		
-   		if($query->num_rows() > 0){			 
-			return $this->db->query("UPDATE adjust_data SET discuss = 'N' WHERE essay_id = '$essay_id'");
-   			
-   		}else{
-   			return false;   			
-   		}
    	}   	
 
    	public function exportmembers($pj_id){

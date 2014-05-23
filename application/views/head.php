@@ -8,7 +8,7 @@
     <meta name="author" content=""> 
 
     <link href="/public/css/bootstrap.css" rel="stylesheet" media="screen">    
-    <link href="/public/css/bootstrap-select.css" rel="stylesheet" media="screen">  
+    <link href="/public/css/bootstrap-select.css" rel="stylesheet" media="screen">      
     <!-- Custom styles for this template -->
     <link href="/public/css/customize.css" rel="stylesheet" media="screen">  
     <style type="text/css">
@@ -17,7 +17,22 @@
 
     <link href="http://netdna.bootstrapcdn.com/font-awesome/3.0.2/css/font-awesome.css" rel="stylesheet">
     <link href="/public/wy/index.css" rel="stylesheet"> 
-    <link href="/public/css/bootstrap-select.css" rel="stylesheet"> 
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!--[if lt IE 9]>
+    <script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE9.js"></script>
+    <![endif]-->
+
+    <!--[if lt IE 8]>
+    <script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE8.js"></script>
+    <![endif]-->
+
+    <!--[if lt IE 7]>
+    <script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE7.js"></script>
+    <![endif]-->
+    
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>    
     <script src="/public/js/bootstrap.js"></script>       
     <script src="/public/js/bootstrap-select.js"></script>       
@@ -35,8 +50,7 @@
 <div class="navbar navbar-inverse navbar-fixed-top">
   <div class="container">
     <div class="navbar-header">      
-      <a class="navbar-brand" href="/">Administrator</a>
-      <!-- <input type="hidden" id="stopwatch"></input> -->
+      <a class="navbar-brand" href="/">Administrator</a>      
     </div>        
     
     <div class="navbar-collapse collapse">          

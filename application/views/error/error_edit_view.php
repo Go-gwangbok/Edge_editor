@@ -33,7 +33,7 @@
 </div>
 <script type="text/javascript">
 var pj_id = '<?=$pj_id;?>';
-var essay_id = '<?=$essay_id;?>';
+var data_id = '<?=$data_id;?>';
 var type = '<?=$type;?>';
 console.log('<?=$cate?>');
 
@@ -46,7 +46,7 @@ $(document).ready(function(){
 	console.log(editing);
 	var data = {
 		data : editing,
-		essay_id : essay_id,
+		data_id : data_id,
 		type : type
 	}
 	
@@ -76,7 +76,7 @@ $("#submit").click(function(){
 	var editing = $('textarea').val();
 	var data = {
 		data : editing,
-		essay_id : essay_id,
+		data_id : data_id,
 		type : type
 	}
 	//console.log(data);
@@ -84,9 +84,9 @@ $("#submit").click(function(){
 		
 		var result = json['result'];
 		console.log(result);		
-		if(result == true){ // Error
+		if(result == true){ // Done
 			window.location = '/errordata/export_error/'+pj_id;									
-		}else{ // Done				
+		}else{ // Error		
 			
 			$('#error').empty();							
 			var error_list = '';

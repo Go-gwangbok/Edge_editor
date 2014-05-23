@@ -4,8 +4,8 @@
         <li><a href="/">Home</a></li>                   
         <li><a href="/service/">Service</a></li>
         <li><a href="/service/serviceType/<?=$service_name;?>"><?=ucfirst($service_name);?></a></li>   
-        <li><a href="/service/enter/writing/<?=$month?>/<?=$year;?>"><?=$year.' - '.$str_month?></a></li>   
-        <li><a href="/service/member_enter/writing/<?=$month;?>/<?=$year;?>/<?=$usr_id;?>">Completed</a></li>   
+        <li><a href="/service/enter/<?=$service_name;?>/<?=$month?>/<?=$year;?>"><?=$year.' - '.$str_month?></a></li>   
+        <li><a href="/service/member_enter/<?=$service_name;?>/<?=$month;?>/<?=$year;?>/<?=$usr_id;?>">Completed</a></li>   
         <li class="akacolor"><?=ucfirst($kind_name);?></li>
       </ol> 
   </div> <!-- Navi end -->      
@@ -220,7 +220,7 @@
             <div class="row" style="margin-bottom:10px;">  
               <label for="inputEmail3" class="col-md-2 "><?=strtoupper($score_name)?></label>
               <div class="col-md-2">
-                <input type="text" class="form-control score_val" id="<?=strtolower($score_name);?>" placeholder="0">
+                <input type="text" class="form-control score_val1" id="<?=strtolower($score_name);?>1" placeholder="0">
               </div>
             </div>
             <? } ?>                                                 
@@ -235,7 +235,7 @@
       <?
       if($chk_sco2 == 'Y'){
       ?>
-      <div class="tab-pane div-box-line " id="sco2">
+      <div class="tab-pane div-box-line" id="sco2">
         <br>    
         <div class="col-md-12 ">           
           <div class="col-md-12 ">                         
@@ -312,6 +312,7 @@ $(document).ready(function(){
   $.each(score_array,function(i,value){
     var each_val = value;
     var score_name = each_val.split(':');
+    //console.log(score_name[1]);
     $('div').find('input#'+score_name[0].toLowerCase()+'1').val(score_name[1]);    
   }); 
 

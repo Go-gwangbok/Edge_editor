@@ -33,7 +33,6 @@
 var page = '<?=$page;?>';
 var list = '<?=$list;?>';
 var pj_id = '<?=$pj_id;?>';
-var editor_id = '';
 var history_totalcount = '';
 var data = '';
 var url = '';
@@ -43,8 +42,7 @@ $(document).ready(function(){
 	data = {
 		page : page,
 		list : list,
-		pj_id : pj_id,
-		editor_id : editor_id,
+		pj_id : pj_id,		
 		cate : cate
 	}
 	console.log(data);
@@ -56,11 +54,10 @@ $(document).ready(function(){
 $('div#pageblock').delegate('button#p_button', 'click', function(){	
 	var page_num = $(this).attr('page_num');
 	
-	data ={
+	data = {
 		page : page_num,
 		list : list,
-		pj_id : pj_id,
-		editor_id : editor_id,
+		pj_id : pj_id,		
 		cate : cate		
 	}
 	console.log(data);
@@ -71,8 +68,7 @@ $('div#pageblock').delegate('button#p_button', 'click', function(){
 
 function ajaxPost(url,data){
 	$.post(url,data,function(json) {		
-		console.log(json['data_list']);
-		//console.log(json['pj_id']);				
+		console.log(json['data_list']);		
 		page = json['page'];
 
 		$('tbody#list').children().remove();
@@ -84,7 +80,7 @@ function ajaxPost(url,data){
 		$('button#total').append('<font color="red">Count : '+data_count+'</font>');
 
 		for(var i = 0; i < json['data_list'].length; i++) {
-			var essay_id = data_list[i]['essay_id'];
+			var id = data_list[i]['id'];
 			var task = data_list[i]['type'];
 			var prompt = data_list[i]['prompt'];
 			var raw_txt = data_list[i]['raw_txt'];
@@ -100,7 +96,7 @@ function ajaxPost(url,data){
 				var date = data_list[i]['sub_date'];
 			}
 			
-			$('tbody#list').append('<tr id='+i+' style="cursor:pointer;" class="hrefclick" href="/text_editor/error/'+essay_id+'/'+task+'"><td class="text-center">'+num+'</td><td>'
+			$('tbody#list').append('<tr id='+i+' style="cursor:pointer;" class="hrefclick" href="/text_editor/error/'+id+'/'+task+'"><td class="text-center">'+num+'</td><td>'
 				+prompt.replace(/"/gi,'')+'</td><td class="text-center">'
 				+data_list[i]['usr_name']+'</td><td class="text-center">'
 				+kind_name+'</td><td class="text-center">'

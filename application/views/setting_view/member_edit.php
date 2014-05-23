@@ -23,11 +23,16 @@
 			    ?>
 			    <div class="col-sm-2">		    
 			      	<label class="checkbox-inline">
-						<input type="checkbox" class="task" id="t<?=$task_id;?>" value="<?=$task_id;?>"> <?=ucfirst($task_name);?>
+						<input type="checkbox" class="task" id="t<?=$task_id;?>" value="<?=$task_id;?>" task="<?=$task_name;?>"> <?=ucfirst($task_name);?>
 					</label>
 				</div>
 			    <? } ?>			
-	    	</div>    
+	    	</div>  
+	    	
+	    	<div class="row" id="desc" style="margin-bottom:10px; display:none">  
+	    		<textarea id="text_desc" rows="5" cols="150" style="margin-left:75px; resize:none;" autofocus placeholder="Describe editor with 140 words..."></textarea>  
+	    	</div>
+
 	  		<br>
 	  		<!-- Type -->
 		  	<div class="row" style="margin-bottom:10px;">  
@@ -72,6 +77,8 @@
 </div>
 <script type="text/javascript">
 var cate = '<?=$cate?>';
+var description = '';
+var email = '';
 console.log(cate);
 var usr_id = '<?=$usr_id;?>';
 $(document).ready(function(){
@@ -80,6 +87,8 @@ $(document).ready(function(){
 		console.log(json['task']);
 		var data = json['result'];
 		var task = json['task'];
+		description = json['result']['description'];
+		email = json['result']['email'];
 
 		// Task Mapping
 		$.each(task,function(i,values){
@@ -87,6 +96,11 @@ $(document).ready(function(){
 			$('div').find('input#t'+task_id).attr('checked','checked');
 		});
 		
+		if($('input#t2').is(':checked')){			
+			$('div#desc').css('display','inline');
+			$('textarea#text_desc').html(description);
+		}
+
 		var name = data['name'];		
 		var type = data['type'];
 		var pay = data['pay'];
@@ -131,6 +145,15 @@ $(document).delegate('input[type=checkbox]','click',function(){
 	}else if(!$('input#case').is(':checked')){	
 	 	$('input#case_pay').attr( "disabled" , true );				
 	}
+
+	if($(this).attr('task') == 'writing'){
+		if($(this).is(':checked')){
+			$('div#desc').css('display','inline');
+			$('textarea#text_desc').focus().html(description);
+		}else{
+			$('div#desc').css('display','none');
+		}	
+	}
 });
 
 var get_type = null;
@@ -143,6 +166,10 @@ $(document).delegate('button#cancel','click',function(){
 });
 
 $(document).delegate('button#submit','click',function(){
+	var task_ids = $('input:checkbox:checked.task').map(function() {        
+		    return this.value;
+		}).get();  	
+	editor_desc = $('textarea#text_desc').val();	
 	var submit = true;
 	if(!$('input.task').is(':checked')){
 		submit = false;
@@ -159,37 +186,44 @@ $(document).delegate('button#submit','click',function(){
 		}
 	}
 
-	if(submit){	
-		var task_ids = $('input:checkbox:checked.task').map(function() {        
-		    return this.value;
-		}).get();  		
+	if($.inArray('2',task_ids) != '-1' && editor_desc.length == 0){
+		alert('에디터에 대한 소개를 작성해 주세여!');
+	}else{
+		if(submit){
+			if($('input#part_time').is(':checked')){
+				get_type = $('input#part_time').val();
+				start_t = $('input#start').val();
+				end_t = $('input#end').val();
+				pay = $('input#pay').val();
+			}else if($('input#case').is(':checked')){
+				get_type = $('input#case').val();
+				pay = $('input#case_pay').val();
+				start_t = null;
+				end_t = null;
+			}	
 
-		if($('input#part_time').is(':checked')){
-			get_type = $('input#part_time').val();
-			start_t = $('input#start').val();
-			end_t = $('input#end').val();
-			pay = $('input#pay').val();
-		}else if($('input#case').is(':checked')){
-			get_type = $('input#case').val();
-			pay = $('input#case_pay').val();
-			start_t = null;
-			end_t = null;
-		}
-		
-		var data = {
-			usr_id : usr_id,
-			task_ids : task_ids.toString(),
-			type : get_type,
-			start : start_t,
-			end : end_t,
-			pay : pay
-		}
-		//console.log(data);
+			var data = {
+				usr_id : usr_id,
+				task_ids : task_ids.toString(),
+				type : get_type,
+				start : start_t,
+				end : end_t,
+				pay : pay,
+				editor_desc : editor_desc,
+				email : email
+			}
+			console.log(data);
 
-		$.post('/setting/info/member_edit_save',data,function(json){
-			console.log(json['result']);
-			window.location.href = '/setting/info';
-		});
-	}
+			$.post('/setting/info/member_edit_save',data,function(json){
+				console.log(json['result']);
+				if(json['result']){
+					window.location.href = '/setting/info';	
+				}else{
+					alert('Curl Error');
+				}
+				
+			});
+		}	
+	}		
 });
 </script>
