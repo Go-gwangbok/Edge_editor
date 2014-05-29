@@ -143,7 +143,9 @@ class Service extends CI_Controller {
 	{
 		$secret = 'isdyf3584MjAI419BPuJ5V6X3YT3rU3C';
 		$email = $this->session->userdata('email');		
-		$access = $this->curl->simple_post('http://54.248.103.31/editor/auth', array('secret'=>$secret,'email'=>$email));
+		$access = $this->curl->simple_post('https://edgewriting.net/editor/auth', array('secret'=>$secret,'email'=>$email));
+
+		log_message('error', 'access = ' . $access);
 
 		// $access = '{
 		// 		    "status": true,
@@ -162,7 +164,9 @@ class Service extends CI_Controller {
 			log_message('error', "token : $token");
 			
 			// re_curl
-			$result_data = $this->curl->simple_post('http://54.248.103.31/editor/get', array('token'=>$token));
+			$result_data = $this->curl->simple_post('https://edgewriting.net/editor/get', array('token'=>$token));
+
+			log_message('error', 'result_data = ' . $result_data);
 
 
 			//log_message('error', "result_data : $result_data");
@@ -197,7 +201,7 @@ class Service extends CI_Controller {
 		$token = $this->input->post('token');
 		$w_id = $this->input->post('w_id');		
 
-		$access = $this->curl->simple_post('http://54.248.103.31/editor/editing/start', array('token'=>$token,'id'=>$w_id));
+		$access = $this->curl->simple_post('https://edgewriting.net/editor/editing/start', array('token'=>$token,'id'=>$w_id));
 
 		// $access = '{
 		// 		    "status": true,
@@ -360,10 +364,10 @@ class Service extends CI_Controller {
 			$json_data = json_encode($sending_data);
 			log_message('error', $json_data);
 
-			//$access = $this->curl->simple_post('http://54.248.103.31/editor/editing/done', array('token'=>$token, 'id'=>$w_id, 'editing'=>$this->input->POST('editing'), 'critique'=>$this->input->POST('critique')));
+			//$access = $this->curl->simple_post('https://edgewriting.net/editor/editing/done', array('token'=>$token, 'id'=>$w_id, 'editing'=>$this->input->POST('editing'), 'critique'=>$this->input->POST('critique')));
 			log_message('error', $json_data);
 			log_message('error', "token : $token");
-			$access = $this->curl->simple_post('http://54.248.103.31/editor/editing/done', array('token'=>$token, 'id'=>$w_id, 'data'=>$json_data));
+			$access = $this->curl->simple_post('https://edgewriting.net/editor/editing/done', array('token'=>$token, 'id'=>$w_id, 'data'=>$json_data));
 			log_message('error', $access);
 
 			// $access = '{
