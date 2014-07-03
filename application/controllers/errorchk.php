@@ -40,9 +40,13 @@ class Errorchk extends CI_Controller {
 		$string = preg_replace("/<s style[^>]*>/i", '<s>', $string);
 		$string = preg_replace("/<br style[^>]*>/i", '<br>', $string);				
 
+		$string = str_replace('<div>', '',$string); // div 태그 제거!
+		$string = str_replace('</div>', '',$string);
+
 		$string = preg_replace('/<span[^>]+\>/i','',$string); 
 		$string = preg_replace('/<font[^>]+\>/i','',$string); //font 테그 제거!							
 		
+		$string = str_replace('</span>', '',$string);
 		$string = str_replace('</font>', '',$string);
 		$string = str_replace('</span>', '',$string);
 		$string = str_replace('&nbsp;', ' ',$string);

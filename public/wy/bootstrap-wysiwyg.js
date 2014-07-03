@@ -40,7 +40,9 @@
 					command = commandArr.shift(),
 					args = commandArr.join(' ') + (valueArg || '');
 				
-				if (command == "underline")
+				// underline command && the command has not been executed on the current range,
+				// add slashes('//'');
+				if (command == "underline" && !document.queryCommandState(command))
 				{					
 					if (window.getSelection) {						
 						var selObj = window.getSelection();
@@ -59,6 +61,7 @@
 				{
 					document.execCommand(command, 0, args);
 				}
+				
 				updateToolbar();
 			},
 			bindHotkeys = function (hotKeys) {

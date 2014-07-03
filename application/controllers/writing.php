@@ -789,7 +789,7 @@ class Writing extends CI_Controller {
 		$premium['raw_writing'] = $convert;
 		$premium['re_raw_writing'] = preg_replace("#(\\\r\\\n|\\\r|\\\n)#","<br>", $convert);
 
-		$premium['done'] = nl2br(str_replace('"', '&quot', $rows->done));
+		$premium['done'] = str_replace('"', '&quot', $rows->done);
 
 		$premium['word_count'] = $rows->word_count;
 		$premium['type'] = $rows->type;
