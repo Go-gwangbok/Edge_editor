@@ -194,7 +194,7 @@ class Upload extends CI_Controller {
 		//echo "service_id : $service_id<br>";
 		//$pj_kind = strtolower($this->input->post('kind'));
 		
-		$config['upload_path'] = './uploads/tmp/';
+		$config['upload_path'] = DOC_UPLOAD_PATH;
 		$config['allowed_types'] = 'doc|docx';
 		$config['max_size']	= '0';
 		$config['max_width']  = '0';

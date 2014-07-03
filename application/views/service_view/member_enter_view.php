@@ -16,7 +16,8 @@
 			<tr>
 				<th class="text-center"><span></span>No.</th>								
 				<th class="text-center">Prompt</th>								
-				<th class="text-center">Type</th>				
+				<th class="text-center">Type</th>
+				<th class="text-center">Price Kind</th>
 				<th class="text-center" style="width:105px;">Submit</th>				
 				<th class="text-center">Status</th>			
 			</tr>
@@ -89,10 +90,12 @@ function ajaxPost(url,data){
 			var essay_id = data_list[i]['essay_id'];
 			var kind = data_list[i]['kind'];
 			var id = data_list[i]['id'];
+			var price_kind = data_list[i]['price_kind'];
 			
 			$('tbody#list').append('<tr id='+i+'  style="cursor:pointer;" class="rowbtn" href="/text_editor/service_comp/'+service_name+'/'+id+'/'+month+'/'+year+'"><td class="text-center">'+num+'</td><td>'																				 
-				+data_list[i]['prompt'].replace(/"/gi,'')+'</td><td class="text-center">'				
-				+kind.toUpperCase()+'</td><td style="width:95px;" class="text-center">'
+				+essay_id+"::"+data_list[i]['prompt'].replace(/"/gi,'')+'</td><td class="text-center">'				
+				+kind.toUpperCase()+'</td><td class="text-center">'				
+				+price_kind+'</td><td style="width:95px;" class="text-center">'
 				+data_list[i]['sub_date']+'</td><td width="80px;" class="text-center"><button class="btn btn-success btn-sm">Completed</button></td>');					
 			num++;			
 		}								

@@ -161,6 +161,7 @@ class Service extends CI_Controller {
 				$this->curl->ssl(FALSE);
 			}
 			$curl_options = array(CURLOPT_CONNECTTIMEOUT => 1, CURLOPT_TIMEOUT => 3);
+			log_message('error', "[DEBUG] w_discuss editing/discuss id : " . $essay_id);
 			$access = $this->curl->simple_post(EDGE_WRITING_URL. 'editor/editing/discuss', array('token'=>$token, 'id'=>$essay_id), $curl_options);
 			log_message('error', "[DEBUG] w_discuss result : " . $access);
 
@@ -210,6 +211,7 @@ class Service extends CI_Controller {
 				$this->curl->ssl(FALSE);
 			}
 			$curl_options = array(CURLOPT_CONNECTTIMEOUT => 1, CURLOPT_TIMEOUT => 3);
+			log_message('error', '[DEBUG] editor/get token = ' . $token);
 			$result_data = $this->curl->simple_post(EDGE_WRITING_URL . 'editor/get', array('token'=>$token), $curl_options);
 
 			log_message('error', '[DEBUG] editor/get result_data = ' . $result_data);
@@ -251,6 +253,8 @@ class Service extends CI_Controller {
 			$this->curl->ssl(FALSE);
 		}	
 		$curl_options = array(CURLOPT_CONNECTTIMEOUT => 1, CURLOPT_TIMEOUT => 3);
+		log_message('error', '[DEBUG] editor/start token = ' . $token);
+		log_message('error', '[DEBUG] editor/start id = ' . $w_id);
 		$access = $this->curl->simple_post(EDGE_WRITING_URL . 'editor/editing/start', array('token'=>$token,'id'=>$w_id), $curl_options);
 
 		log_message('error', '[DEBUG] editing/start result : ' . $access);
@@ -596,6 +600,8 @@ class Service extends CI_Controller {
 				}
 				else
 				{
+					$submit_dic['editing'] = $errorchk_class->garbageTag_replace($submit_dic['editing']);
+					
 					// finally, if no error is dectected, submit save
 					$submit_dic['submit']	= 1;
 					$query_res = $this->service_list->insert_service_data($submit_dic);
@@ -637,12 +643,14 @@ class Service extends CI_Controller {
 					log_message('error', $json_data);
 
 					//$access = $this->curl->simple_post('https://edgewriting.net/editor/editing/done', array('token'=>$token, 'id'=>$w_id, 'editing'=>$this->input->POST('editing'), 'critique'=>$this->input->POST('critique')));
-					log_message('error', $json_data);
-					log_message('error', "token : $token");
+					//log_message('error', $json_data);
+					//log_message('error', "token : $token");
 					if (IS_SSL) {
 						$this->curl->ssl(FALSE);
 					}
 					$curl_options = array(CURLOPT_CONNECTTIMEOUT => 1, CURLOPT_TIMEOUT => 3);
+					log_message('error', '[DEBUG] edtiting/done token : ' . $token);
+					log_message('error', '[DEBUG] edtiting/done id : ' . $submit_dic['w_id']);
 					$access = $this->curl->simple_post(EDGE_WRITING_URL . 'editor/editing/done', array('token'=>$token, 'id'=>$submit_dic['w_id'], 'data'=>$json_data), $curl_options);
 					log_message('error', '[DEBUG] edtiting/done result : ' . $access);
 

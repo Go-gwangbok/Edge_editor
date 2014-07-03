@@ -539,6 +539,9 @@ class Text_editor extends CI_Controller {
 				}
 				else
 				{
+					// for remove garbage tag (span, div, ...)
+					$editing = $errorchk_class->garbageTag_replace($editing);
+
 					$result = $this->service_list->admin_service_tbd_submit($data_id,$type,$editing,$critique,$tagging,$scoring,$score2);
 
 					$json['result'] = $result;
@@ -560,7 +563,7 @@ class Text_editor extends CI_Controller {
 
 						$data = array();
 						$data["id"] = $data_id;
-						$data["editing"] = $editing;
+						$data["editing"] = $essays[0]->editing;
 
 						$completed_editing = $this->get_completed_editing($ex_editing);
 						if ($completed_editing != "")
@@ -569,10 +572,10 @@ class Text_editor extends CI_Controller {
 						}
 						else
 						{
-							$data["done"] = $editing;
+							$data["done"] = $essays[0]->editing;
 						}
-						$data["critique"] = $critique;
-						$data["score"] = $scoring;
+						$data["critique"] = $essays[0]->critique;
+						$data["score"] = $essays[0]->scoring;
 						$data["date"] = date("Y-m-d H:i:s", time());
 						$data["file"] = "";
 
@@ -583,7 +586,7 @@ class Text_editor extends CI_Controller {
 						log_message('error', $json_data);
 
 						//$access = $this->curl->simple_post('https://edgewriting.net/editor/editing/done', array('token'=>$token, 'id'=>$w_id, 'editing'=>$this->input->POST('editing'), 'critique'=>$this->input->POST('critique')));
-						log_message('error', $json_data);
+						//log_message('error', $json_data);
 						if (IS_SSL) {
 							$this->curl->ssl(FALSE);
 						}

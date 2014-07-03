@@ -44,6 +44,12 @@ define('EDGE_WRITING_URL',	'https://edgewritings.com/');
 #define('EDGE_WRITING_URL',	'https://edgewritings.com/');
 define('WRITING_PREMIUM_SECRET_KET', 'isdyf3584MjAI419BPuJ5V6X3YT3rU3C');
 
+define('DOC_UPLOAD_PATH', './uploads/tmp/');
+//define('DOC_UPLOAD_PATH', 'C:/uploads/');
+
+define('MY_DOMAIN', 'http://ec2-54-199-7-211.ap-northeast-1.compute.amazonaws.com/');
+
+
 
 /* End of file constants.php */
 /* Location: ./application/config/constants.php */

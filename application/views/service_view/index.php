@@ -47,14 +47,14 @@
 				<tbody id="list">
 				<!-- ajax list -->
 				</tbody>	
-			</table>    		
+			</table>    
+
+		<div class="text-center" id="pageblock">
+			<!-- ajax list -->
+		</div>			
     	</div> <!-- com div -->
     </div> <!-- tab content -->
 
-
-	<div class="text-center" id="pageblock">
-		<!-- ajax list -->
-	</div>	
 </div> <!-- container -->
 
 <script type="text/javascript">

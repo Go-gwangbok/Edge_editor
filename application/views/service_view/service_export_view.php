@@ -26,7 +26,7 @@
 				<th class="text-center"><span></span>No.</th>								
 				<th class="text-center">Prompt</th>				
 				<th class="text-center" width="85px;">Editor</th>				
-				<th class="text-center">Type</th>				
+				<th class="text-center">Price Kind</th>				
 				<th class="text-center" width="105px;">Date</th>				
 				<th class="text-center">Status</th>			
 			</tr>
@@ -83,9 +83,9 @@ function ajaxPost(url,data){
 			}
 			
 			$('tbody#list').append('<tr class="com" id='+i+' style="cursor:pointer;" href="/text_editor/service_comp/'+service_name+'/'+essay_id+'/'+task+'/'+month+'/'+year+'"><td>'+num+'</td><td>'																				 
-					+data_list[i]['prompt'].replace(/"/gi,'')+'</td><td>'
+					+essay_id+"::"+data_list[i]['prompt'].replace(/"/gi,'')+'</td><td>'
 					+data_list[i]['name']+'</td><td>'
-					+data_list[i]['kind']+'</td><td>'
+					+data_list[i]['price_kind']+'</td><td>'
 					+date+'</td>');						
 			$('tbody#list tr#'+i).last().append('<td><button class="btn btn-success btn-sm">Completed</button></td>');								
 			num++;				

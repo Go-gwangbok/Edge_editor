@@ -17,51 +17,6 @@ class Writing extends CI_Controller {
 		//$this->load->library('eng_month');			
 	}
 
-	function eng_month($int_month){
-		switch ($int_month) {
-			case '01' : $str_month = 'January'; break;
-            case '02' : $str_month = 'February'; break;
-            case '03' : $str_month = 'March'; break;
-            case '04' : $str_month = 'April'; break;
-            case '05' : $str_month = 'May'; break;
-            case '06' : $str_month = 'June'; break;
-            case '07' : $str_month = 'July'; break;
-            case '08' : $str_month = 'August'; break;
-            case '09' : $str_month = 'September'; break;
-            case '10' : $str_month = 'October'; break;
-            case '11' : $str_month = 'November'; break;
-            case '12' : $str_month = 'December'; break;
-		}
-		return $str_month;
-	}
-
-	public function index()
-	{			
-		if($this->session->userdata('is_login')){
-			$classify = $this->session->userdata('classify');
-
-			if($classify == 0){ // Admin
-				$data['cate'] = 'service';
-				$this->load->view('head',$data);				
-				
-				$data['services'] = $this->all_list->get_service_list();				
-				$this->load->view('/service_view/admin_service_index',$data);					
-			}else{	// Editor
-				$cate['cate'] = 'service';
-				$this->load->view('head',$cate);
-
-				$usr_id = $this->session->userdata('id');								
-				$data['all_usr'] = '';
-				$data['cate'] = 'service';
-				$this->load->view('/service_view/index',$data);		
-					
-			}	
-			$this->load->view('footer');					
-		}else{
-			redirect('/');
-		}		
-	}	
-
 	public function get_premium()
 	{
 		//$secret = 'isdyf3584MjAI419BPuJ5V6X3YT3rU3C';
@@ -70,10 +25,6 @@ class Writing extends CI_Controller {
 		//$last_id = 1;
 		$last_id = $this->service_list->get_max_premium_essay_id();
 
-		//print $last_id;
-		//$this->curl->ssl(FALSE);
-		//$access = $this->curl->simple_post('https://edgewriting.net/editor/get_premium', array('secret'=>$secret,'email'=>$email,'last_id'=>$last_id));
-		//$this->curl->option(CURLOPT_CONNECTTIMEOU, 1);
 		if (IS_SSL) {
 			$this->curl->ssl(FALSE);
 		}
@@ -81,24 +32,6 @@ class Writing extends CI_Controller {
 		$access = $this->curl->simple_post(EDGE_WRITING_URL. 'editor/get_premium', array('token'=>WRITING_PREMIUM_SECRET_KET,'email'=>$email,'last_id'=>$last_id), $curl_options);
 		
 		log_message('error', '[DEBUG] get_premium result = ' . $access);
-
-		// $access = '{
-		// 		    "status": true,
-		// 		    "data": [
-		//                       {"id":"69","kind_id":"5","title":"asdasda","writing":"asdadasd","date":"2014-05-15 19:21:01","words":"1","price_kind":"premium","orig_id":"0","reason":""}
-		// 		        
-		// 		    }
-		// 		}';
-
-		    //	[id] => 70
-		    //	[kind_id] => 2
-		    //	[title] => asdasd
-		    //	[writing] => asdasasd asdad
-		    //	[date] => 2014-05-21 21:24:47
-		    //	[words] => 2
-		    //	[price_kind] => premium
-		    //	[orig_id] => 0
-		    //	[reason] => 
 		
 
 		$access_status = json_decode($access, true);		
@@ -150,9 +83,6 @@ class Writing extends CI_Controller {
 			}
 		}
 
-		//$json['result'] = $access;
-
-		//$this->output->set_content_type('application/json')->set_output(json_encode($json));
 	}	
 
 	function premium(){
@@ -323,7 +253,6 @@ class Writing extends CI_Controller {
 
 
 			}
-			//var_dump($data);
 
 			$this->load->view('/editor/writing_editor',$data);
 			$this->load->view('footer');
@@ -533,170 +462,6 @@ class Writing extends CI_Controller {
 		$this->output->set_content_type('application/json')->set_output(json_encode($json));
 	}
 
-
-
-	/*************************/
-
-	function serviceType($service_name){
-		if($this->session->userdata('is_login')){			
-			$data['cate'] = 'service';
-			$this->load->view('head',$data);				
-
-			$row = $this->all_list->get_serviceId_num($service_name);
-			$service_id = $row->id;
-			$data['type_id'] = $service_id;			
-			$data['service_name'] = $service_name;
-			$data['all_year'] = $this->all_list->service_all_year_data($service_id);
-			
-			
-			$this->load->view('/service_view/service_type_view',$data);		
-			$this->load->view('footer');					
-		}else{
-			redirect('/');
-		}					
-	}
-
-	function get_service_month_data(){
-		if($this->session->userdata('is_login')){
-			$yen = $this->input->post('yen');			
-			$type_id = $this->input->post('type_id');
-			$result = $this->service_list->service_month_data($yen,$type_id);			
-			$json['data'] = $result;			
-		}else{
-			redirect('/');
-		}
-		$this->output->set_content_type('application/json')->set_output(json_encode($json));
-	}
-
-	function enter($service_name,$month,$year){ // 0
-		if($this->session->userdata('is_login')){
-			$data['cate'] = 'service';
-			$this->load->view('head',$data);
-
-			$str_month = $this->eng_month($month); // 숫자 달을 영문으로 변경하는 함수!
-			$data['str_month'] = $str_month;			
-			$data['int_month'] = $month;			
-			$data['year'] = $year;		
-			$data['service_name'] = $service_name;
-
-			$row = $this->all_list->get_serviceId_num($service_name);
-			$service_id = $row->id;
-			$data['service_id'] = $service_id;			
-
-			//$data['cate'] = 'writing';
-			$this->load->view('/service_view/service_enter_view',$data);		
-			$this->load->view('footer');			
-		}else{
-			redirect('/');
-		}				
-	}
-
-	function get_enter_users(){
-		if($this->session->userdata('is_login')){			
-			$service_id = $this->input->post('service_id');		
-			$year = $this->input->post('year');		
-			$month = $this->input->post('month');		
-
-			$json['memlist'] = $this->all_list->get_enter_users($service_id,$year,$month);
-		}else{
-			redirect('/');
-		}
-		$this->output->set_content_type('application/json')->set_output(json_encode($json));
-	}
-
-	function get_enter_data(){
-		if($this->session->userdata('is_login')){			
-			$service_id = $this->input->post('service_id');		
-
-			$list = $this->all_list->get_service_datalist($service_id);
-			$json['memlist'] = $list;
-
-		}else{
-			redirect('/');
-		}
-		$this->output->set_content_type('application/json')->set_output(json_encode($json));
-	}
-
-	public function discuss(){ //error 신고 입력! DB--> error_essay //0
-		if($this->session->userdata('is_login')){
-			$token = $this->input->POST('token');			
-			$essay_id 	 = $this->input->POST('data_id');
-
-			log_message('error', "w_discuss id : $essay_id");
-			$this->curl->ssl(FALSE);
-			$access = $this->curl->simple_post('https://edgewriting.net/editor/editing/discuss', array('token'=>$token, 'id'=>$essay_id));
-			log_message('error', "w_discuss result : " . $access);
-
-
-			$result = $this->all_list->discuss_service_proc($essay_id);
-			$json['result'] = $access;
-		}else{
-			redirect('/service');
-		}
-		$this->output->set_content_type('application/json')->set_output(json_encode($json));
-	}
-
-
-	public function get_writing()
-	{
-		$secret = 'isdyf3584MjAI419BPuJ5V6X3YT3rU3C';
-		$email = $this->session->userdata('email');
-		$this->curl->ssl(FALSE);		
-		$access = $this->curl->simple_post('https://edgewriting.net/editor/auth', array('secret'=>$secret,'email'=>$email));
-
-		log_message('error', 'access = ' . $access);
-
-		// $access = '{
-		// 		    "status": true,
-		// 		    "data": {
-		// 		        "token": "~~~"
-		// 		    }
-		// 		}';		
-
-		$access_status = json_decode($access, true);		
-		
-		if($access_status['status']){
-			
-			// success -> token
-			$token = $access_status['data']['token'];
-
-			log_message('error', "token : $token");
-			
-			// re_curl
-			$this->curl->ssl(FALSE);
-			$result_data = $this->curl->simple_post('https://edgewriting.net/editor/get', array('token'=>$token));
-
-			log_message('error', 'result_data = ' . $result_data);
-
-
-			//log_message('error', "result_data : $result_data");
-			/** "is_24hr":"1" == true  "0" == 'false'   "is_critique":"1" == true  "0" == 'false' **/
-			
-			// $result_data = '{
-			// 			    "status": true,
-			// 			    "data": 
-			// 		        {
-			// 		            "id": 1,
-			// 		            "kind": "essay",
-			// 		            "is_24hr":"1",
-			// 		            "is_critique": "0",
-			// 		            "title": "Which is better for children to grow up in the countryside or in a big city.personally disagree with the former idea since children in the urban area can acquire the better educational conditions as well as improve their capability through positive competition",
-			// 		            "writing": " personally disagree with the former idea since children in the urban area can acquire the better educational conditions as well as improve their capability through positive competition",					            
-			// 		            "date": "2014-03-12 15:06:03"
-			// 		        }						   
-			// 			}';		
-			
-			$json['result'] = $result_data;	
-			$json['access'] = $access;
-
-		}else{ //status = false
-			$json['result'] = $access;
-			$json['access'] = $access;
-
-		}		
-		$this->output->set_content_type('application/json')->set_output(json_encode($json));
-	}
-
 	public function download($service_id, $essay_id, $filename)
 	{
 		if (!isset($service_id) || !isset($essay_id) || !isset($filename) ) {
@@ -729,7 +494,7 @@ class Writing extends CI_Controller {
 			return;
 		}
 
-		$full_path = "./uploads/tmp/".$filename . ".". $fileNameParts[1];
+		$full_path = DOC_UPLOAD_PATH . $filename . ".". $fileNameParts[1];
 		$file_size = filesize($full_path);
 		//$encoded_filename = urlencode($full_path);
 		$download_fname = "EDGE_Writing_$essay_id.doc";
@@ -924,7 +689,7 @@ class Writing extends CI_Controller {
 
 				$download_str = "";
 				if ($r_premium['filename'] != "") {
-					$download_link = "http://localhost/writing/download/$service_id/" . $r_premium['essay_id'] . "/" . $r_premium['filename'] . "/"; 
+					$download_link = MY_DOMAIN . "writing/download/$service_id/" . $r_premium['essay_id'] . "/" . $r_premium['filename'] . "/"; 
 					$download_str = '<a href="' . $download_link.'">File Download</a>';
 				}
 
@@ -964,7 +729,7 @@ class Writing extends CI_Controller {
 		$message .= '
 		<p style="margin-top:60px; font-size:13px; color:#555; margin-bottom:3px;">CATEGORY</p>
 		<a class="cate_pointer" href="'.$url.'/cate/testprep" style="'.$style.'">TEST PREP</a><span style="'.$style.'">|</span><a class="cate_pointer" href="'.$url.'/cate/academic" style="'.$style.'">ACADEMIC</a><span style="'.$style.'">|</span><a class="cate_pointer" style="'.$style.'" href="'.$url.'/cate/admission">ADMISSION</a><span style="'.$style.'">|</span><a class="cate_pointer" style="'.$style.'" href="'.$url.'/cate/free">LIFE WRITING</a><span style="'.$style.'">|</span><a class="cate_pointer" style="'.$style.'" href="'.$url.'/cate/premium">PREMIUM</a>
-		<p class="text-muted credit" style="font-size:12px;">EDGE Writings &nbsp;<a href="http://akaon.com/">AKAON.COM</a> &nbsp;Copyright 2014</p>
+		<p class="text-muted credit" style="font-size:12px;">EDGE Writings &nbsp;<a href="http://akaon.com/">AKASTUDY limited</a> &nbsp;Copyright 2014</p>
 		</div>
 		</td>
 		</tr>
@@ -972,8 +737,6 @@ class Writing extends CI_Controller {
 		</table>
 		';
 
-
-		/** **/
 		$email_setting = Array(
 		    'protocol' => 'smtp',
 		    'smtp_host' => 'ssl://smtp.gmail.com',
@@ -991,7 +754,7 @@ class Writing extends CI_Controller {
 
 		$this->email->from('editors@edgewritings.com', 'EDGE Writing');
 		$this->email->to($to);
-		$this->email->bcc('bettychoi@akaprep.com'); 
+		//$this->email->bcc('bettychoi@akaprep.com'); 
 		$this->email->set_mailtype("html");
 		$url = 'https://edgewritings.com';
 		$style = 'font-size:14px; color:#777; margin-right: 13px; text-decoration:none;';  
@@ -1002,6 +765,70 @@ class Writing extends CI_Controller {
 		$this->email->attach($filename1);
 		return $this->email->send();
 	}
+
+
+	/*************************/
+
+	public function get_writing()
+	{
+		$secret = 'isdyf3584MjAI419BPuJ5V6X3YT3rU3C';
+		$email = $this->session->userdata('email');
+		$this->curl->ssl(FALSE);		
+		$access = $this->curl->simple_post('https://edgewriting.net/editor/auth', array('secret'=>$secret,'email'=>$email));
+
+		log_message('error', 'access = ' . $access);
+
+		// $access = '{
+		// 		    "status": true,
+		// 		    "data": {
+		// 		        "token": "~~~"
+		// 		    }
+		// 		}';		
+
+		$access_status = json_decode($access, true);		
+		
+		if($access_status['status']){
+			
+			// success -> token
+			$token = $access_status['data']['token'];
+
+			log_message('error', "token : $token");
+			
+			// re_curl
+			$this->curl->ssl(FALSE);
+			$result_data = $this->curl->simple_post('https://edgewriting.net/editor/get', array('token'=>$token));
+
+			log_message('error', 'result_data = ' . $result_data);
+
+
+			//log_message('error', "result_data : $result_data");
+			/** "is_24hr":"1" == true  "0" == 'false'   "is_critique":"1" == true  "0" == 'false' **/
+			
+			// $result_data = '{
+			// 			    "status": true,
+			// 			    "data": 
+			// 		        {
+			// 		            "id": 1,
+			// 		            "kind": "essay",
+			// 		            "is_24hr":"1",
+			// 		            "is_critique": "0",
+			// 		            "title": "Which is better for children to grow up in the countryside or in a big city.personally disagree with the former idea since children in the urban area can acquire the better educational conditions as well as improve their capability through positive competition",
+			// 		            "writing": " personally disagree with the former idea since children in the urban area can acquire the better educational conditions as well as improve their capability through positive competition",					            
+			// 		            "date": "2014-03-12 15:06:03"
+			// 		        }						   
+			// 			}';		
+			
+			$json['result'] = $result_data;	
+			$json['access'] = $access;
+
+		}else{ //status = false
+			$json['result'] = $access;
+			$json['access'] = $access;
+
+		}		
+		$this->output->set_content_type('application/json')->set_output(json_encode($json));
+	}
+
 
 	public function auth(){
 		$token = $this->input->post('token');
