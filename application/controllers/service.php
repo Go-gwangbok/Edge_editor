@@ -6,6 +6,7 @@ class Service extends CI_Controller {
 		parent::__construct();
 		$this->load->database();
 		$this->load->model('all_list');
+		$this->load->model('service_list');
 		$this->load->helper('url');	
 		$this->load->helper('file');
 		$this->load->helper(array('form', 'url'));
@@ -42,7 +43,7 @@ class Service extends CI_Controller {
 				$this->load->view('head',$data);				
 				
 				$data['services'] = $this->all_list->get_service_list();				
-				$this->load->view('/service_view/admin_service_index',$data);					
+				$this->load->view('/service_view/admin_service_index',$data);
 			}else{	// Editor
 				$cate['cate'] = 'service';
 				$this->load->view('head',$cate);
@@ -50,6 +51,7 @@ class Service extends CI_Controller {
 				$usr_id = $this->session->userdata('id');								
 				$data['all_usr'] = '';
 				$data['cate'] = 'service';
+				$data['usr_id'] = $usr_id;
 				$this->load->view('/service_view/index',$data);		
 					
 			}	
@@ -82,7 +84,7 @@ class Service extends CI_Controller {
 		if($this->session->userdata('is_login')){
 			$yen = $this->input->post('yen');			
 			$type_id = $this->input->post('type_id');
-			$result = $this->all_list->service_month_data($yen,$type_id);			
+			$result = $this->service_list->service_month_data($yen,$type_id);			
 			$json['data'] = $result;			
 		}else{
 			redirect('/');
@@ -139,13 +141,52 @@ class Service extends CI_Controller {
 		$this->output->set_content_type('application/json')->set_output(json_encode($json));
 	}
 
+	// first draft_save and do discss
+	public function discuss(){ //error 신고 입력! DB--> error_essay //0
+		if($this->session->userdata('is_login')){
+			$token = $this->input->POST('token');			
+			$essay_id 	 = $this->input->POST('data_id');
+
+			log_message('error', "w_discuss id : $essay_id");
+
+			$draft_dic = $this->get_service_data();
+			$draft_dic['draft'] = 1;
+			$draft_dic['submit'] = 0;
+
+			$result = $this->service_list->insert_service_data($draft_dic);
+			
+			log_message('error', 'discuss -> draft_save :' . $result);
+			
+			if (IS_SSL) {
+				$this->curl->ssl(FALSE);
+			}
+			$curl_options = array(CURLOPT_CONNECTTIMEOUT => 1, CURLOPT_TIMEOUT => 3);
+			$access = $this->curl->simple_post(EDGE_WRITING_URL. 'editor/editing/discuss', array('token'=>$token, 'id'=>$essay_id), $curl_options);
+			log_message('error', "[DEBUG] w_discuss result : " . $access);
+
+
+			$result = $this->all_list->discuss_service_proc($essay_id);
+			$json['result'] = $access;
+		}else{
+			redirect('/service');
+		}
+		$this->output->set_content_type('application/json')->set_output(json_encode($json));
+	}
+
+
 	public function get_writing()
 	{
 		$secret = 'isdyf3584MjAI419BPuJ5V6X3YT3rU3C';
-		$email = $this->session->userdata('email');		
-		$access = $this->curl->simple_post('https://edgewriting.net/editor/auth', array('secret'=>$secret,'email'=>$email));
+		$email = $this->session->userdata('email');
 
-		log_message('error', 'access = ' . $access);
+		$curl_options = array(CURLOPT_CONNECTTIMEOUT => 1, CURLOPT_TIMEOUT => 3);
+
+		if (IS_SSL) {
+			$this->curl->ssl(FALSE);
+		}		
+		$access = $this->curl->simple_post(EDGE_WRITING_URL. 'editor/auth', array('secret'=>$secret,'email'=>$email), $curl_options);
+
+		log_message('error', '[DEBUG] editor/auth result = ' . $access);
 
 		// $access = '{
 		// 		    "status": true,
@@ -164,9 +205,14 @@ class Service extends CI_Controller {
 			log_message('error', "token : $token");
 			
 			// re_curl
-			$result_data = $this->curl->simple_post('https://edgewriting.net/editor/get', array('token'=>$token));
+			//$this->curl->ssl(FALSE);
+			if (IS_SSL) {
+				$this->curl->ssl(FALSE);
+			}
+			$curl_options = array(CURLOPT_CONNECTTIMEOUT => 1, CURLOPT_TIMEOUT => 3);
+			$result_data = $this->curl->simple_post(EDGE_WRITING_URL . 'editor/get', array('token'=>$token), $curl_options);
 
-			log_message('error', 'result_data = ' . $result_data);
+			log_message('error', '[DEBUG] editor/get result_data = ' . $result_data);
 
 
 			//log_message('error', "result_data : $result_data");
@@ -199,9 +245,15 @@ class Service extends CI_Controller {
 
 	public function auth(){
 		$token = $this->input->post('token');
-		$w_id = $this->input->post('w_id');		
+		$w_id = $this->input->post('w_id');	
 
-		$access = $this->curl->simple_post('https://edgewriting.net/editor/editing/start', array('token'=>$token,'id'=>$w_id));
+		if (IS_SSL) {
+			$this->curl->ssl(FALSE);
+		}	
+		$curl_options = array(CURLOPT_CONNECTTIMEOUT => 1, CURLOPT_TIMEOUT => 3);
+		$access = $this->curl->simple_post(EDGE_WRITING_URL . 'editor/editing/start', array('token'=>$token,'id'=>$w_id), $curl_options);
+
+		log_message('error', '[DEBUG] editing/start result : ' . $access);
 
 		// $access = '{
 		// 		    "status": true,
@@ -226,10 +278,20 @@ class Service extends CI_Controller {
 		return $this->all_list->get_templet_ele(2, $kind);
 	}
 
+	function score_pattern_replace($data_obj){
+		$pattern = array('({)','(})','(")');
+		$replace = array('','','');
+		return preg_replace($pattern, $replace, $data_obj);			
+	}
+
 	public function writing(){
 		if($this->session->userdata('is_login')){
 			$data['cate'] = 'service';
 			$this->load->view('head',$data);
+
+			$service_name = "writing";
+			$row = $this->all_list->get_serviceId_num($service_name);
+			$type = $row->id;  // get service_id
 
 			/** service_view/index 에서 form으로 전송된값 **/
 			$token = $this->input->post('token');
@@ -238,50 +300,151 @@ class Service extends CI_Controller {
 			$writing = $this->input->post('writing');			
 			$kind_id = $this->input->post('kind_id');			
 			$word_count = $this->input->post('word_count');
+			$start_date = $this->input->post('start_date');
+			$price_kind = $this->input->post('price_kind');
+			$orig_id = $this->input->post('orig_id');
+			$reason = $this->input->post('reason');
+
 
 			$data['tag_templet'] = $this->all_list->get_tag($kind_id);
 			$data['score_templet'] = $this->all_list->get_scores_temp($kind_id);		
 
 			$data['templet'] = $this->get_templet_ele($kind_id);
-			//$score1 = $this->score_pattern_replace($scoring);			
-			$data['score1'] = '';	
 
-			//$score2 = $this->score_pattern_replace($score2);
-			$data['score2'] = '';				
+			$essay = $this->service_list->get_one_essay_by_essayid('service', $w_id, $type);
 
-			$data['title'] = $title;
-			$data['raw_writing'] = $writing;
-			$data['writing'] = $writing;
-			$data['re_raw_writing'] = preg_replace("/[\n\r]/","<br>", $writing); //Tagging 할때 쓰임! All clear
+			//log_message('error', 'w_id : ' . $w_id . ', type : '. $type);
+			if ($essay)
+			{
+				//log_message('error', 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb');
+				$scoring = $essay->scoring;
+				$kind = $essay->kind;
+				$score2 = $essay->score2;		
+
+				$score1 = $this->score_pattern_replace($scoring);			
+				$data['score1'] = $score1;	
+
+				$score2 = $this->score_pattern_replace($score2);
+				$data['score2'] = $score2;	
+
+				$data['kind'] = $kind;
+				$data['kind_name'] = strtoupper($essay->kind_name);
+				$data['time'] = $essay->time;
+				$data['title'] = str_replace('"', '&quot', $essay->prompt);
+				$data['cate'] = 'writing';	
+				
+				// <p>  </p> 간혹 테스트하다가 태그로 감싸진 것이 있다. 그럴경우 detection 표시가 안된다!
+				$editing = str_replace('<p>', '', trim($essay->editing));
+				$editing = str_replace('</p>', '', $editing);
+				$start_doubble_quotationConfirm = substr($editing,0,1);
+				$end_doubble_quotationConfirm = substr($editing,-1);
+				if($start_doubble_quotationConfirm == '"'){
+					$editing = substr($editing, 1);
+				}
+
+				if($end_doubble_quotationConfirm == '"'){
+					$editing = substr($editing, 0,-1);
+				}
+				$editing = str_replace('"', '&quot',$editing); 
+
+				$data['edit_writing'] = preg_replace("#(\\\r\\\n|\\\r|\\\n)#","<br>",$editing);
+
+				$convert = str_replace('"', '&quot',$essay->raw_txt); 
+				$convert = str_replace('’', "'",$convert);
+				$convert = str_replace('“', '"',$convert);
+				$convert = str_replace('”', '"',$convert);
+				$data['raw_writing'] = $convert;
+				$data['re_raw_writing'] = preg_replace("#(\\\r\\\n|\\\r|\\\n)#","<br>", $convert);
+				$data['discuss'] = $essay->discuss;
+				$data['writing'] = preg_replace("#(\\\r\\\n|\\\r|\\\n)#","<br>",$editing);
+				$data['id'] = $w_id;
+				//$data['token'] = '';
+				$tagging = str_replace('"','',preg_replace("#(\\\r\\\n|\\\r|\\\n)#","<br>", $essay->tagging));
+				$data['error_chk'] = 'N'; // Y or N
+				$data['tagging'] = $tagging;
+				$data['critique'] = $essay->critique;
+				$data['type'] = $type;
+				$data['pj_id'] = '';
+				$data['word_count'] = $essay->word_count;	
+				$data['submit'] = $essay->submit;
+				$data['draft'] = $essay->draft;
+				$data['price_kind'] = $essay->price_kind;
+				$data['start_date'] = $essay->start_date;
+				$data['orig_id'] = $essay->orig_essay_id;
+				$convert = str_replace('"', '&quot',$essay->reason); 
+				$convert = str_replace('’', "'",$convert);
+				$convert = str_replace('“', '"',$convert);
+				$convert = str_replace('”', '"',$convert);
+				$data['reason'] = $convert;
+			}
+			else
+			{
+				//log_message('error', 'ccccccccccccccccccccccccccccccccc');
+				//$score1 = $this->score_pattern_replace($scoring);			
+				$data['score1'] = '';	
+
+				//$score2 = $this->score_pattern_replace($score2);
+				$data['score2'] = '';				
+
+				$data['title'] = $title;
+				$convert = str_replace('’', "'",$writing);
+				$convert = str_replace('“', '"',$convert);
+				$convert = str_replace('”', '"',$convert);
+				$convert = str_replace('"', '&quot',$convert); 
+				$data['raw_writing'] = $convert;
+				//log_message('error', "[DEBUG] raw_writing = " . $data['raw_writing'] );
+				
+				
+				//$convert = str_replace('’', "'",$convert);
+				//$convert = str_replace('“', '"',$convert);
+				//$convert = str_replace('”', '"',$convert);
+				
+				//$data['writing'] = preg_replace("/[\n\r]/","<br>", $convert);
+				$data['writing'] = preg_replace("#(\\\r\\\n|\\\r|\\\n)#","<br>", $convert);
+
+				$data['re_raw_writing'] = preg_replace("#(\\\r\\\n|\\\r|\\\n)#","<br>", $convert); //Tagging 할때 쓰임! All clear
+				$data['critique'] = '';
+				$data['kind'] = $kind_id;
+				$data['kind_name'] = strtoupper($this->all_list->get_kind_name($kind_id)->kind);
+				//$data['conf'] = true;
+				$data['error_chk'] = 'N'; // Y or N
+				$data['submit'] = '0'; // 1 or 2
+				$data['discuss'] = 'Y'; // Y or N
+				$data['time'] = 0;
+				$data['cate'] = 'writing';
+				$data['word_count'] = $word_count;
+				$data['edit_writing'] = '';
+				$data['tagging'] = $writing;
+				$data['start_date'] = $start_date;
+				$data['price_kind'] = $price_kind;
+				$data['orig_id'] = $orig_id;
+				$data['reason'] = $reason;
+				//$data['classify'] = 'new';				
+			}
+
 			$data['token'] = $token;
 			$data['id'] = $w_id; // Writing service data_id.			
-			$data['critique'] = '';
-			$data['kind'] = $kind_id;
-			$data['type'] = '2';
-			//$data['conf'] = true;
-			$data['error_chk'] = 'N'; // Y or N
-			$data['submit'] = '0'; // 1 or 2
-			$data['discuss'] = 'Y'; // Y or N
-			$data['time'] = 0;
-			$data['cate'] = 'writing';
+			$data['type'] = $type;
 			$data['pj_id'] = '';
-			$data['word_count'] = $word_count;
-			$data['edit_writing'] = '';
-			$data['tagging'] = $writing;
-			//$data['classify'] = 'new';
+			if ($data['orig_id'] == 0 || $data['id'] == $data['orig_id']) {
+				$data['re_submit'] = 'No';
+			} else {
+				$data['re_submit'] = 'Yes';
+			}
 
-			$this->load->view('/editor/editor',$data);		
+			if ($service_name = "writing") {
+				$this->load->view('/editor/writing_editor',$data);
+			} else {
+				$this->load->view('/editor/editor',$data);
+			}		
 			$this->load->view('footer');					
 		}else{
 			redirect('/');
 		}
-	}	
+	}
 
-	public function w_submit(){
-		log_message('error', "w_submit called!!!");
-
+	function get_service_data() {
 		$usr_id = $this->session->userdata('id');
-		$token = $this->input->POST('token');
 		$w_id = $this->input->POST('data_id');	
 		$time = $this->input->POST('time');							
 		$type = $this->input->POST('type');
@@ -296,6 +459,12 @@ class Service extends CI_Controller {
 		$score2 = $this->db->escape($this->input->post('score2'));		
 		$kind = $this->input->POST('kind');
 		$word_count = $this->input->POST('word_count');
+		$start_date = $this->input->POST('start_date');
+		$price_kind = $this->db->escape($this->input->POST('price_kind') );
+		$orig_id = $this->input->POST('orig_id');
+		$reason = $this->db->escape($this->input->POST('reason'));
+
+		log_message('error', 'price_kind = ' . $price_kind);
 
 		//local DB save
 		$dic = array();
@@ -312,83 +481,197 @@ class Service extends CI_Controller {
 		$dic['time']			= $time;
 		$dic['kind']			= $kind;
 		$dic['type']			= $type;
+		$dic['start_date']		= $start_date;
+		$dic['price_kind']		= $price_kind;
+		$dic['orig_essay_id']	= $orig_id;
+		$dic['reason']		= $reason;
 
-		$query_res = $this->all_list->insert_service_data($dic);
-		//$query_res = $this->all_list->local_save($usr_id,$w_id,$raw_writing,$editing,$tagging,$critique,$title,$kind,$score1,$score2,$word_count,$time,$type);		
+		return $dic;
+	} 
 
-		//return;
+	public function draft_save(){ //<br>을 다시 \r\n으로 // 0
+		if($this->session->userdata('is_login')){
+			/***			
+			$essay_id = $this->input->POST('data_id');						
+			$time = $this->input->post('time');
+			$score1 = $this->input->post('score1');
+			$score2 = $this->input->post('score2');
+			$editing = mysql_real_escape_string(trim($this->input->POST('editing')));
+			log_message('error', 'essay_id :' . $essay_id);
+			log_message('error', 'draft_save :' . $editing);
+			$critique = mysql_real_escape_string(trim($this->input->POST('critique')));
+			$tagging = mysql_real_escape_string(trim($this->input->POST('tagging')));			
 
-		//$query_res = true;
-		//log_message('error', print_r($query_res, 1));
+			$result = $this->all_list->draft_servicedata($essay_id,$editing,$critique,$tagging,$score1,$score2,$time);
+			**/
 
-		if($query_res){ // True or false
-			$data_id = $query_res;
-			log_message('error', '[DEBUG] w_submit insert_id = ' . $data_id);
+			$draft_dic = $this->get_service_data();
+			$draft_dic['draft'] = 1;
+			$draft_dic['submit'] = 0;
 
-			// Error chk
-			$errorchk_class = new Errorchk;
-			$error_chk = $errorchk_class->error_chk('once',$data_id,$type);
-
-			$essays = $this->all_list->get_essay($data_id, $type);
-
-			$completed_editing = "";
-			if (count($essays) > 0)
-			{
-				$ex_editing = $essays[0]->ex_editing;
-				log_message('error', '[DEBUG] w_submit ex_editing = ' . $ex_editing);
-
-				if ($ex_editing != "")
-				{
-					$completed_editing = $this->get_completed_editing($ex_editing);
-				}
-			}
-
-			$data = array();
-			$data["id"] = $w_id;
-			$data["editing"] = $editing;
-			if ($completed_editing != "")
-			{
-				$data["done"] = $completed_editing;
-			}
-			else
-			{
-				$data["done"] = $editing;
-			}
-			$data["critique"] = $critique;
-			$data["score"] = $score1;
-			$data["date"] = date("Y-m-d H:i:s", time());
-
-			$sending_data["status"]	= true;
-			$sending_data["data"] = $data;
-
-			$json_data = json_encode($sending_data);
-			log_message('error', $json_data);
-
-			//$access = $this->curl->simple_post('https://edgewriting.net/editor/editing/done', array('token'=>$token, 'id'=>$w_id, 'editing'=>$this->input->POST('editing'), 'critique'=>$this->input->POST('critique')));
-			log_message('error', $json_data);
-			log_message('error', "token : $token");
-			$access = $this->curl->simple_post('https://edgewriting.net/editor/editing/done', array('token'=>$token, 'id'=>$w_id, 'data'=>$json_data));
-			log_message('error', $access);
-
-			// $access = '{
-			// 		    "status": true,
-			// 		    "data": {
-					        
-			// 		    }
-			// 		}';		
-
-			$conform = json_decode($access,true);		
-			if($conform['status']){
-				$json['result'] = true;	
-				
-			}else{			
-				$json['result'] = 'curl';							
-			}
-			//$json['error_chk'] = $error_chk;	
+			$result = $this->service_list->insert_service_data($draft_dic);
+			
+			log_message('error', 'draft_save :' . $result);
+			
+			$json['status'] = $result;			
 		}else{
-			$json['result'] = 'localdb';
-		}				
-		$this->output->set_content_type('application/json')->set_output(json_encode($json));
+			redirect('/');
+		}		
+		$this->output->set_content_type('application/json')->set_output(json_encode($json));	
+	}
+
+	public function w_submit(){
+		if($this->session->userdata('is_login')){
+			//log_message('error', "w_submit called!!!");
+
+			$token = $this->input->POST('token');
+
+			$submit_dic = $this->get_service_data();
+			$submit_dic['draft']			= 1;
+			$submit_dic['submit']		= 0;
+
+			/***
+			$usr_id = $this->session->userdata('id');
+			$token = $this->input->POST('token');
+			$w_id = $this->input->POST('data_id');	
+			$time = $this->input->POST('time');							
+			$type = $this->input->POST('type');
+
+			$title = $this->db->escape($this->input->POST('title'));
+			$editing = $this->db->escape($this->input->POST('editing'));
+			$raw_writing = $this->db->escape($this->input->POST('raw_writing'));
+			$critique = $this->db->escape($this->input->POST('critique'));
+			$tagging = $this->db->escape($this->input->POST('tagging'));		
+			
+			$score1 = $this->db->escape($this->input->post('score1'));		
+			$score2 = $this->db->escape($this->input->post('score2'));		
+			$kind = $this->input->POST('kind');
+			$word_count = $this->input->POST('word_count');
+
+
+			//local DB save
+			$dic = array();
+			$dic['usr_id']		= $usr_id;
+			$dic['w_id']			= $w_id;
+			$dic['title']			= $title;
+			$dic['raw_writing']		= $raw_writing;
+			$dic['editing']		= $editing;
+			$dic['tagging']		= $tagging;
+			$dic['critique']		= $critique;
+			$dic['score1']		= $score1;
+			$dic['score2']		= $score2;
+			$dic['word_count']		= $word_count;
+			$dic['time']			= $time;
+			$dic['kind']			= $kind;
+			$dic['type']			= $type;
+			***/
+
+			// first, draft save
+			$query_res = $this->service_list->insert_service_data($submit_dic);
+			//$query_res = $this->all_list->local_save($usr_id,$w_id,$raw_writing,$editing,$tagging,$critique,$title,$kind,$score1,$score2,$word_count,$time,$type);		
+
+			//$query_res = true;
+			//log_message('error', print_r($query_res, 1));
+
+			if($query_res){ // True or false
+				$data_id = $query_res;
+				log_message('error', '[DEBUG] w_submit   insert_id = ' . $data_id);
+
+				// Error chk
+				$errorchk_class = new Errorchk;
+				$error_chk = $errorchk_class->error_chk('once',$data_id,$submit_dic['type']);
+
+				//log_message('error', '[DEBUG] w_submit   error_chk = ' . $error_chk);
+
+				if ($error_chk != 'true') 
+				{
+					$json['result'] = 'error_chk';
+					$json['error_chk'] = $error_chk;
+
+					//log_message('error', '[DEBUG] w_submit error_chk : ' . $error_chk);
+
+					//$this->output->set_content_type('application/json')->set_output(json_encode($json));
+
+					//exit();
+				}
+				else
+				{
+					// finally, if no error is dectected, submit save
+					$submit_dic['submit']	= 1;
+					$query_res = $this->service_list->insert_service_data($submit_dic);
+		 
+					$essays = $this->service_list->get_essay($data_id, $submit_dic['type']);
+
+					$completed_editing = "";
+					if (count($essays) > 0)
+					{
+						$ex_editing = $essays[0]->ex_editing;
+						log_message('error', '[DEBUG] w_submit ex_editing = ' . $ex_editing);
+
+						if ($ex_editing != "")
+						{
+							$completed_editing = $this->get_completed_editing($ex_editing);
+						}
+					}
+
+					$data = array();
+					$data["id"] = $submit_dic['w_id'];
+					$data["editing"] = $essays[0]->editing;
+					if ($completed_editing != "")
+					{
+						$data["done"] = $completed_editing;
+					}
+					else
+					{
+						$data["done"] = $submit_dic['editing'];
+					}
+					$data["critique"] = $essays[0]->critique;
+					$data["score"] = $essays[0]->scoring;
+					$data["date"] = date("Y-m-d H:i:s", time());
+					$data["file"] = "";
+
+					$sending_data["status"]	= true;
+					$sending_data["data"] = $data;
+
+					$json_data = json_encode($sending_data);
+					log_message('error', $json_data);
+
+					//$access = $this->curl->simple_post('https://edgewriting.net/editor/editing/done', array('token'=>$token, 'id'=>$w_id, 'editing'=>$this->input->POST('editing'), 'critique'=>$this->input->POST('critique')));
+					log_message('error', $json_data);
+					log_message('error', "token : $token");
+					if (IS_SSL) {
+						$this->curl->ssl(FALSE);
+					}
+					$curl_options = array(CURLOPT_CONNECTTIMEOUT => 1, CURLOPT_TIMEOUT => 3);
+					$access = $this->curl->simple_post(EDGE_WRITING_URL . 'editor/editing/done', array('token'=>$token, 'id'=>$submit_dic['w_id'], 'data'=>$json_data), $curl_options);
+					log_message('error', '[DEBUG] edtiting/done result : ' . $access);
+
+					// $access = '{
+					// 		    "status": true,
+					// 		    "data": {
+							        
+					// 		    }
+					// 		}';		
+
+					$conform = json_decode($access,true);		
+					if($conform['status']){
+						$json['result'] = true;	
+						
+					}else{			
+						$json['result'] = 'curl';							
+					}
+				}
+
+				//$json['error_chk'] = $error_chk;	
+			}else{
+				$json['result'] = 'localdb';
+			}
+			log_message('error', '[DEBUG] w_submit json : ' . json_encode($json));
+
+			$this->output->set_content_type('application/json')->set_output(json_encode($json));
+		} else{
+			redirect('/');
+		}
 	}
 
 	public function member_enter($service_name,$month,$year,$usr_id){ // 0
@@ -444,7 +727,7 @@ class Service extends CI_Controller {
 		$this->output->set_content_type('application/json')->set_output(json_encode($json));
 	}
 
-	public function export($month,$year){
+	public function export($service_name, $month, $year){
 		if($this->session->userdata('is_login')){			
 			$data['cate'] = 'service';
 			$this->load->view('head',$data);
@@ -452,9 +735,14 @@ class Service extends CI_Controller {
 			$page = 1;
 			$data['page'] = $page;
 			$list = 20; // 한페이지에 보요질 갯수.			
-			$data['list'] = $list;						
+			$data['list'] = $list;
 
-			$row = $this->all_list->service_export_total_count($month,$year);
+			$service_info = $this->service_list->get_serviceId_num($service_name);
+			$service_id = $service_info->id;
+
+			$row = $this->service_list->service_export_total_count($service_id, $month,$year);
+			$data['service_name'] = $service_name;
+			$data['service_id'] = $service_id;
 			$data['total'] = $row->count;
 			$data['export_count'] = $row->export_count;			
 			$data['str_month'] = $str_month = $this->eng_month($month);
@@ -470,7 +758,8 @@ class Service extends CI_Controller {
 	}
 
 	public function get_export_data(){
-		if($this->session->userdata('is_login')){						
+		if($this->session->userdata('is_login')){
+			$service_id = $this->input->post('service_id');
 			$page = $this->input->post('page');
 			$year = $this->input->post('year');			
 			$month = $this->input->post('month');
@@ -479,9 +768,9 @@ class Service extends CI_Controller {
 			$page_list = 20;			
 			$limit = ($page - 1) * $page_list;					
 
-			$totalcount = $this->all_list->get_service_export_count($year,$month);
+			$totalcount = $this->all_list->get_service_export_count($service_id,$year,$month);
 			$json['data_count'] = $totalcount->count;
-			$json['data_list'] = $this->all_list->get_service_export_data($year,$month,$limit,$page_list);
+			$json['data_list'] = $this->all_list->get_service_export_data($service_id,$year,$month,$limit,$page_list);
 			
 			$json['page'] = $page;
 			$json['page_list'] = $page_list;			
@@ -493,7 +782,8 @@ class Service extends CI_Controller {
 	}
 
 	function service_export_errorlist(){
-		if($this->session->userdata('is_login')){						
+		if($this->session->userdata('is_login')){
+			$service_id = $this->input->post('service_id');
 			$page = $this->input->post('page');
 			$year = $this->input->post('year');			
 			$month = $this->input->post('month');
@@ -502,9 +792,9 @@ class Service extends CI_Controller {
 			$page_list = 20;			
 			$limit = ($page - 1) * $page_list;					
 
-			$totalcount = $this->all_list->get_service_error_count($month,$year);
+			$totalcount = $this->service_list->get_service_error_count($service_id,$month,$year);
 			$json['data_count'] = $totalcount->error_count;
-			$json['data_list'] = $this->all_list->get_service_error_list($month,$year,$limit,$page_list);
+			$json['data_list'] = $this->service_list->get_service_error_list($service_id,$month,$year,$limit,$page_list);
 			
 			$json['page'] = $page;
 			$json['page_list'] = $page_list;			
@@ -517,17 +807,18 @@ class Service extends CI_Controller {
 	}
 
 	function all_export(){ // 0
-		if($this->session->userdata('is_login')){						
+		if($this->session->userdata('is_login')){
+			$service_id = $this->input->post('service_id');
 			$month = $this->input->get_post('month');			
 			$year = $this->input->get_post('year');			
 
 			$query = $this->db->query("SELECT prompt,ex_editing
-					FROM adjust_data
+					FROM service_data
 					WHERE sub_date
 					BETWEEN  '".$year."-".$month."-01 00:00:00'
 					AND  '".$year."-".$month."-31 00:00:00'
 					AND essay_id !=0						
-					and type != 'musedata'				
+					and type = '$service_id'			
 					AND submit = 1
 					and ex_editing != ''
 					and active = 0");
@@ -587,5 +878,57 @@ class Service extends CI_Controller {
 
 		return $str;
 	}
+
+	public function tbd($service_name,$month,$year){ // 0
+		if($this->session->userdata('is_login')){
+			$data['cate'] = 'service';
+			$this->load->view('head',$data);			
+
+			$page = 1;
+			$data['page'] = $page;
+			$list = 20; // 한페이지에 보요질 갯수.			
+			$data['list'] = $list;							
+
+			$row = $this->all_list->get_serviceId_num($service_name);
+			$service_id = $row->id;
+
+			$str_month = $this->eng_month($month); // 숫자 달을 영문으로 변경하는 함수!
+			$data['str_month'] = $str_month;
+			$data['int_month'] = $month;
+			$data['year'] = $year;
+			$data['service_name'] = $service_name;
+			$data['service_id'] = $service_id;
+
+			$this->load->view('/service_view/tbd_view',$data);
+
+			$this->load->view('footer');					
+		}else{
+			redirect('/');
+		}
+	}
+
+	public function get_service_tbd(){
+		if($this->session->userdata('is_login')){			
+			$page = $this->input->post('page');
+			$month = $this->input->post('month');
+			$year = $this->input->post('year');
+			$service_id = $this->input->post('service_id');
+
+			$page_list = 20;			
+			$limit = ($page - 1) * $page_list;					
+
+			$totalcount = $this->service_list->get_service_tbdCount($year,$month,$service_id);
+			$json['total_count'] = $totalcount->count;
+			$json['list'] = $this->service_list->get_service_tbdData($year,$month,$service_id,$limit,$page_list);
+			
+			$json['page'] = $page;
+			$json['page_list'] = $page_list;						
+		}else{
+			redirect('/');
+		}	
+		$this->output->set_content_type('application/json')->set_output(json_encode($json));
+	}
+
+
 }
 ?>

@@ -1,5 +1,5 @@
 <?php
-class All_list extends CI_Model{
+class Service_List extends CI_Model{
 	function get_cate($service_id,$cate){
 		return $this->db->query("SELECT * FROM data_kind WHERE service_id = '$service_id' and service_cate_name = '$cate'")->result();
 
@@ -69,7 +69,7 @@ class All_list extends CI_Model{
 		}
 	}		
 
-	function get_one_essay_by_essayid($cate,$essay_id){
+	function get_one_essay_by_essayid($cate,$essay_id,$type=0){
 		if($cate == 'service'){
 			$from_table = 'service_data';
 		}else{
@@ -79,6 +79,9 @@ class All_list extends CI_Model{
 					FROM ".$from_table." 
 					LEFT JOIN data_kind ON data_kind.id = ".$from_table.".kind
 					WHERE ".$from_table.".essay_id = '$essay_id'";
+		if ($type > 1) {
+			$query .= " AND ".$from_table.".type = '$type'";
+		}
 		$result = $this->db->query($query);
 		if($result->num_rows() > 0){
 			return	$this->db->query($query)->row();
@@ -132,7 +135,6 @@ class All_list extends CI_Model{
 									LEFT JOIN usr ON usr.id = service_data.usr_id									
 									WHERE service_data.type = '$service_id'
 									AND service_data.sub_date BETWEEN  '".$year."-".$month."-01 00:00:00' AND '".$year."-".$month."-31 23:59:59'
-									GROUP BY service_data.usr_id
 									ORDER BY service_data.usr_id")->result();
 	}
 
@@ -236,12 +238,12 @@ class All_list extends CI_Model{
 									AND project.id =  '$pj_id' LIMIT 1")->row();
 	}	
 
-	function admin_tbd_submit($usr_id,$data_id,$editing,$critique,$tagging,$scoring,$score2,$time){		
-		return $this->db->query("UPDATE adjust_data SET editing = '$editing',critique = '$critique',tagging = '$tagging',scoring = '$scoring', score2 = '$score2', draft = 1,submit = 1,sub_date = now(), time = '$time', discuss = 'Y', usr_id = '$usr_id' WHERE id = '$data_id'");
+	function admin_service_tbd_submit($data_id,$type,$editing,$critique,$tagging,$scoring,$score2){		
+		return $this->db->query("UPDATE service_data SET editing = '$editing',critique = '$critique',tagging = '$tagging',scoring = '$scoring', score2 = '$score2', draft = 1,submit = 1,sub_date = now(), discuss = 'Y' WHERE essay_id = '$data_id' and type = '$type'");
 	}	
 
-	function admin_tbd_draft($data_id,$editing,$critique,$tagging,$scoring,$score2,$time){				
-		return $this->db->query("UPDATE adjust_data SET editing = '$editing',critique = '$critique',tagging = '$tagging',draft = 1,scoring = '$scoring', score2 = '$score2', time = '$time' WHERE id = '$data_id'");				
+	function admin_service_tbd_draft($data_id,$type,$editing,$critique,$tagging,$scoring,$score2){				
+		return $this->db->query("UPDATE service_data SET editing = '$editing',critique = '$critique',tagging = '$tagging',draft = 1,scoring = '$scoring', score2 = '$score2' WHERE essay_id = '$data_id' and type = '$type'");				
 	}
 
 	function dos_avg(){
@@ -448,21 +450,21 @@ class All_list extends CI_Model{
 	   		return $result;
 	}
 
-	function error_replace($data_id,$replace_data, $type = 1){
+	function error_replace($data_id,$replace_data){
 			preg_match_all("|</mod>|", $replace_data, $mod_matches);
 			preg_match_all("|</ins>|", $replace_data, $ins_matches);
 			preg_match_all("|</del>|", $replace_data, $del_matches);   			
 
 			$replace_tag = count($mod_matches[0])+count($ins_matches[0])+count($del_matches[0]);
 
-			if ($type == 1) {
-				$result = $this->db->query("UPDATE adjust_data SET ex_editing = '$replace_data', replace_tag = '$replace_tag' WHERE id = '$data_id'");
-			} else {
-				$result = $this->db->query("UPDATE service_data SET ex_editing = '$replace_data', replace_tag = '$replace_tag' WHERE id = '$data_id'");
-			}
-	   		
+	   		$result = $this->db->query("UPDATE adjust_data SET ex_editing = '$replace_data', replace_tag = '$replace_tag' WHERE id = '$data_id'");
 	   		return $result;      
 	}
+
+
+
+
+
 
 
 	// Service Sql
@@ -491,7 +493,8 @@ class All_list extends CI_Model{
 		$end = $yen."-12-31 23:59:59";	
 
 		$query = "SELECT DISTINCT DATE_FORMAT( sub_date,  '%Y-%m' ) AS month , 
-					COUNT(*) AS count
+					COUNT(*) AS count,
+					COUNT( IF( service_data.discuss =  'N', 1, NULL ) ) AS tbd_count 
 					FROM service_data
 					WHERE sub_date
 					BETWEEN  '$start'
@@ -616,14 +619,14 @@ class All_list extends CI_Model{
 		return $this->db->query($query)->row();
 	}
 
-	function get_service_error_count($month,$year){
+	function get_service_error_count($service_id, $month,$year){
 		$query = "SELECT count(*) as error_count
-					FROM adjust_data
+					FROM service_data
 					WHERE sub_date
 					BETWEEN  '".$year."-".$month."-01 00:00:00'
 					AND  '".$year."-".$month."-31 23:59:59'
 					AND essay_id !=0						
-					and type != 'musedata'				
+					and type = '$service_id'				
 					AND submit = 1
 					and ex_editing = ''					
 					and active = 0";
@@ -631,20 +634,33 @@ class All_list extends CI_Model{
 		return $this->db->query($query)->row();
 	}
 
-	function get_service_error_list($month,$year,$limit,$page_list){
-		$query = "SELECT adjust_data.*,usr.name,usr.id as usr_id
-					FROM adjust_data
-					LEFT join usr ON usr.id = adjust_data.usr_id
-					WHERE adjust_data.sub_date
+	function get_service_error_list($service_id, $month,$year,$limit,$page_list){
+		$query = "SELECT service_data.*,usr.name,usr.id as usr_id
+					FROM service_data
+					LEFT join usr ON usr.id = service_data.usr_id
+					WHERE service_data.sub_date
 					BETWEEN  '".$year."-".$month."-01 00:00:00'
 					AND  '".$year."-".$month."-31 23:59:59'
 					AND essay_id !=0
 					AND ex_editing = ''
-					and adjust_data.type != 'musedata'
-					AND adjust_data.submit = 1
-					and adjust_data.active = 0	
+					and service_data.type = '$service_id'
+					AND service_data.submit = 1
+					and service_data.active = 0	
 					LIMIT $limit,$page_list";
 
+		return $this->db->query($query)->result();
+	}
+
+	function get_related_servicedata($service_id, $essay_id, $orig_essay_id){
+		$query = "SELECT service_data.*,usr.name as usr_name
+					FROM service_data
+					LEFT join usr ON usr.id = service_data.usr_id
+					WHERE service_data.orig_essay_id =$orig_essay_id
+					and service_data.essay_id !=$essay_id
+					and service_data.type = '$service_id'
+					and service_data.active = 0
+					ORDER BY id DESC";
+		log_message('error', $query);
 		return $this->db->query($query)->result();
 	}
 
@@ -665,16 +681,6 @@ class All_list extends CI_Model{
 									LEFT JOIN task ON task.id = connect_usr_task.task_id
 									WHERE connect_usr_task.usr_id = '$usr_id'
 									AND connect_usr_task.active = 0")->result();	
-	}
-
-	function get_editors_by_task($task){
-		return $this->db->query("SELECT a.*, b.id as usr_id, b.name as usr_name
-									FROM connect_usr_task a, usr b
-									WHERE a.task_id = '$task'
-									AND a.active = 0
-									AND a.usr_id = b.id
-									AND b.active = 0
-									AND b.classify = 1")->result();	
 	}
 
 	function get_Editors(){
@@ -1691,10 +1697,10 @@ class All_list extends CI_Model{
 									WHERE essay_id = '$essay_id' and usr_id = '$usr_id' and type = '$type' and submit = 1")->row();	
 	}
 
-	public function draft($data_id,$title,$editing,$critique,$tagging,$score1,$score2,$time){		
+	public function draft($data_id,$editing,$critique,$tagging,$score1,$score2,$time){		
 		$confirm = $this->db->query("SELECT * FROM adjust_data WHERE id = '$data_id'");
 		if($confirm->num_rows() > 0){
-			return $this->db->query("UPDATE adjust_data SET prompt = '$title', editing = '$editing',critique = '$critique',tagging = '$tagging',draft = 1,scoring = '$score1', score2 = '$score2', time = '$time' WHERE id = '$data_id'");			
+			return $this->db->query("UPDATE adjust_data SET editing = '$editing',critique = '$critique',tagging = '$tagging',draft = 1,scoring = '$score1', score2 = '$score2', time = '$time' WHERE id = '$data_id'");			
 		}else{
 			return false;
 		}		
@@ -1710,7 +1716,7 @@ class All_list extends CI_Model{
 		}		
 	}
 
-	public function submit($data_id,$title,$editing,$critique,$tagging,$score1,$score2,$time){
+	public function submit($data_id,$editing,$critique,$tagging,$score1,$score2,$time){
 		$confirm = $this->db->query("SELECT * FROM adjust_data WHERE id = '$data_id'");
 		
 		if($confirm->num_rows() > 0){	
@@ -1718,7 +1724,7 @@ class All_list extends CI_Model{
 			$pj_id = $row->pj_id;
 			$raw_txt = $row->raw_txt;
 
-			return $this->db->query("UPDATE adjust_data SET prompt = '$title', editing = '$editing',critique = '$critique',tagging = '$tagging', scoring = '$score1', score2 = '$score2', draft = 1,submit = 1,sub_date = now(), time = '$time', discuss = 'Y' WHERE id = '$data_id'");			
+			return $this->db->query("UPDATE adjust_data SET editing = '$editing',critique = '$critique',tagging = '$tagging', scoring = '$score1', score2 = '$score2', draft = 1,submit = 1,sub_date = now(), time = '$time', discuss = 'Y' WHERE id = '$data_id'");			
 		}else{
 			return false;					
 		}			
@@ -1827,16 +1833,29 @@ class All_list extends CI_Model{
 	}
 	***/
 
+
+	public function get_max_premium_essay_id() {
+		$confirm = $this->db->query("SELECT max(essay_id) as max_essay_id FROM service_data WHERE price_kind='premium'");
+	   	
+	   	$confirm->row();	
+	   	if($confirm->row()->max_essay_id == "NULL") {
+	   		return 0;
+	   	}
+	   	else {
+	   		return $confirm->row()->max_essay_id;
+	   	}
+	}
+
 	public function insert_service_data($dic) {
 		$usr_id = $dic['usr_id'];
 		$w_id = $dic['w_id'];
-		$title = $dic['title'];
-		$raw_writing = $dic['raw_writing'];
-		$editing = $dic['editing'];
-		$tagging = $dic['tagging'];
-		$critique = $dic['critique'];
-		$score1 = $dic['score1'];
-		$score2 = $dic['score2'];
+		$title = trim($dic['title']);
+		$raw_writing = trim($dic['raw_writing']);
+		$editing = trim($dic['editing']);
+		$tagging = trim($dic['tagging']);
+		$critique = trim($dic['critique']);
+		$score1 = trim($dic['score1']);
+		$score2 = trim($dic['score2']);
 		$word_count = $dic['word_count'];
 		$time = $dic['time'];
 		$kind = $dic['kind'];
@@ -1851,26 +1870,47 @@ class All_list extends CI_Model{
 		else
 			$submit = 0;
 
-		$confirm = $this->db->query("SELECT * FROM service_data WHERE essay_id=$w_id");
+		if ($dic['price_kind'] != null ) 
+			$price_kind = trim($dic['price_kind']);
+		else
+			$price_kind = "''";
+
+		if ($dic['orig_essay_id'] != null ) 
+			$orig_essay_id = $dic['orig_essay_id'];
+		else
+			$orig_essay_id = 0;
+
+		if ($dic['reason'] != null ) 
+			$reason = trim($dic['reason']);
+		else
+			$reason = "''";
+
+		$confirm = $this->db->query("SELECT * FROM service_data WHERE essay_id=$w_id and type = $type");
 	   	
 	   	if($confirm->num_rows() > 0)
 	   	{
 	   		$data_id = $confirm->row()->id;
-	   		log_message('error', '[DEBUG] insert_service_data data_id : ' . $data_id);
+	   		//log_message('error', '[DEBUG] insert_service_data data_id : ' . $data_id);
 
-	   		$sql = "UPDATE service_data SET prompt = $title, editing = $editing, critique = $critique, tagging = $tagging, scoring = $score1, score2 = $score2, word_count = $word_count, draft = $draft, submit = $submit, time = $time, sub_date = now() WHERE essay_id=$w_id";
+	   		$sql = "UPDATE service_data SET prompt = $title, editing = $editing, critique = $critique, tagging = $tagging, scoring = $score1, score2 = $score2, word_count = $word_count, draft = $draft, submit = $submit, time = $time, sub_date = now() WHERE essay_id=$w_id and type=$type";
 	   		$flag = "update";
 	   	}
 	   	else
 	   	{
+	   		if ( isset($dic['start_date']) ) {
+	   			$start_date = $dic['start_date'];
+	   		} else {
+	   			$start_date = date("Y-m-d H:i:s",time());;
+	   		}
+
 	   		$sql = "INSERT INTO service_data(
 				usr_id, essay_id, prompt, raw_txt, editing, tagging,
 				critique, scoring, score2, word_count, draft, submit,
-				time, kind, type, sub_date
+				time, kind, type, start_date, price_kind, orig_essay_id, reason
 				) VALUES (
 				'$usr_id','$w_id',$title,$raw_writing,$editing,$tagging,
-				$critique,$score1,$score2,'$word_count',$draft,$submit,
-				$time,$kind,$type,now())";
+				$critique,$score1,$score2,$word_count,$draft,$submit,
+				$time,$kind,$type,'$start_date', $price_kind, $orig_essay_id, $reason)";
 
 			$flag = "insert";
 	   	}
@@ -1896,6 +1936,66 @@ class All_list extends CI_Model{
 			return false;
 		}
 	}
+
+	function update_service_data($dic) {
+		$essay_id = $dic['essay_id'];
+		$service_id = $dic['service_id'];
+
+		$confirm = $this->db->query("SELECT * FROM service_data WHERE essay_id=$essay_id and type=$service_id");
+
+		if($confirm->num_rows() > 0)
+	   	{
+	   		$update_str = "set ";
+	   		$is_first = 1;
+	   		if ( isset($dic['usr_id']) ) {
+	   			if ($is_first != 1) {
+	   				$update_str .= ", ";
+	   			}
+	   			$is_first = 0;
+	   			$update_str .= "usr_id = '" . $dic['usr_id'] . "' ";
+	   		}
+	   		if ( isset($dic['draft']) ) {
+	   			if ($is_first != 1) {
+	   				$update_str .= ", ";
+	   			}
+	   			$is_first = 0;
+	   			$update_str .= "draft = " . $dic['draft'] . " ";
+	   		}
+	   		if ( isset($dic['submit']) ) {
+	   			if ($is_first != 1) {
+	   				$update_str .= ", ";
+	   			}
+	   			$is_first = 0;
+	   			$update_str .= "submit = " . $dic['submit'] . " ";
+	   		}
+	   		if ( isset($dic['filename']) ) {
+	   			if ($is_first != 1) {
+	   				$update_str .= ", ";
+	   			}
+	   			$is_first = 0;
+	   			$update_str .= "filename = '" . $dic['filename'] . "' ";
+	   		}
+	   		
+	   		$sql = "UPDATE service_data " . $update_str . " WHERE essay_id=$essay_id and type=$service_id";
+	   		log_message('error', "debug : $sql");
+
+	   		$ret = $this->db->query($sql);
+
+			if ($ret)
+			{
+				return true;
+	
+			}
+			else
+			{
+				return false;
+			}
+	   	}
+	   	else {
+	   		return false;
+	   	}
+	}
+
 
 	public function insert_file($filename, $title){
       	$data = array(
@@ -2112,9 +2212,18 @@ class All_list extends CI_Model{
 		return $this->db->query("SELECT count(*) as count FROM adjust_data WHERE pj_id = '$pj_id' and usr_id = '$usr_id' and submit != 1 and pj_active = 0 and active = 0 and discuss = 'Y'")->row();
 	}
 
-	public function pj_comp_totalcount($pj_id,$usr_id) {
-		return $this->db->query("SELECT count(*) as count FROM adjust_data WHERE pj_id = '$pj_id' and usr_id = '$usr_id' and draft = 1 and submit = 1 and pj_active = 0 and active = 0 and discuss = 'Y'")->row();
+	public function service_comp_totalcount($type,$usr_id) {
+		return $this->db->query("SELECT count(*) as count FROM service_data WHERE type = '$type' and usr_id = '$usr_id' and draft = 1 and submit = 1 and active = 0 and discuss = 'Y'")->row();
 	}
+
+	function get_service_comp($type,$usr_id,$page,$limit,$list){ // 0
+		$query = "SELECT service_data.*,data_kind.kind as kind_name
+					FROM service_data 
+					LEFT JOIN data_kind ON data_kind.id = service_data.kind
+					WHERE usr_id = '$usr_id' and type = '$type' and active = 0 and draft = 1 and submit = 1 and discuss = 'Y' ORDER BY sub_date desc LIMIT $limit,$list";
+		return $this->db->query($query)->result();
+	}
+
 
 	public function history_totalcount($usr_id){
 		return $this->db->query("SELECT count(*) as count FROM adjust_data WHERE usr_id = '$usr_id' and pj_active = 0 and active = 0")->row();
@@ -2359,5 +2468,59 @@ class All_list extends CI_Model{
    		}
    		return true;
    	}
+
+   	function get_service_tbdCount($year,$month,$service_id){
+		$query = "SELECT count(*) as count 
+					FROM service_data
+					WHERE sub_date
+					BETWEEN  '".$year."-".$month."-01 00:00:00'
+					AND  '".$year."-".$month."-31 23:59:59'
+					and essay_id != 0 
+					and discuss = 'N' 
+					and type = '$service_id'
+					and active = 0";
+		return $this->db->query($query)->row();
+	}
+
+	function get_service_tbdData($year,$month,$service_id,$limit,$page_list){
+		$query = "SELECT service_data.*,data_kind.kind
+					FROM service_data
+					LEFT JOIN data_kind ON data_kind.id = service_data.kind
+					WHERE service_data.sub_date
+					BETWEEN '".$year."-".$month."-01 00:00:00'
+					AND '".$year."-".$month."-31 23:59:59'
+					and essay_id != 0 
+					and discuss = 'N' 
+					and type = '$service_id'
+					and active = 0				
+					ORDER BY sub_date DESC
+					LIMIT $limit,$page_list";
+		return $this->db->query($query)->result();
+	}
+
+
+   	function get_service_pricekindCount($service_id, $price_kind){
+		$query = "SELECT count(*) as count 
+					FROM service_data
+					WHERE price_kind = '$price_kind'
+					and essay_id != 0 
+					and type = '$service_id'
+					and active = 0";
+		return $this->db->query($query)->row();
+	}
+
+	function get_service_pricekindData($service_id,$price_kind,$limit,$page_list){
+		$query = "SELECT service_data.*,data_kind.kind,usr.name
+					FROM service_data
+					LEFT JOIN data_kind ON data_kind.id = service_data.kind
+					LEFT join usr ON usr.id = service_data.usr_id
+					WHERE service_data.price_kind = '$price_kind'
+					and service_data.essay_id != 0 
+					and service_data.type = '$service_id'
+					and service_data.active = 0
+					ORDER BY service_data.id desc				
+					LIMIT $limit,$page_list";
+		return $this->db->query($query)->result();
+	}
 }
 ?>

@@ -8,6 +8,7 @@ class Text_editor extends CI_Controller {
 		parent::__construct();
 		$this->load->database();
 		$this->load->model('all_list');
+		$this->load->model('service_list');
 		$this->load->helper('url');		
 	}
 
@@ -61,19 +62,19 @@ class Text_editor extends CI_Controller {
 		}
 		$editing = str_replace('"', '&quot',$editing); 
 
-		$data['edit_writing'] = preg_replace("/[\n\r]/","<br>",$editing);
+		$data['edit_writing'] = preg_replace("#(\\\r\\\n|\\\r|\\\n)#","<br>",$editing);
 
 		$convert = str_replace('"', '&quot',$datas->raw_txt); 
 		$convert = str_replace('’', "'",$convert);
 		$convert = str_replace('“', '"',$convert);
 		$convert = str_replace('”', '"',$convert);
 		$data['raw_writing'] = $convert;
-		$data['re_raw_writing'] = preg_replace("/[\n\r]/","<br>", $convert);
+		$data['re_raw_writing'] = preg_replace("#(\\\r\\\n|\\\r|\\\n)#","<br>", $convert);
 		$data['discuss'] = $datas->discuss;
 		$data['writing'] = '';
 		$data['id'] = $datas->id;
 		$data['token'] = '';
-		$tagging = str_replace('"','',preg_replace("/[\n\r]/","<br>", $datas->tagging));
+		$tagging = str_replace('"','',preg_replace("#(\\\r\\\n|\\\r|\\\n)#","<br>", $datas->tagging));
 		
 		$data['tagging'] = $tagging;
 		$data['critique'] = $datas->critique;
@@ -101,13 +102,14 @@ class Text_editor extends CI_Controller {
 			$data['score2'] = $score2;
 			$data['time'] = $datas->time;
 			$data['title'] = str_replace('"', '&quot', $datas->prompt);
-			$writing = preg_replace("/[\n\r]/","<br>", $datas->raw_txt);
+			$writing = preg_replace("#(\\\r\\\n|\\\r|\\\n)#","<br>", $datas->raw_txt);
 			$data['writing'] = str_replace('"', '&quot', $writing);
 
 			$convert = str_replace('"', '&quot',$datas->raw_txt); 
 			$convert = str_replace('“', '"',$convert);
 			$convert = str_replace('”', '"',$convert);
-			$data['re_raw_writing'] = preg_replace("/[\n\r]/","<br>", $convert);
+			//$data['re_raw_writing'] = preg_replace("/[\n\r]/","<br>", $convert);
+			$data['re_raw_writing'] = preg_replace("#(\\\r\\\n|\\\r|\\\n)#","<br>", $convert);
 
 			$data['id'] = $datas->essay_id;
 			$data['token'] = '';
@@ -170,11 +172,12 @@ class Text_editor extends CI_Controller {
 			$time = $this->input->post('time');
 			$score1 = $this->input->post('score1');
 			$score2 = $this->input->post('score2');
+			$title = mysql_real_escape_string(trim($this->input->POST('title')));
 			$editing = mysql_real_escape_string(trim($this->input->POST('editing')));
 			$critique = mysql_real_escape_string(trim($this->input->POST('critique')));
 			$tagging = mysql_real_escape_string(trim($this->input->POST('tagging')));			
 
-			$result = $this->all_list->draft($data_id,$editing,$critique,$tagging,$score1,$score2,$time);
+			$result = $this->all_list->draft($data_id,$title,$editing,$critique,$tagging,$score1,$score2,$time);
 			
 			$json['status'] = $result;			
 		}else{
@@ -184,18 +187,20 @@ class Text_editor extends CI_Controller {
 	}
 
 	public function submit(){
-		if($this->session->userdata('is_login')){						
+		if($this->session->userdata('is_login')){
+			$usr_id = $this->session->userdata('id');						
 			$data_id = $this->input->POST('data_id');						
 			$time = $this->input->post('time');
 			$score1 = $this->input->post('score1');
 			$score2 = $this->input->post('score2');
+			$title = mysql_real_escape_string(trim($this->input->POST('title')));
 			$editing = mysql_real_escape_string(trim($this->input->POST('editing')));
 			$critique = mysql_real_escape_string(trim($this->input->POST('critique')));
 			$tagging = mysql_real_escape_string(trim($this->input->POST('tagging')));			
 
 			$pj_id = $this->input->POST('pj_id');			
 
-			$result = $this->all_list->submit($data_id,$editing,$critique,$tagging,$score1,$score2,$time);
+			$result = $this->all_list->submit($data_id,$title,$editing,$critique,$tagging,$score1,$score2,$time);
 			
 			if($result){	
 				$errorchk_class = new Errorchk;
@@ -244,15 +249,19 @@ class Text_editor extends CI_Controller {
 /* ======================================================================================================================== 
    Admin	*/ 
 
-   function admin_get_datas($cate,$data_id){
+   function admin_get_datas($cate,$data_id,$service_id = 2){
 		if($cate == 'error' || $cate == 'tbd' || $cate == 'history' || $cate == 'admin_export'){			
 			$data['cate'] = 'musedata';
 			$this->load->view('head',$data);
+
+			$rows = $this->all_list->get_one_essay($cate,$data_id);
 		}elseif ($cate == 'service') {			
 			$data['cate'] = 'service';			
-			$this->load->view('head',$data);			
+			$this->load->view('head',$data);
+
+			$rows = $this->service_list->get_one_essay_by_essayid($cate,$data_id,$service_id);						
 		}
-		$rows = $this->all_list->get_one_essay($cate,$data_id);		
+				
 
 		if($rows == false){
 			return false;			
@@ -262,7 +271,7 @@ class Text_editor extends CI_Controller {
 			$kind = $rows->kind; // ex) toefl, essay, toeic
 			$type = $rows->type;
 			$data['kind'] = $kind;
-			$data['kind_name'] = $rows->kind_name; // ex) toefl, essay, toeic			 
+			$data['kind_name'] = strtoupper($rows->kind_name); // ex) toefl, essay, toeic			 
 
 			$data['tag_templet'] = $this->all_list->get_tag($kind);
 			$data['score_templet'] = $this->all_list->get_scores_temp($kind);		
@@ -288,7 +297,7 @@ class Text_editor extends CI_Controller {
 			}
 			$editing = str_replace('"', '&quot',$editing); 
 
-			$data['edit_writing'] = preg_replace("/[\n\r]/","<br>",$editing);			
+			$data['edit_writing'] = preg_replace("#(\\\r\\\n|\\\r|\\\n)#","<br>",$editing);			
 
 			$convert = str_replace('"', '&quot',$rows->raw_txt); 
 			$convert = str_replace('’', "'",$convert);
@@ -296,17 +305,17 @@ class Text_editor extends CI_Controller {
 			$convert = str_replace('”', '"',$convert);
 			//”
 			$convert = str_replace('”', '"',$convert);
-			$data['raw_writing'] = preg_replace("/[\n\r]/","<br>", $convert);			
+			$data['raw_writing'] = preg_replace("#(\\\r\\\n|\\\r|\\\n)#","<br>", $convert);			
 			$data['word_count'] = $rows->word_count;
-			$data['re_raw_writing'] = preg_replace("/[\n\r]/","<br>", $convert);			
+			$data['re_raw_writing'] = preg_replace("#(\\\r\\\n|\\\r|\\\n)#","<br>", $convert);			
 			
-			$tagging = str_replace('"','',preg_replace("/[\n\r]/","<br>", $rows->tagging));			
+			$tagging = str_replace('"','',preg_replace("#(\\\r\\\n|\\\r|\\\n)#","<br>", $rows->tagging));			
 			$data['tagging'] = $tagging;
 			
 			$data['writing'] = '';
 			$data['critique'] = str_replace('"','&quot',$rows->critique);
 			$data['id'] = $rows->id;			
-			
+			$data['essay_id'] = $rows->essay_id;
 			$data['type'] = $rows->type;
 
 			if($cate != 'service'){
@@ -314,9 +323,38 @@ class Text_editor extends CI_Controller {
 			}
 			
 			$data['time'] = $rows->time;
-			$data['cate'] = $cate;
+			if ($cate == 'service') {
+				if ($rows->discuss == 'N') {
+					$data['cate'] = 'tbd';
+				} else if ($rows->ex_editing == "" ) {
+					$data['cate'] = 'error';
+				} else {
+					$data['cate'] = $cate;
+				}
+			} else {
+				$data['cate'] = $cate;
+			}
+
 			$data['data_id'] = $data_id;			
 			$data['usr_id'] = $rows->usr_id;
+
+			if ($cate == 'service') {
+				$data['price_kind'] = $rows->price_kind;
+				$data['start_date'] = $rows->start_date;
+				$data['orig_id'] = $rows->orig_essay_id;
+
+				if ($data['orig_id'] == 0 || $data['id'] == $data['orig_id']) {
+					$data['re_submit'] = 'No';
+				} else {
+					$data['re_submit'] = 'Yes';
+				}
+
+				$convert = str_replace('"', '&quot',$rows->reason); 
+				$convert = str_replace('’', "'",$convert);
+				$convert = str_replace('“', '"',$convert);
+				$convert = str_replace('”', '"',$convert);
+				$data['reason'] = $convert;
+			}
 
 			return $data;
 		}		
@@ -369,12 +407,15 @@ class Text_editor extends CI_Controller {
 
 	public function service_comp($service_name,$id,$month,$year){
 		if($this->session->userdata('is_login')){	
-			$data = $this->admin_get_datas('service',$id);					
-
+			
 			$row = $this->all_list->get_serviceId_num($service_name);
 			$service_id = $row->id;
+			
+			$data = $this->admin_get_datas('service',$id, $service_id);	
+
 			$data['service_id'] = $service_id;			
-			$data['service_name'] = $service_name;			
+			$data['service_name'] = $service_name;					
+		
 
 			switch ($month) {
 				case '01' : $str_month = 'January'; break;
@@ -404,7 +445,7 @@ class Text_editor extends CI_Controller {
 		}else{
 			redirect('/');
 		}
-	}		
+	}	
 
 	public function admin_draft_save(){ //<br>을 다시 \r\n으로 // 0
 		if($this->session->userdata('is_login')){						
@@ -444,8 +485,148 @@ class Text_editor extends CI_Controller {
 		}
 	}
 
+	public function admin_service_draft_save(){ //<br>을 다시 \r\n으로 // 0
+		if($this->session->userdata('is_login')){						
+			$data_id = $this->input->POST('data_id');
+			$type = $this->input->POST('type');
+			//$time = $this->input->post('time');
+			$editing = mysql_real_escape_string(trim($this->input->POST('editing')));
+			$critique = mysql_real_escape_string(trim($this->input->POST('critique')));
+			$tagging = mysql_real_escape_string(trim($this->input->POST('tagging')));			
+			$scoring = $this->input->POST('score1');
+			$score2 = $this->input->POST('score2');	
+			$result = $this->service_list->admin_service_tbd_draft($data_id,$type,$editing,$critique,$tagging,$scoring,$score2);
 
+			$json['status'] = $result;			
+		}else{
+			redirect('/');
+		}		
+		$this->output->set_content_type('application/json')->set_output(json_encode($json));	
+	}
+
+	// 1. draft-save, 2. error_chk, 3. submit 
+	public function admin_service_submit(){
+		if($this->session->userdata('is_login')){			
+			//$usr_id = $this->session->userdata('id');
+			$data_id = $this->input->POST('data_id');
+			$type = $this->input->POST('type');
+			log_message('error', '[DEBUG] admin_service_submit data_id ' . $data_id . ', type ' . $type);					
+			//$time = $this->input->post('time');
+			$editing = mysql_real_escape_string(trim($this->input->POST('editing')));
+			$critique = mysql_real_escape_string(trim($this->input->POST('critique')));
+			$tagging = mysql_real_escape_string(trim($this->input->POST('tagging')));			
+			$scoring = $this->input->POST('score1');
+			$score2 = $this->input->POST('score2');
+
+			// first draft-save
+			$result = $this->service_list->admin_service_tbd_draft($data_id,$type,$editing,$critique,$tagging,$scoring,$score2);
+			if (!$result) {
+				$json['result'] = $result;	
+			} else {
+				$rows = $this->service_list->get_one_essay_by_essayid('service',$data_id,$type);
+
+				$id = $rows->id;
+				log_message('error', '[DEBUG] admin_service_submit id ' . $id);
+
+				$errorchk_class = new Errorchk;
+				$error_chk = $errorchk_class->error_chk('once',$id, $type);
+				$json['error_chk'] = $error_chk;	
+					
+				if ($error_chk != 'true') 
+				{
+					$json['result'] = 'error_chk';
+					$json['error_chk'] = $error_chk;
+				}
+				else
+				{
+					$result = $this->service_list->admin_service_tbd_submit($data_id,$type,$editing,$critique,$tagging,$scoring,$score2);
+
+					$json['result'] = $result;
+
+					if ($result) {
+						$essays = $this->service_list->get_essay($id, $type);
+
+						$completed_editing = "";
+
+						$ex_editing = $essays[0]->ex_editing;
+						log_message('error', '[DEBUG] admin_service_submit ex_editing = ' . $ex_editing);
+
+						if ($ex_editing == "")
+						{
+							$json['result'] = false;
+							$this->output->set_content_type('application/json')->set_output(json_encode($json));
+							return;
+						}
+
+						$data = array();
+						$data["id"] = $data_id;
+						$data["editing"] = $editing;
+
+						$completed_editing = $this->get_completed_editing($ex_editing);
+						if ($completed_editing != "")
+						{
+							$data["done"] = $completed_editing;
+						}
+						else
+						{
+							$data["done"] = $editing;
+						}
+						$data["critique"] = $critique;
+						$data["score"] = $scoring;
+						$data["date"] = date("Y-m-d H:i:s", time());
+						$data["file"] = "";
+
+						$sending_data["status"]	= true;
+						$sending_data["data"] = $data;
+
+						$json_data = json_encode($sending_data);
+						log_message('error', $json_data);
+
+						//$access = $this->curl->simple_post('https://edgewriting.net/editor/editing/done', array('token'=>$token, 'id'=>$w_id, 'editing'=>$this->input->POST('editing'), 'critique'=>$this->input->POST('critique')));
+						log_message('error', $json_data);
+						if (IS_SSL) {
+							$this->curl->ssl(FALSE);
+						}
+						$curl_options = array(CURLOPT_CONNECTTIMEOUT => 1, CURLOPT_TIMEOUT => 3);
+						$access = $this->curl->simple_post(EDGE_WRITING_URL . 'editor/editing/done', array('token'=>WRITING_PREMIUM_SECRET_KET, 'id'=>$data_id, 'data'=>$json_data), $curl_options);
+						log_message('error', '[DEBUG] edtiting/done result : ' . $access);	
+
+						$conform = json_decode($access,true);		
+						if($conform['status']){
+							$json['result'] = true;	
+							
+						}else{			
+							$json['result'] = 'curl';							
+						}
+					}
+				}
+			}
+
+			$this->output->set_content_type('application/json')->set_output(json_encode($json));	
+		}else{
+			redirect('/');
+		}
+	}
 	
+	function get_completed_editing($str) {
+		$patterns = array("!<del(.*?)<\/del>!is", 
+					"!<ins>!is", 
+					"!</ins>!is", 
+					"/<mod[^>]+\>/i", 
+					"!</mod>!is");
+
+		$replace = array("", 
+					"", 
+					"", 
+					"", 
+					"");
+
+		$str = preg_replace($patterns, $replace, $str);
+		log_message('error', "[debug] get_completed_editing => $str");
+
+		return $str;
+	}
+
 
 	// public function alldone($id){
 	// 	if($this->session->userdata('is_login')){

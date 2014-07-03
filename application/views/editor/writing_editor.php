@@ -2,40 +2,32 @@
   <div class="row">   
     <ol class="breadcrumb" style="background:white;">
           <li><a href="/">Home</a></li>                   
-          <?php
-            if($cate == 'writing'){
-          ?>
             <li><a href="/service">Service</a></li>                         
-            <li class="akacolor">Writing</li>
-          <?php
-            }elseif($cate == 'todo' || $cate == 'draft'){
-          ?>
-            <li><a href="/musedata/project/">Project</a></li>   
-            <li><a href="/musedata/project/board/<?=$cate;?>/<?=$pj_id?>/<?=$this->session->userdata('id');?>"><?=$pjname;?></a></li>   
-            <li class="akacolor">Todo</li>                         
-          <?php
-            }elseif($cate == 'com'){
-          ?>
-            <li><a href="/musedata/project/">Project</a></li>   
-            <li><a href="/musedata/project/board/<?=$cate;?>/<?=$pj_id?>/<?=$this->session->userdata('id');?>"><?=$pjname;?></a></li>   
-            <li class="akacolor">Completed</li>                         
-          <?php
-            }elseif($cate == 'tbd'){
-          ?>             
-            <li><a href="/musedata/project/">Project</a></li>   
-            <li><a href="/musedata/project/board/<?=$cate;?>/<?=$pj_id?>/<?=$this->session->userdata('id');?>"><?=$pjname;?></a></li>    
-            <li class="akacolor">T.B.D</li>                         
-          <?php
-            }elseif($cate == 'history'){
-          ?>
-            <li><a href="/musedata/project/">Project</a></li>   
-            <li><a href="/musedata/project/board/<?=$cate;?>/<?=$pj_id?>/<?=$this->session->userdata('id');?>"><?=$pjname;?></a></li>   
-            <li class="akacolor">History</li>
-          <?php
-            }                          
-          ?>            
+            <li class="akacolor">Writing</li>          
       </ol> <!-- Navi end -->
   </div>  
+
+<table class="table table-bordered">          
+    <tbody>
+    <tr>
+      <td width="100" style="background-color:rgb(249,249,249)"><b>KIND</b></td>
+      <td width="200"><?=$kind_name?></td>
+      <td width="120" style="background-color:rgb(249,249,249)"><b>Re-Submit</b></td>
+      <td><?php if ($re_submit == 'Yes') { ?> <a href="/writing/view_essay/<?=$orig_id?>/"><?=$re_submit?></a><?php } else { ?> <?=$re_submit?> <?php } ?> </td>
+      <td width="100" style="background-color:rgb(249,249,249)"><b>Date</b></td>
+      <td><?=$start_date?></td>
+    </tr>
+    <?php
+       if ($re_submit == 'Yes') {
+    ?>
+    <tr>
+      <td width="100" style="background-color:rgb(249,249,249)"><b>Reason</b></td>
+      <td colspan="5" id=reason><?=$reason?></td>
+    </tr>
+    <?php
+       }
+    ?>
+  </table>
 
     <!-- <h2 style="margin-top:-10px;">Title</h2>  -->
   <div class="div-box-line-promp">
@@ -327,16 +319,7 @@
     <!-- Submit button -->
     <div style="margin-top:8px;">
       <?php
-      if($this->session->userdata('classify') == 1 && $cate == 'draft' || $cate == 'todo' || $cate == 'pj_draft' || $cate == 'tbd'){     
-      ?>  
-      <button class="btn btn-danger pull-right" id="submit">Submit</button>
-      <button class="btn btn-primary" id="draft">Save Draft</button>
-      <?php  
-      }elseif($this->session->userdata('classify') == 1 && $cate == 'com'){          
-      ?>
-      <button class="btn btn-danger pull-right" id="editSubmit">Submit</button>
-      <?php
-      }elseif($this->session->userdata('classify') == 1 && $cate == 'writing'){
+      if($this->session->userdata('classify') == 1 && $cate == 'writing'){
       ?>  
       <button class="btn btn-danger pull-right" id="w_submit" disabled>Submit</button>
       <button class="btn btn-primary" id="w_draft">Save Draft</button>
@@ -1035,98 +1018,6 @@ function get_save_data(){
 }
 
 
-// 결과 전송
-$('button#draft').click(function(){    
-  var data = get_save_data();
-  console.log(data);
-  
-  $.ajax(
-  {
-    url: '/text_editor/draft_save', // 포스트 보낼 주소
-    type: 'POST',         
-    data: data,
-    dataType: 'json',
-    success: function(json)
-    {      
-      if(json['status'])
-      {
-        // 정상적으로 처리됨
-        alert('It’s been successfully processed!');
-        window.history.back();
-        //location.reload();
-        //window.location.replace('/essaylist'); // 리다이렉트할 주소
-      }
-      else
-      {
-        alert('all_list --> draft DB Error');
-      }
-    }
-  });
-});  
-
-$('button#submit').click(function()
-{ 
-  var data = get_save_data();  
-  data['pj_id'] = '<?=$pj_id;?>';
-  console.log(data);  
-  $.ajax(
-  {
-    url: '/text_editor/submit', // 포스트 보낼 주소
-    type: 'POST',         
-    data: data,
-    dataType: 'json',
-    success: function(json)
-    { 
-      console.log(json['error_chk']);
-      console.log(json['status']);
-
-      if(json['error_chk'] == 'garbage_update_error'){
-        alert('garbage_update_error');
-      }else if(json['error_chk'] == 'final_update_error'){
-        alert('final_update_error');
-      }else{
-        if(json['status'])
-        {
-          // 정상적으로 처리됨
-          alert('It’s been successfully processed!');
-          window.history.back();
-          //window.location.replace('/essaylist'); // 리다이렉트할 주소
-        }else{
-          alert('all_list --> draft DB Error');
-        }  
-      }
-    }
-  });
-});
-
-$('button#editSubmit').click(function()
-{ 
-  var data = get_save_data();  
-  console.log(data);
-  
-  $.ajax(
-  {
-    url: '/text_editor/editsubmit', // 포스트 보낼 주소
-    type: 'POST',         
-    data: data,
-    dataType: 'json',
-    success: function(json)
-    {
-      if(json['status'])
-      {
-        // 정상적으로 처리됨
-        alert('It’s been modified!');
-        window.history.back();
-        //window.location.replace('/essaylist/done'); // 리다이렉트할 주소
-      }
-      else
-      {
-        alert('all_list --> draft DB Error');
-      }
-    }
-  });
-});      
-
 // writing js
 var conf = '';
 var conf_cri = '';
@@ -1148,6 +1039,10 @@ $('#critique').on("propertychange input textInput", function() {
 $('button#w_draft').click(function(){    
   var data = get_save_data();
   data['kind'] = '<?=$kind?>';
+  data['start_date'] = '<?=$start_date?>';
+  data['orig_id'] = '<?=$orig_id?>';
+  data['reason'] = $('td#reason').val();
+  data['price_kind'] = '<?=$price_kind?>';
   data['raw_writing'] = $('input#raw_writing').val();
   data['title'] = $('input#h_title').val();
   data['word_count'] = '<?=$word_count?>';
@@ -1181,12 +1076,16 @@ $('button#w_draft').click(function(){
 // Service Submit.
 $("button#w_submit").click(function(){    
 
-  var data = get_save_data();  
-  data['token'] = '<?=$token;?>';  
+  var data = get_save_data(); 
+  data['token'] = '<?=$token;?>';
+  data['start_date'] = '<?=$start_date?>';
   data['kind'] = '<?=$kind?>';
   data['raw_writing'] = $('input#raw_writing').val();
   data['title'] = $('input#h_title').val();
   data['word_count'] = '<?=$word_count?>';
+  data['orig_id'] = '<?=$orig_id?>';
+  data['reason'] = $('td#reason').val();;
+  data['price_kind'] = '<?=$price_kind?>';
   console.log(data);
 
   $.ajax({    
@@ -1231,48 +1130,25 @@ $("button#w_submit").click(function(){
   });       
 });
 
-//Error List button
-$('button#errorlist').click(function(){
-  console.log('error');
-  var error_data = {
-    data_id: <?=$id;?>    
-  }
-  console.log(error_data);
-  $.post('/musedata/project/error',error_data,function(json){            
-      if(json['result']){
-          window.location = "/musedata/project/board/<?=$cate;?>/<?=$pj_id?>/<?=$this->session->userdata('id')?>";
-      }else{
-        alert('DB Error --> error_proc');
-      }
-  });
-});
-
-// To be discuss button
-$('button#discuss').click(function(){  
-  var data = {            
-    data_id : <?=$id;?>    
-  }  
-  console.log(data);
-  $.post('/musedata/project/discuss',data,function(json){          
-    if(json['result']){        
-        window.location = "/musedata/project/board/<?=$cate;?>/<?=$pj_id?>/<?=$this->session->userdata('id')?>";
-    }else{
-      alert('DB Error --> error_proc');
-    }
-  });
-});
 
 // To be discuss button
 $('button#w_discuss').click(function(){  
-  var data = {
-    token : '<?=$token;?>', 
-    data_id : <?=$id;?>    
-  }  
+    var data = get_save_data();
+  data['token'] = '<?=$token?>';
+  data['kind'] = '<?=$kind?>';
+  data['start_date'] = '<?=$start_date?>';
+  data['orig_id'] = '<?=$orig_id?>';
+  data['reason'] = $('td#reason').val();;
+  data['price_kind'] = '<?=$price_kind?>';
+  data['raw_writing'] = $('input#raw_writing').val();
+  data['title'] = $('input#h_title').val();
+  data['word_count'] = '<?=$word_count?>';
+
   console.log(data);
   $.post('/service/discuss',data,function(json){          
     if(json['result']){
-        alert(json['result']);        
-        //window.history.back();
+        alert("T.B.D Success ");        
+        window.location = "/service"
     }else{
       alert('DB Error --> error_proc');
     }

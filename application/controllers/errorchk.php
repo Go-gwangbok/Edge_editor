@@ -61,12 +61,12 @@ class Errorchk extends CI_Controller {
 		$text_array = explode($needle1, $original_text);
 		$arr = array();
 		for($i=1; $i<sizeof($text_array); $i++) {
-			$arr[] = trim(substr($text_array[$i], 0, strpos($text_array[$i], $needle2)));
+			//$arr[] = trim(substr($text_array[$i], 0, strpos($text_array[$i], $needle2)));
+			$arr[] = substr($text_array[$i], 0, strpos($text_array[$i], $needle2));
 		}
 
 		return $arr;		
 	}		
-
 
 	/* Option 'once' == 하나의 에세이만 검사  'all' == 여러개 검사. */
 	public function error_chk($option, $data_id, $type = 1){ //0 member_list
@@ -80,6 +80,7 @@ class Errorchk extends CI_Controller {
 			foreach ($essays as $values) {
 				$editing = $values->editing;
 				$data_id = $values->id; // Data_id.
+				log_message('error', '[DEBUG] 1. error_chk : ' . $editing);
 
 				$editing = $this->garbageTag_replace($editing);
 
@@ -87,7 +88,8 @@ class Errorchk extends CI_Controller {
 				$garbage_data_del = mysql_real_escape_string($editing);
 				$garbage_update = $this->all_list->garbage_data_del($data_id,$garbage_data_del, $type);				
 
-				if($garbage_update){				
+				if($garbage_update){
+					log_message('error', '[DEBUG] 2. error_chk : ' . $editing);				
 					$s_tagmatch = preg_match('/<s>/',$editing);	
 
 					if($s_tagmatch > 0){ // preg_match return true == 1 or false == 0
@@ -131,7 +133,7 @@ class Errorchk extends CI_Controller {
 							else if (trim($token[0]) == "" || trim($token[1] == ""))
 							{
 								array_push($error_array_temp, '&ltu&gt'.$value.'&lt/u&gt');
-								// log_message('error', "[error] <u> tagging error : $value");								
+								log_message('error', "[error] <u> tagging error : $value");								
 							}
 
 							/***
@@ -152,13 +154,15 @@ class Errorchk extends CI_Controller {
 						}	
 
 						// 에디팅 한것중에 전체 slash 카운트.
-						preg_match_all('/\/\//', $editing, $matches); //  '//' slash count
+						$slash = preg_match_all('/\/\//', $editing, $matches); //  '//' slash count
 						$match = preg_match('/\/\/\/\//', $editing); // <u>문자////문자</u> -- Error
+
 
 						// <u> 태그와 // 태그 카운터가 같아야 한다! 아니면 에러!				
 						if(count($matches[0]) != count($content_count) || $match == 1){ 
-							// Error											
-							array_push($error_array_temp, $data_id);						
+							// Error
+							$error_msg = "mismatched tag count: u(mod) tag count (" . count($content_count) . ") // slash count (" . $slash . ")";
+							array_push($error_array_temp, $error_msg);
 						}		
 
 						// mod ins del 태그로 변형하기전에 모든 다른 태그 삭제한 데이터!
@@ -170,17 +174,20 @@ class Errorchk extends CI_Controller {
 						// 태그 변형!
 						foreach ($done_content as $value) {														
 							$explode = explode('//', $value); 													
-							$editing = str_replace('<u>'.$explode[0].'//', '<mod target = '.$explode[0].'>', $editing);							
+							$editing = str_replace('<u>'.$explode[0].'//', '<mod target = '. trim($explode[0]).'>', $editing);							
 							$editing = preg_replace('/<\/u>/','</mod>',$editing); // second word.				
 						}			
 						$patterns = array("(<strike>)","(</strike>)","(<b>)","(</b>)");
 						$replace = array("<del>","</del>","<ins>","</ins>");
 						$editing = preg_replace($patterns, $replace, $editing);	// result = ["<mod>to//that</mod>", "<mod>investing money//city investments</mod>"]
 						
+
 						// 마지막에 replace가 되지 않으면, error로 판별한다! 
+						log_message('error', '[DEBUG] 3. error_chk : ' . $editing);	
 						preg_match_all('/<u>/', $editing, $not_replace);
 						if(count($not_replace[0]) > 0){
-							array_push($error_array_temp, $data_id);							
+							log_message('error', "u tagging error ");
+							array_push($error_array_temp, "u(mod) tagging error");							
 						}		
 						
 					} // Else if End
@@ -240,16 +247,18 @@ class Errorchk extends CI_Controller {
 			
 			$editing = $this->input->post('data');
 			$data_id = $this->input->post('data_id');
-			$type = $this->input->post('type');						
+			$type = $this->input->post('type');
 
-			//log_message('error', '[debug] 1. error_chk_post edting : ' . $editing);
+			log_message('error', '[debug] 1. error_chk_post data_id : ' . $data_id);						
+
+			log_message('error', '[debug] 1. error_chk_post edting : ' . $editing);
 			$editing = $this->garbageTag_replace($editing);
-			//log_message('error', '[debug] 2. error_chk_post edting : ' . $editing);
+			log_message('error', '[debug] 2. error_chk_post edting : ' . $editing);
 
 			// Garbage Tag 삭제후 업데이트 해준다!			
 			$garbage_data_del = mysql_real_escape_string($editing);
-			//log_message('error', '[debug] 3. error_chk_post garbage_data_del : ' . $garbage_data_del);
-			$this->all_list->garbage_data_del($data_id,$garbage_data_del);
+			log_message('error', '[debug] 3. error_chk_post garbage_data_del : ' . $garbage_data_del);
+			$this->all_list->garbage_data_del($data_id,$garbage_data_del, $type);
 			//$this->all_list->garbage_data_del($data_id,$type,$garbage_data_del);				
 
 			$s_tagmatch = preg_match('/<s>/',$editing);	
@@ -365,6 +374,7 @@ class Errorchk extends CI_Controller {
 		}else{
 			redirect('/');
 		}
+		log_message('error', json_encode($json));
 		$this->output->set_content_type('application/json')->set_output(json_encode($json));	
 	}
 

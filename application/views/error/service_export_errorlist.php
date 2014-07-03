@@ -31,6 +31,7 @@
 		<!-- ajax list -->
 	</div>	
 <script type="text/javascript">
+var service_id = '<?=$service_id;?>';
 var cate = '<?=$cate;?>';
 var page = '<?=$page;?>';
 var list = '<?=$list;?>';
@@ -40,6 +41,7 @@ var year = '<?=$year;?>';
 
 $(document).ready(function(){		
 	var values = {
+		service_id : service_id,
 		month : month,
 		year : year,				
 		page : page
@@ -56,12 +58,13 @@ $('div#pageblock').delegate('button#p_button', 'click', function(){
 	var page_num = $(this).attr('page_num');
 	console.log(page_num);
 	data ={
+		service_id : service_id,
 		page : page_num,
 		list : list,	
 		year : year,
 		month : month		
 	}
-	console.log(data);	
+	console.log(data);
 	url = '/service/service_export_errorlist';
 	ajaxPost(url,data); //page list.
 });

@@ -7,7 +7,7 @@
 	    </ol>	    
 	    <label class="pull-right" style="margin-right:10px;" id="total">Total : <?=$total;?>&nbsp;&nbsp;</label>				
 	    <h3 class="text-center"><?=$str_month;?></h3>	    
-	    <a href="/errordata/service_export_error/<?=$month;?>/<?=$year;?>"><button class="btn btn-danger pull-left" id="errorbtn" style="margin-top:-10px; margin-left:15px;">Error List<span class="badge" style="background-color:transparent;"><?=$total-$export_count;?></span></button></a>
+	    <a href="/errordata/service_export_error/<?=$service_id;?>/<?=$month;?>/<?=$year;?>"><button class="btn btn-danger pull-left" id="errorbtn" style="margin-top:-10px; margin-left:15px;">Error List<span class="badge" style="background-color:transparent;"><?=$total-$export_count;?></span></button></a>
 		<button class="btn btn-danger pull-right" id="allexport" style="margin-top:-10px; margin-right:15px;"> Export <span class="badge" id="allcount" style="background-color:transparent;"><?=$export_count;?></span><span class="glyphicon glyphicon-download"></span></button>		
 	</div> <!-- Div row -->
 	<br>
@@ -49,6 +49,8 @@
 	<!-- Loading Modal End -->
 
 <script type="text/javascript">
+var service_name = '<?=$service_name;?>';
+var service_id = '<?=$service_id;?>';
 var page = '<?=$page;?>';
 var list = '<?=$list;?>';
 var data = '';
@@ -80,7 +82,7 @@ function ajaxPost(url,data){
 				var date = data_list[i]['sub_date'];
 			}
 			
-			$('tbody#list').append('<tr class="com" id='+i+' style="cursor:pointer;" href="/text_editor/service_comp/export/'+essay_id+'/'+task+'/'+month+'/'+year+'"><td>'+num+'</td><td>'																				 
+			$('tbody#list').append('<tr class="com" id='+i+' style="cursor:pointer;" href="/text_editor/service_comp/'+service_name+'/'+essay_id+'/'+task+'/'+month+'/'+year+'"><td>'+num+'</td><td>'																				 
 					+data_list[i]['prompt'].replace(/"/gi,'')+'</td><td>'
 					+data_list[i]['name']+'</td><td>'
 					+data_list[i]['kind']+'</td><td>'
@@ -143,6 +145,7 @@ function pageBlock(page,list,data_count){
 
 $(document).ready(function(){	
 	data = {
+		service_id : service_id,
 		page : page,		
 		year : year,	
 		month : month
@@ -161,6 +164,7 @@ $('div#pageblock').delegate('button#p_button', 'click', function(){
 	console.log(mems);
 
 	data ={
+		service_id : service_id,
 		page : page_num,		
 		year : year,	
 		month : month		
@@ -247,7 +251,8 @@ $('button#sorting').click(function(){
 
 $('button#allexport').click(function(){		
 	
-	data = {		
+	data = {
+		service_id : service_id,
 		year : year,
 		month : month
 	}

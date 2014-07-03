@@ -37,5 +37,13 @@ define('FOPEN_WRITE_CREATE_STRICT',				'xb');
 define('FOPEN_READ_WRITE_CREATE_STRICT',		'x+b');
 
 
+
+define('IS_SSL', true);
+define('EDGE_WRITING_URL',	'https://edgewritings.com/');
+#define('EDGE_WRITING_URL',	'http://192.168.219.144/');
+#define('EDGE_WRITING_URL',	'https://edgewritings.com/');
+define('WRITING_PREMIUM_SECRET_KET', 'isdyf3584MjAI419BPuJ5V6X3YT3rU3C');
+
+
 /* End of file constants.php */
 /* Location: ./application/config/constants.php */

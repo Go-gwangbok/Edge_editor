@@ -34,7 +34,7 @@ $(document).ready(function(){
 	console.log(editing);
 	var data = {
 		data : editing,
-		essay_id : essay_id,
+		data_id : essay_id,
 		type : type
 	}
 	
@@ -64,7 +64,7 @@ $("#submit").click(function(){
 	var editing = $('textarea').val();
 	var data = {
 		data : editing,
-		essay_id : essay_id,
+		data_id : essay_id,
 		type : type
 	}
 	//console.log(data);
@@ -73,7 +73,7 @@ $("#submit").click(function(){
 		var result = json['result'];
 		console.log(result);		
 		if(result == true){ // Error
-			window.location = '/errordata/service_export_error/<?=$month;?>/<?=$year;?>';
+			window.location = '/errordata/service_export_error/<?=$type;?>/<?=$month;?>/<?=$year;?>';
 		}else{ // Done				
 			
 			$('#error').empty();							

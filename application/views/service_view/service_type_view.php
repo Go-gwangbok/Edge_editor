@@ -1,14 +1,16 @@
 <div class="container" style="margin-top:-15px;">   
-    <div class="row">       
+    <div class="row">      
         <ol class="breadcrumb" style="background:white;">
         <li><a href="/">Home</a></li>        
         <li><a href="/service">Service</a></li>   
         <li class="akacolor"><?=ucfirst($service_name);?></li>
       </ol>
+        
       <h3 style="margin-left:13px;">Service</h3>
       <!-- <button class="btn btn-default" id="merge">Table Merge</button>       -->
-    </div> 
+    </div>
     <div class="col-md-12 text-center" style="margin-top:-43px;">
+        <button type="button" class="btn btn-primary" id="premium">Premium</button>
         <select>   
         <?php
         foreach ($all_year as $value) {
@@ -18,9 +20,10 @@
         <?php
         }
         ?>  
-        </select>           
+        </select>
     </div>
     <br>
+
     <!-- <span class="stat-count">1000</span> -->
     <div class="row" id="month">
         <!-- Ajax -->
@@ -40,8 +43,10 @@ function months_list(yen){
         $.each(data,function(i,value){
             var month = value['month'].substr(5); // 2014-01                      
             var int_month = value['month'].substr(5); // 2014-01                      
-            var month_total = value[month+'month'];
+            //var month_total = value[month+'month'];
             var year = value['month'].substr(0,4); // 2014-01           
+            var month_total = value['count'];
+            var tbd_count = value['tbd_count'];
 
             switch(month){
                 case '01' : month = 'January'; break;
@@ -62,10 +67,14 @@ function months_list(yen){
                                     +'<div class="col-lg-12 line">'
                                         +'<h4 style="margin-top:10px;" class="service_font"><span class="glyphicon glyphicon-calendar"></span> '+month+'</h4>'
                                     +'</div>'
-                                    +'<div class="col-lg-12 service_bg service_btn" href="/service/enter/'+service_name+'/'+int_month+'/'+year+'" id="enter">'
-                                        +'<font class="font-white" id="stat-count">'+month_total+'</font>'
+                                    +'<div class="col-lg-6 service_bg service_btn-export" href="/service/enter/'+service_name+'/'+int_month+'/'+year+'" id="enter">'
+                                        +'<font class="font-white" id="stat-count">Total<br>'+month_total+'</font>'
                                     +'</div>'
-                                    +'<div class="col-lg-6 service_bg service_btn-export" href="/service/export/'+int_month+'/'+year+'" id="export">'
+                                    +'<div class="col-lg-6 service_bg service_btn-stats" href="/service/tbd/'+service_name+'/'+int_month+'/'+year+'" id="enter">'
+                                        +'<font class="font-white" id="stat-count">TBD<BR>'+tbd_count+'</font>'
+                                    +'</div>'
+ 
+                                    +'<div class="col-lg-6 service_bg service_btn-export" href="/service/export/'+service_name+'/'+int_month+'/'+year+'" id="export">'
                                         +'<font class="font-white">Export</font>'
                                     +'</div>'
                                     +'<div class="col-lg-6 service_bg service_btn-stats" href="#" id="stats">'
@@ -112,5 +121,8 @@ $('#merge').click(function(){
     });
 });
 
+$('button#premium').click(function(){ 
+    window.document.location = "/writing/premium/";
+});  
 
 </script>

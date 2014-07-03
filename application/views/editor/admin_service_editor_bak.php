@@ -1,41 +1,20 @@
 <div class="container" style="margin-top:-15px;">
-  <div class="row">       
+  <div class="row">   
     <ol class="breadcrumb" style="background:white;">
-        <li><a href="/">Home</a></li>
+        <li><a href="/">Home</a></li>                   
         <li><a href="/service/">Service</a></li>
-        <li><a href="/service/serviceType/<?=$service_name;?>"><?=ucfirst($service_name);?></a></li> 
+        <li><a href="/service/serviceType/<?=$service_name;?>"><?=ucfirst($service_name);?></a></li>   
+        <li><a href="/service/enter/<?=$service_name;?>/<?=$month?>/<?=$year;?>"><?=$year.' - '.$str_month?></a></li>   
         <?php if ($cate == 'tbd') { ?>
           <li  class="akacolor">T.B.D</li>   
         <?php } else if ($cate == "error") { ?>
           <li  class="akacolor">Error</li>   
         <?php } else { ?>
           <li  class="akacolor">Completed</li>   
-        <?php } ?>      
+        <?php } ?>
+        <!--li class="akacolor"><?=ucfirst($kind_name);?></li-->
       </ol> 
-  </div> <!-- Navi end -->
-
-  <table class="table table-bordered">          
-    <tbody>
-    <tr>
-      <td width="100" style="background-color:rgb(249,249,249)"><b>KIND</b></td>
-      <td width="200"><?=$kind_name?></td>
-      <td width="120" style="background-color:rgb(249,249,249)"><b>Re-Submit</b></td>
-      <td><?=$re_submit?></td>
-      <td width="100" style="background-color:rgb(249,249,249)"><b>Date</b></td>
-      <td><?=$start_date?></td>
-    </tr>
-    <?php
-       if ($re_submit == 'Yes') {
-    ?>
-    <tr>
-      <td width="100" style="background-color:rgb(249,249,249)"><b>Reason</b></td>
-      <td colspan="5"><?=$reason?></td>
-    </tr>
-    <?php
-       }
-    ?>
-  </table>
-
+  </div> <!-- Navi end -->      
   <div class="div-box-line-promp">
     <dl>
         <dt style="margin:0 10px 0 10px">Prompt</dt>              
@@ -81,18 +60,13 @@
     }
     ?>
     <!-- Default -->    
-    <div id="stopwatch" class="btn btn-default pull-right" disabled>Timer : 00:00</div>       
-    <div class="btn btn-default pull-right" style="margin-right:3px;" disabled>Word count : <?=$word_count?></div>      
-        
+    <div id="stopwatch" class="btn btn-default pull-right" disabled>Timer : 00:00 </div>       
+    <div class="btn btn-default pull-right" style="margin-right:3px;" disabled>Word count : <?=$word_count?></div>       
     <?php
     if($cate == 'error'){
     ?>
     <button class="btn btn-md btn-danger pull-right" id="not_error" style="margin-right:5px;">Return</button>
     <button class="btn btn-md btn-danger pull-right" id="yes" style="margin-right:5px;">Yes</button>     
-    <?php
-    } elseif($cate == 'tbd'){
-    ?>
-        <button class="btn btn-warning pull-right"  style="margin-right:5px;" id="errorchk">Error Check </button>  
     <?php
     }
     ?>    
@@ -113,8 +87,8 @@
         <br>      
       </div>  <!-- col-md-12 -->
     </div> <!-- tab-pane -->
-  <?php } ?>
-  <!-- Original end -->
+    <?php } ?>
+    <!-- Original end -->
 
     <!-- Error detecting -->
     <?php
@@ -131,27 +105,27 @@
             <a class="btn" data-edit="strikethrough" title="Strikethrough" disabled><span class="glyphicon glyphicon-trash"></span> DEL</a>                
             <a class="btn" data-edit="underline" title="Underline (Ctrl/Cmd+U)" disabled><span class="glyphicon glyphicon-refresh"></span> MOD</a>        
             <a class="btn" data-edit="bold" title="Bold (Ctrl/Cmd+B)" disabled><span class="glyphicon glyphicon-pencil"></span> INS</a>            
-          </div>   
+          </div>
 
           <div class="btn-group pull-right">
             <a class="btn" data-edit="undo" title="Undo (Ctrl/Cmd+Z)" disabled><i class="icon-undo"></i></a>
             <a class="btn" data-edit="redo" title="Redo (Ctrl/Cmd+Y)" disabled><i class="icon-repeat"></i></a>
-          </div>  
+          </div>            
         <?php
          }else{ // Cate == T.B.D
         ?>
 
-        <div id = "error"></div>
+        <div id = "error">aaa</div>
 
         <div class="btn-group">
           <a class="btn" data-edit="strikethrough" title="Strikethrough"><span class="glyphicon glyphicon-trash"></span> DEL</a>                
           <a class="btn" data-edit="underline" title="Underline (Ctrl/Cmd+U)" ><span class="glyphicon glyphicon-refresh"></span> MOD</a>        
           <a class="btn" data-edit="bold" title="Bold (Ctrl/Cmd+B)" ><span class="glyphicon glyphicon-pencil"></span> INS</a>            
         </div>
-
+        
         <div class="btn-group pull-right">
-            <a class="btn" data-edit="undo" title="Undo (Ctrl/Cmd+Z)" ><i class="icon-undo"></i></a>
-            <a class="btn" data-edit="redo" title="Redo (Ctrl/Cmd+Y)" ><i class="icon-repeat"></i></a>
+          <a class="btn" data-edit="undo" title="Undo (Ctrl/Cmd+Z)" ><i class="icon-undo"></i></a>
+          <a class="btn" data-edit="redo" title="Redo (Ctrl/Cmd+Y)" ><i class="icon-repeat"></i></a>
         </div> 
         <?php
          }
@@ -159,7 +133,7 @@
         </div> <!-- btn-toolbar -->      
         <!-- Error detecting -->
         <div id="editor">          
-          <?php
+          <?php          
               echo trim($edit_writing);
           ?>      
         </div>
@@ -195,14 +169,14 @@
     if($chk_structure == 'Y'){
     ?>      
     <div class="tab-pane div-box-line" id="structure">
-      <!--<div class="div-box-line">-->
-      <div class="col-md-12">           
-        <div class="col-md-12" style="margin-top:10px;"> 
+        <!--<div class="div-box-line">-->
+        <div class="col-md-12">           
+          <div class="col-md-12" style="margin-top:10px;"> 
 
-          <div class="col-md-12"> 
-            <div class="col-md-12" style="margin-top:20px; text-align:center" id="confbox">
-              <h5>Confirm&nbsp;&nbsp;   
-               <?php
+            <div class="col-md-12"> 
+              <div class="col-md-12" style="margin-top:20px; text-align:center" id="confbox">
+                <h5>Confirm&nbsp;&nbsp;    
+                  <?php
                 foreach ($tag_templet as $value) {
                   $tag_id = $value->tag_id;
                   $tag_name = $value->tag;
@@ -210,125 +184,119 @@
                 ?>
                 <button id="block" tag="<?=$tag_name;?>" type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-tasks"></span> <?=strtoupper($appear_tag);?></button>
                 <?php } ?>                      
-                <!-- <button id="block" tag="in" type="button" class="btn btn-default btn-sm" data-toggle="button"><span class="glyphicon glyphicon-tasks"></span> IN</button> -->                  
-              </h5>
+                </h5>
+              </div>
+              <hr style="border:1px dashed; border-color: #d6e9c6;">                         
+            </div>        
+                      
+            <?php
+            foreach ($tag_templet as $value) {
+              $tag_id = $value->tag_id;
+              $tag_name = $value->tag;
+              $appear_tag = $value->appear;
+            ?>
+            <button id="tag" tag="<?=strtolower($tag_name);?>" appear="<?=strtoupper($appear_tag);?>" type="button" class="btn btn-success btn-sm">&lt;<?=strtoupper($appear_tag);?>&gt;</button>
+            <?php } ?>            
+
+            <button id="all" type="button" class="btn btn-default btn-danger btn-sm pull-right" click="clear"><span class="glyphicon glyphicon-refresh"></span> Clear All</button>            
+            <button id="redo" type="button" class="btn btn-default btn-sm pull-right" style="margin-right:5px;"><span class="glyphicon glyphicon-refresh"></span> Redo</button>
+            <button id="undo" type="button" class="btn btn-default btn-sm pull-right" style="margin-right:5px;"><span class="glyphicon glyphicon-refresh"></span> Undo</button>            
+   
+          </div>  <!-- col-md-12 -->
+        </div> <!-- col-md-12 -->              
+        <hr class="text-box-hr">              
+        <div class="col-md-12" id="hrline">                              
+          <div class="divtagging_box" id="tagging_box"><?=trim($tagging);?></div>                    
+        </div>        
+      </div>  
+      <?php } ?>
+      <!-- Tagging End --> 
+
+      <?php
+      if($chk_sco1 == 'Y'){
+      ?>          
+      <!-- Score1 start -->   
+      <div class="tab-pane div-box-line " id="sco1">
+        <br>    
+        <div class="col-md-12 ">           
+          <div class="col-md-12 ">                         
+            <div class="col-md-12 ">  
+            <?php
+            foreach ($score_templet as $value) {
+              $score_id = $value->score_id;
+              $score_name = $value->name;
+            ?>
+            <div class="row" style="margin-bottom:10px;">  
+              <label for="inputEmail3" class="col-md-2 "><?=strtoupper($score_name)?></label>
+              <div class="col-md-2">
+                <input type="text" class="form-control score_val1" id="<?=strtolower($score_name);?>1" placeholder="0">
+              </div>
             </div>
-           <hr style="border:1px dashed; border-color: #d6e9c6;">                         
-          </div>       
-
-          <?php
-          foreach ($tag_templet as $value) {
-            $tag_id = $value->tag_id;
-            $tag_name = $value->tag;
-            $appear_tag = $value->appear;
-          ?>
-          <button id="tag" tag="<?=strtolower($tag_name);?>" appear="<?=strtoupper($appear_tag);?>" type="button" class="btn btn-success btn-sm">&lt;<?=strtoupper($appear_tag);?>&gt;</button>
-          <?php } ?>       
-               
-          <button id="all" type="button" class="btn btn-default btn-danger btn-sm pull-right" click="clear"><span class="glyphicon glyphicon-refresh"></span> Clear All</button>            
-          <button id="redo" type="button" class="btn btn-default btn-sm pull-right" style="margin-right:5px;"><span class="glyphicon glyphicon-refresh"></span> Redo</button>
-          <button id="undo" type="button" class="btn btn-default btn-sm pull-right" style="margin-right:5px;"><span class="glyphicon glyphicon-refresh"></span> Undo</button>            
- 
-        </div>  <!-- col-md-12 -->
-      </div> <!-- col-md-12 -->              
-      <hr class="text-box-hr">              
-    <div class="col-md-12" id="hrline">                          
-      <div class="divtagging_box" id="tagging_box"><?=trim($tagging);?></div>                
-    </div>        
-  </div>   
-  <?php } ?>
-  <!-- Tagging End -->
-
-  <?php
-  if($chk_sco1 == 'Y'){
-  ?>          
-  <!-- Score1 start -->   
-  <div class="tab-pane div-box-line " id="sco1">
-    <br>    
-    <div class="col-md-12 ">           
-      <div class="col-md-12 ">                         
-        <div class="col-md-12 ">  
-          <?php
-          foreach ($score_templet as $value) {
-            $score_id = $value->score_id;
-            $score_name = $value->name;
-          ?>
-          <div class="row" style="margin-bottom:10px;">  
-            <label for="inputEmail3" class="col-md-2 "><?=strtoupper($score_name)?></label>
-            <div class="col-md-2">
-              <input type="text" class="form-control score_val1" id="<?=strtolower($score_name);?>1" placeholder="0">
+            <?php } ?>                                                 
             </div>
           </div>
-          <?php } ?>                                  
-        </div>
-      </div>
-    </div>               
-  </div>  
-  <?php } ?>
-  <!-- Score1 End --> 
+        </div>               
+      </div> 
+      <?php } ?>
+      <!-- Score1 End -->   
 
-  <!-- Score2 start -->   
-  <?php
-  if($chk_sco2 == 'Y'){
-  ?>      
-  <div class="tab-pane div-box-line " id="sco2">
-    <br>    
-    <div class="col-md-12 ">           
-      <div class="col-md-12 ">                         
-        <div class="col-md-12 ">  
+      <!-- Score2 start -->   
+      <?php
+      if($chk_sco2 == 'Y'){
+      ?>
+      <div class="tab-pane div-box-line" id="sco2">
+        <br>    
+        <div class="col-md-12 ">           
+          <div class="col-md-12 ">                         
+            <div class="col-md-12 ">  
+            <?php
+            foreach ($score_templet as $value) {
+              $score_id = $value->score_id;
+              $score_name = $value->name;
+            ?>
+            <div class="row" style="margin-bottom:10px;">  
+              <label for="inputEmail3" class="col-md-2 "><?=strtoupper($score_name)?></label>
+              <div class="col-md-2">
+                <input type="text" class="form-control score_val2" id="<?=strtolower($score_name);?>2" placeholder="0">
+              </div>
+            </div>
+            <?php } ?>                 
+            </div>
+          </div>
+        </div>              
+      </div>  
+      <?php } ?>
+      <!-- Score2 End -->
+
+      <!-- Submit button -->
+      <div style="margin-top:8px;">
         <?php
-        foreach ($score_templet as $value) {
-          $score_id = $value->score_id;
-          $score_name = $value->name;
-        ?>
-        <div class="row" style="margin-bottom:10px;">  
-          <label for="inputEmail3" class="col-md-2 "><?=strtoupper($score_name)?></label>
-          <div class="col-md-2">
-            <input type="text" class="form-control score_val2" id="<?=strtolower($score_name);?>2" placeholder="0">
-          </div>
-        </div>
-        <?php } ?>                 
-        </div>
-      </div>
-    </div>              
-  </div>  
-  <?php } ?>
-  <!-- Score2 End -->
-
-  <!-- Submit button -->
-  <div style="margin-top:8px;">
-    <?php
-    if($cate == 'tbd'){
-    ?>
-    <button class="btn btn-primary" id="draft">Save Draft</button>
-    <button class="btn btn-danger pull-right" id="submit" disabled>Submit</button>
-
-    <?php  
-    }
-    ?>        
-  </div> 
-  <!-- Submit button end -->
-  
-    <!-- hidden data -->
-    <form> 
-      <input type="hidden" id="raw_writing" value="<?=$writing;?>">
-      <input type="hidden" id="re_raw_writing" value="<?=$re_raw_writing;?>">
-      <input type="hidden" id="edit_writing" value="<?=$edit_writing;?>">
-      <input type="hidden" id="writing" value="<?=$writing;?>">
-      <input type="hidden" id="h_critique" value="<?=$critique;?>">      
-      <input type="hidden" id="h_tagging" value="<?=$tagging;?>">
-      <!--
-      <input type="hidden" id="score_templet" value="<?=$score_templet;?>">      
-      -->
-    </form>  
+        if($cate == 'tbd'){     
+        ?>  
+        <button class="btn btn-danger pull-right" id="submit">Submit</button>
+        <button class="btn btn-primary" id="draft">Save Draft</button>
+        <?php  
+        }
+        ?>        
+      </div> 
+      <!-- Submit button end -->
+      <!-- hidden data -->
+      <form> 
+        <input type="hidden" id="raw_writing" value="<?=$writing;?>">
+        <input type="hidden" id="re_raw_writing" value="<?=$re_raw_writing;?>">
+        <input type="hidden" id="edit_writing" value="<?=$edit_writing;?>">
+        <input type="hidden" id="writing" value="<?=$writing;?>">
+        <input type="hidden" id="h_critique" value="<?=$critique;?>">      
+        <input type="hidden" id="h_tagging" value="<?=$tagging;?>">
+        <input type="hidden" id="score_templet" value="<?=$score_templet;?>">      
+      </form>  
   </div>  
 </div>   
 <script src="/public/js/jquery.timer.js"></script>
 <script src="/public/wy/external/jquery.hotkeys.js"></script>   
 <script src="/public/wy/external/google-code-prettify/prettify.js"></script> 
 <script src="/public/wy/bootstrap-wysiwyg.js"></script>
-<script type="text/javascript" >
-var is_error = false;
+<script type="text/javascript">
 var chk_orig = '<?=$chk_orig;?>';
 var chk_detection = '<?=$chk_detection;?>';
 var chk_structure = '<?=$chk_structure;?>';
@@ -340,8 +308,7 @@ var draft_time = <?=$time;?>;
 var score = '<?=$score1?>';
 var score_second = '<?=$score2?>';
 console.log(cate);
-//console.log(score);
-
+console.log(score);
 
 var tagging_action_array = new Array();  
 $(document).ready(function(){
@@ -354,6 +321,7 @@ $(document).ready(function(){
   $.each(score_array,function(i,value){
     var each_val = value;
     var score_name = each_val.split(':');
+    //console.log(score_name[1]);
     $('div').find('input#'+score_name[0].toLowerCase()+'1').val(score_name[1]);    
   }); 
 
@@ -376,7 +344,7 @@ $(document).ready(function(){
     // <IN></IN>, <TR></TR>... 기존에 있던 태그 삭제 후 Mapping한다.       
     $.each(tagOrg,function(i,value){
       var className = value;          
-      var spanCount = $('span.'+className).length;    
+      var spanCount = $('span.'+className).length;
       var span_str = '<span class="'+className+'">';
       
       for(j = 0; j < spanCount; j++){
@@ -392,7 +360,7 @@ $(document).ready(function(){
             taggingData = taggingData.replace(span_str + $('span.'+className+':eq('+j+')').html(), span_str + '&lt;'+tagAppear[i]+'&gt;'+get_span_replace+'&lt;/'+tagAppear[i]+'&gt;');
           }else{
             taggingData = taggingData.replace(span_str + $('span.'+className+':eq('+j+')').html(), span_str + '&lt;'+tagAppear[i]+(j+1)+'&gt;'+get_span_replace+'&lt;/'+tagAppear[i]+(j+1)+'&gt;');
-          }             
+          }        
           $.trim($('div#tagging_box').html(taggingData));          
         }else{
           taggingData = taggingData.replace('&lt;'+tagAppear[i]+'&gt;',''); // 앞 태그
@@ -409,80 +377,13 @@ $(document).ready(function(){
   tagging_action_array.push($('div#tagging_box').html());  
   $('button#undo').attr('disabled',true);    
   $('button#redo').attr('disabled',true);  
-
-  if(cate == 'tbd'){
-    errorChecking();
-  }
-
 }); // Ready end.
-
-
-function check_submit() {
-  var charLimit = 10;
-  var critique = $('textarea#critique').val();  
-  var remaining = charLimit - critique.replace(/\s+/g," ").length;
-  
-   if (remaining < charLimit && remaining > 0) {
-    return false;
-   }
-   if (is_error == true) {
-    return false;
-   } else {
-    return true;
-   }
-}
 
 if(cate == 'writing'){
   clearInterval(service_chk); //realtime service chk clear.  
   console.log('stop');
 }
 
-function errorChecking() {
-  var erchk_data = {
-    data : $.trim($('div#editor').html()),
-    data_id : <?=$id;?>,
-    type : <?=$type;?>
-  }
-  
-  $.post('/errorchk/error_chk_post',erchk_data,function(json){
-    var result = json['result'];
-    console.log(result);    
-    
-    $('#error').empty();
-    var error_list = '';
-    
-    if (result == true) {
-         //alert("enabled");
-        is_error = false;
-        if(check_submit()) {
-          $('#submit').prop('disabled', false);
-        }
-          
-        
-    }
-    else if(result.length != 0){
-      
-      $.each(result,function(i,value){
-        if(value != 'Replace Error' && value != '// Slash count Error'){
-          error_list += value+' : ';
-        }
-      });
-
-      $('#error').append('<span><font color="red">Error message : </span></font>'+error_list.slice(0,-2)+'<br>'
-                );
-      //alert("disalbed");
-      is_error = true;
-      $('#submit').prop('disabled', true);
-
-    }  else {
-      //alert("enabled");
-      is_error = false;
-      alert('ccc');
-      if(check_submit())
-       $('#submit').prop('disabled', false);
-    }
-  });
-}
 // Timer
 function formatTime(time) {
     var min = parseInt(time / 6000),
@@ -512,7 +413,7 @@ var Example1 = new (function() {
     if(cate == 'draft' || cate == 'tbd'){
       var currentTime = draft_time; // Current time in hundredths of a second 100 == 1  
           incrementTime = 70; // Timer speed in milliseconds      
-    }else if(cate == 'admin_export' || cate == 'com' || cate == 'error' || cate == 'history'){ // Time을 멈춤!
+    }else if(cate == 'admin_export' || cate == 'com' || cate == 'error' || cate == 'service'){ // Time을 멈춤!
       var currentTime = draft_time; // Current time in hundredths of a second 100 == 1  
       var incrementTime = 0; // Timer speed in milliseconds       
     }else{      
@@ -604,6 +505,34 @@ function checkValidationOfSelectedText(selectedText)
   return result;
 }
 
+  // error checking
+  var erchk_data = {
+    data : '<?=$edit_writing;?>',
+    data_id : <?=$id;?>,
+    type : <?=$type;?>
+  }
+  
+  $.post('/errorchk/error_chk_post',erchk_data,function(json){
+    var result = json['result'];
+    console.log(result);    
+    
+    $('#error').empty();
+    var error_list = '';
+    
+    if(result.length != 0){
+      $.each(result,function(i,value){
+        if(value != 'Replace Error' && value != '// Slash count Error'){
+          error_list += value+' : ';
+        }       
+      });     
+
+      $('#error').append('<span><font color="red">U tag count : </span></font>'+json['u_tag']+'<br>'
+                +'<span><font color="red">// Slash count : </span></font>'+json['slash_tag']+'<br>'
+                +'<span><font color="red">Error message : </span></font>'+error_list.slice(0,-2)+'<br>'
+                ); 
+    }   
+  });
+
 // for redo & undo of tagging_action_array
 var undo_num = 1;
 var redo_num = 0;
@@ -614,8 +543,13 @@ $('button#tag').click(function(){
   var tag = $(this).attr('tag'); // Original Tag name
   var get_appear_tag = $(this).attr('appear'); // Appear Tag name
   //var select_text = $.selection('html');
-  //console.log(select_text);  
-
+  //alert(select_text);
+  // var select_a = $.selection('html');
+  // console.log(select_a); 
+  
+  //console.log($("div#tagging_box").html().indexOf(select_text));
+  //console.log($("div#tagging_box").html().anchorOffset(select_text));
+  
     var div = $("div#tagging_box");  
     var tagging_data = $("div#tagging_box").html(); 
 
@@ -718,11 +652,11 @@ $('button#tag').click(function(){
   return;
 
 
-/***  
+  /***
   if(select_text == ''){
     alert('selection Error');
   }else{
-    var div = $("div#tagging_box");  
+    var div = $("div#tagging_box");    
     var tagging_data = $("div#tagging_box").html(); 
 
     var reg = new RegExp('span class="'+tag+'"', "ig");  
@@ -738,10 +672,10 @@ $('button#tag').click(function(){
     tagging_action_array.push(replace_tagging_text); // Replace 될때 마다 push.
     $('button#undo').attr('disabled',false);    
     $('button#redo').attr('disabled',true);   
-  }    
-  ****/
+  }   
+  ***/ 
 });
-  
+
 //Error Undo
 
 $('button#undo').click(function(){  
@@ -779,7 +713,6 @@ $('button#redo').click(function(){
     undo_num = 1;
   }  
 });
-
 
 var clear_storage = '';
 
@@ -820,7 +753,7 @@ $("span#mouse").hover(
   },
   function(){
     $(this).removeClass("my-hover");
-});       
+}); 
 
 // Score
 function make_obj_score(input_className){
@@ -881,217 +814,6 @@ function hidden_score(h_score){
   return hidden_score_obj;
 }
 
-function get_save_data(){ 
-  Example1.resetStopwatch(); // stop timer
-  var time = $('div#stopwatch').text().substr(8);  
-  var min = parseInt(time.substr(0,2));
-  var second = parseInt(time.substr(3));
-
-  min = min * 6000;
-  second = second * 100;
-  var total_time = min+second;
-
-  if(chk_detection == 'Y'){    
-    var editing = $.trim($('div#editor').html());
-    var critique = $.trim($('textarea#critique').val());
-  }else{
-    if(cate == 'draft' || cate == 'com' || cate == 'tbd'){
-      var editing = $.trim($('input#edit_writing').val());
-      var critique = $.trim($('input#h_critique').val());
-    }else{ //new
-      var editing = $.trim($('input#writing').val());
-      var critique = $.trim($('input#h_critique').val());
-    }
-  }
-
-  $('span').removeAttr('style'); // Confirm으로 인해 span css를 삭제하고 DB에 저장한다!
-  $('br').removeAttr('style'); // Confirm으로 인해 br css를 삭제하고 DB에 저장한다!
-  if(chk_structure == 'Y'){            
-    var tagging = $.trim($('div#tagging_box').html());    
-  }else{
-    if(cate == 'draft' || cate == 'com' || cate == 'tbd'){
-      var tagging = $.trim($('input#h_tagging').val());
-    }else{ // new
-      var tagging = $.trim($('input#writing').val());
-    }
-  }
-
-  if(chk_sco1 == 'Y'){
-    var score_obj = make_obj_score('score_val1'); // Score1
-    var score1 = JSON.stringify(score_obj);    
-  }else{ 
-    var score_obj = hidden_score(score); // Score1
-    var score1 = JSON.stringify(score_obj);        
-  }
-
-  if(chk_sco2 == 'Y'){
-    var score_obj2 = make_obj_score('score_val2'); // Score2
-    var score2 = JSON.stringify(score_obj2);    
-  }else{
-    var score_obj2 = hidden_score(score_second); // Score2
-    var score2 = JSON.stringify(score_obj2);       
-  } 
-
-  var all_tag_array = all_tagsArray('appear'); // Array  
-  var all_orgtag = all_tagsArray('org'); // Array  
-  
-  $.each(all_tag_array,function(i,value){
-    var tag = value;    
-    var re = new RegExp('span class="'+all_orgtag[i]+'"', "ig");  
-    var match = tagging.match(re);
-
-    if(match != null){
-      for(j = 0; j < match.length; j++){
-        if(match.length == 1){
-          tagging = tagging.replace('&lt;'+tag+'&gt;',''); // 앞 태그
-          tagging = tagging.replace('&lt;/'+tag+'&gt;',''); // 뒤 태그  
-        }else{
-          if(j == 0){
-            tagging = tagging.replace('&lt;'+tag+'&gt;',''); // 앞 태그
-            tagging = tagging.replace('&lt;/'+tag+'&gt;',''); // 뒤 태그  
-          }else{
-            tagging = tagging.replace('&lt;'+tag+(j+1)+'&gt;',''); // 앞 태그
-            tagging = tagging.replace('&lt;/'+tag+(j+1)+'&gt;',''); // 뒤 태그    
-          }
-        }
-      }        
-    }      
-  });  
-
-  var type = '<?=$type;?>';   
-  var data = {            
-        data_id: <?=$essay_id;?>,            
-        editing: editing,
-        critique: critique,
-        tagging: tagging,
-        type: type,
-        score1 : score1,
-        score2 : score2,
-        time : total_time
-  }  
-  return data;
-  //return match;
-}
-
-// 결과 전송
-$('button#draft').click(function(){      
-  var data = get_save_data();
-  console.log(data);
-  
-  $.ajax(
-  {
-    url: '/text_editor/admin_service_draft_save', // 포스트 보낼 주소
-    type: 'POST',         
-    data: data,
-    dataType: 'json',
-    success: function(json)
-    {      
-      console.log(json['status']);
-      if(json['status'])
-      {
-        // 정상적으로 처리됨
-        alert('It’s been successfully processed!');        
-        window.location.replace('/service/tbd/<?=$service_name;?>/<?=$month;?>/<?=$year;?>'); // 리다이렉트할 주소
-      }
-      else
-      {
-        alert('all_list --> draft DB Error');
-      }
-    }
-  });
-});  
-
-
-$('button#submit').click(function()
-{ 
-  var data = get_save_data();
-  //console.log(data);  
-
-  $.ajax(
-  {
-    url: '/text_editor/admin_service_submit', // 포스트 보낼 주소
-    type: 'POST',         
-    data: data,
-    dataType: 'json',
-    success: function(json)
-    {
-      var access = json['result']; 
-       console.log(access);       
-      if(access == true)// 정상적으로 처리됨
-      {        
-        alert('It’s been successfully processed!');        
-        window.location.replace('/service/tbd/<?=$service_name;?>/<?=$month;?>/<?=$year;?>'); // 리다이렉트할 주소
-      }else if(access == 'error_chk'){
-   
-        $('#error').empty();
-        var error_list = '';
-        
-        var errors = String(json['error_chk']);
-        errors = errors.replace(/&lt/g, '<').replace(/&gt/g, '>');
-        var errorList = errors.split(",");
-
-        $.each(errorList,function(i,value){
-          if(value != 'Replace Error' && value != '// Slash count Error'){
-            error_list += value+' : ';
-          }       
-        });     
-
-          $('#error').append('<span><font color="red">Error message : </span></font>'+error_list.slice(0,-2)+'<br>'
-                    );
-        alert("editting tagging error is dectected!!!");
-        $('#submit').prop('disabled', true);
-        return false;
-      }
-      else
-      {
-        alert('all_list --> submit DB Error');
-      }
-    }
-  });
-}); 
-
-$('button#errorchk').click(function(){
-  errorChecking();
-});
-
-
-// Error Yes Button
-/**
-$('button#yes').click(function(){
-  var data_id = '<?=$data_id;?>'; 
-  data = {
-    data_id : data_id 
-  }
-  console.log(data);
-  $.post('/errordata/error_yes',data,function(json){
-    console.log(json['result']);
-    if(json['result']){
-      window.location = "/musedata/project/errorlist/<?=$pj_id;?>";
-    }else{
-      alert('DB Error --> error_yes');
-    }
-  });
-});
-
-// Error return button
-$('button#not_error').click(function(){
-  var data_id = '<?=$data_id;?>';  
-  data = {
-    data_id : data_id    
-  }
-  console.log(data);
-
-  $.post('/errordata/error_return',data,function(json){
-    console.log(json['result']);
-    if(json['result']){
-      window.location = "/musedata/project/errorlist/<?=$pj_id;?>";
-    }else{
-      alert('DB Error --> error_return');
-    }
-  });
-});
-**/
-
 // Editor
   $(function(){
     function initToolbarBootstrapBindings() {
@@ -1118,21 +840,6 @@ $('button#not_error').click(function(){
         $('#voiceBtn').hide();
       }
   };
-
-
-
-$('#critique').on("propertychange input textInput", function() {
-    var charLimit = 10;
-    var critique = $('textarea#critique').val();  
-    var remaining = charLimit - $(this).val().replace(/\s+/g," ").length;
-  
-    if (remaining < charLimit && remaining > 0) { 
-       $('#submit').prop('disabled', true);                  
-    } else if (remaining < 0) {
-        if (!is_error)        
-          $('#submit').prop('disabled', false);               
-    } 
-});
 
   function showErrorAlert (reason, detail) {
     var msg='';
@@ -1174,4 +881,4 @@ $('#critique').on("propertychange input textInput", function() {
   }
 }
 (document,"script","twitter-wjs");
-</script>
+</script>                   

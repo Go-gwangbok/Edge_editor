@@ -192,11 +192,12 @@ class Errordata extends CI_Controller {
 		}		
 	}	
 
-	function service_export_error($month,$year){
+	function service_export_error($service_id, $month,$year){
 		if($this->session->userdata('is_login')){			
 			$cate['cate'] = 'service';
 			$this->load->view('head',$cate);				
 			
+			$data['service_id'] = $service_id;
 			$page = 1;
 			$data['page'] = $page;
 			$list = 20; // 한페이지에 보요질 갯수.			

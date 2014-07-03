@@ -3,7 +3,8 @@ class Upload extends CI_Controller {
 	function __construct(){
 		parent::__construct();
 		$this->load->database();
-		$this->load->model('all_list');		
+		$this->load->model('all_list');
+		$this->load->model('service_list');	
 		$this->load->helper('file');
 		$this->load->helper(array('form', 'url'));
 		
@@ -19,18 +20,20 @@ class Upload extends CI_Controller {
 		$pj_kind = strtolower($this->input->post('kind'));
 		
 		$config['upload_path'] = './uploads/';
-		$config['allowed_types'] = 'csv';
+		$config['allowed_types'] = '*';
 		$config['max_size']	= '0';
 		$config['max_width']  = '0';
 		$config['max_height']  = '0';
+		$config['encrypt_name'] = true;
 		$config['overwrite'] = true;
 		$this->load->library('upload', $config);
 		
 		echo var_dump($_FILES);
 
-		if (!$this->upload->do_upload())
+		if (!$this->upload->do_upload('userfile'))
 		{				
-			$data['error'] = 'Please select a file';						
+			//$data['error'] = 'Please select a file';						
+			$data['error'] = $this->upload->display_errors();
 		}else{
 			$data = $this->upload->data();			
 			$filename = $data['file_name'];
@@ -39,7 +42,7 @@ class Upload extends CI_Controller {
 			if($conf){
 				$file = read_file('./uploads/'.$filename);
 				$file = substr($file, 0,-2); // 마지막 문장의 끝에 //를 없앤다! 
-				$data = explode('//', $file);
+				$data = explode(',//', $file);
 				$data_cou = count($data);
 				$result = true;
 
@@ -59,6 +62,12 @@ class Upload extends CI_Controller {
 						$data_replace = preg_replace($taste, $taste_replace, $data_replace);
 
 						$text = explode('::', $data_replace);
+						if (count($text) != 12) {
+							echo $i . " " . count($text) . " $text[0] \n";
+							continue;
+						}
+
+						
 						$title = trim(mysql_real_escape_string(substr($text[0],0,-1)));
 						
 						$structure = substr($text[1],1);
@@ -85,7 +94,10 @@ class Upload extends CI_Controller {
 						$json['si'] = trim(substr($text[8],1,1));
 						$json['style'] = trim(substr($text[9],1,1));
 						$json['usage'] = trim(substr($text[10],1,1));
-						$scoring = json_encode($json);	
+						$scoring = json_encode($json);
+
+						//print $scoring . "\n";
+
 						//essay 테이블에 문장 입력!
 						if($result){
 							$result = $this->all_list->import_sentence($pj_id,$sentence,$structure,$kind_id,$scoring,$critique);
@@ -169,6 +181,82 @@ class Upload extends CI_Controller {
 		$this->load->view('import',$data);
 		$this->load->view('footer');
 	}	
+
+	public function upload_docfile()
+	{		
+		//$cate['cate'] = 'service';
+		//$this->load->view('head',$cate);
+
+		$files = $this->input->post('userfile');
+		$essay_id = $this->input->post('essay_id');
+		$service_id = $this->input->post('kind');
+		//echo "essay_id : $essay_id<br>";
+		//echo "service_id : $service_id<br>";
+		//$pj_kind = strtolower($this->input->post('kind'));
+		
+		$config['upload_path'] = './uploads/tmp/';
+		$config['allowed_types'] = 'doc|docx';
+		$config['max_size']	= '0';
+		$config['max_width']  = '0';
+		$config['max_height']  = '0';
+		$config['encrypt_name'] = true;
+		$config['overwrite'] = true;
+
+		//echo var_dump($_FILES);
+
+		$name = $_FILES['userfile']['name']; // get file name from form
+		$fileNameParts   = explode( ".", $name ); // explode file name to two part
+		$fileExtension   = end( $fileNameParts ); // give extension
+		$fileExtension   = strtolower( $fileExtension ); // convert to lower case
+		$filename = "${service_id}_${essay_id}";
+		$encripted_pic_name   = md5($filename).".".$fileExtension;  // new file name
+		$config['file_name'] = $encripted_pic_name; //set file name
+
+		//echo "file_name : $name //  " . $encripted_pic_name . "<br>";
+
+
+		$this->load->library('upload', $config);
+
+
+		//$file_data['full_path'];
+		//$new_file = "./uploads/doc/${kind}_${essay_id}.doc";
+
+		if (!$this->upload->do_upload('userfile'))
+		{				
+			//$data['error'] = 'Please select a file';						
+			//$data['error'] = $this->upload->display_errors();
+			$message = $this->upload->display_errors();
+		}else{
+			$file_data = $this->upload->data();
+			//echo var_dump($file_data);
+
+			$draft_dic['essay_id'] = $essay_id;	
+			$draft_dic['service_id'] = $service_id;
+			$draft_dic['filename'] = $config['file_name'];
+
+			log_message('error', 'essay_id :' . $draft_dic['essay_id']);
+			log_message('error', 'filename :' . $draft_dic['filename']);
+
+			$result = $this->service_list->update_service_data($draft_dic);
+			
+			log_message('error', 'upload_docfile :' . $result);
+
+			//echo ('upload_docfile :' . $result);
+			
+			
+			$message = "file upload success!!!";
+			
+		}
+
+		echo '<script> alert("'.$message.'"); window.location = "/writing/view_premium/'.$essay_id.'/";</script>';
+		//echo ('/writing/view_premium/'.$essay_id.'/');
+
+		//redirect('/writing/view_premium/'.$essay_id.'/');
+
+		//$this->load->view('import',$data);
+		//$this->load->view('footer');
+	}	
+
 
 	function get_mistakes(){		
 
