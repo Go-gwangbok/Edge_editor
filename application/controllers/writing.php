@@ -235,53 +235,12 @@ class Writing extends CI_Controller {
 				$service_id = $row->id;
 				$data['service_id'] = $service_id;
 
-				$rows = $this->service_list->get_one_essay_by_essayid($data['cate'],$data_id);
+				$rows = $this->service_list->get_one_essay_by_essayid($data['cate'],$data_id, $service_id);
 
 				if ($rows == false) {
 					return false;
 				} else {
 					$premium =  $this->pretreatment_premium($rows);
-					/***
-					$premium['id'] = $rows->id;
-					$premium['essay_id'] = $rows->essay_id;
-					$premium['orig_essay_id'] = $rows->orig_essay_id;
-					if ($rows->orig_essay_id == $rows->essay_id) {
-						$premium['re_submit'] = "No";
-					}
-					else {
-						$premium['re_submit'] = "Yes";
-					}
-					$premium['kind'] = strtoupper($rows->kind_name);
-					$premium['title'] = str_replace('"', '&quot', $rows->prompt);
-					$convert = str_replace('"', '&quot',$rows->raw_txt); 
-					$convert = str_replace('’', "'",$convert);
-					$convert = str_replace('“', '"',$convert);
-					$convert = str_replace('”', '"',$convert);
-					//”
-					$convert = str_replace('”', '"',$convert);
-					$premium['raw_writing'] = preg_replace("/[\n\r]/","<br>", $convert);
-
-					$premium['word_count'] = $rows->word_count;
-					$premium['type'] = $rows->type;
-					$premium['usr_id'] = $rows->usr_id;
-					if ($rows->usr_id > 0) {
-						$usr_info = $this->all_list->get_user($rows->usr_id);
-						$premium['name'] = $usr_info->name;
-					}
-					$premium['draft'] = $rows->draft;
-					$premium['submit'] = $rows->submit;
-					if ($rows->submit == 1) {
-						$premium['status'] = "Done";
-					} else if ($rows->draft == 1) {
-						$premium['status'] = "In Progress";
-					} else {
-						$premium['status'] = "ToDo";
-					}
-					$premium['sub_date'] = $rows->sub_date;
-					$premium['start_date'] = $rows->start_date;
-					$premium['reason'] = str_replace('"', '&quot', $rows->reason);
-					$premium['filename'] = explode( ".", $rows->filename)[0];
-					***/
 
 					$usrs = $this->all_list->get_editors_by_task($rows->type);
 
@@ -442,14 +401,21 @@ class Writing extends CI_Controller {
 			$classify = $this->session->userdata('classify');
 
 			if($classify == 0){ // Admin
-				$draft_dic['essay_id'] = $this->input->POST('essay_id');	
-				$draft_dic['service_id'] = $this->input->POST('service_id');
-				$draft_dic['draft'] = 1;
-				$draft_dic['submit'] = 1;
+				$submit_dic['essay_id'] = $this->input->POST('essay_id');	
+				$submit_dic['service_id'] = $this->input->POST('service_id');
+				$submit_dic['done'] = $this->db->escape($this->input->POST('done'));
+				$done_str = $this->input->POST('done');
+				$submit_dic['draft'] = 1;
+				$submit_dic['submit'] = 1;
 
-				log_message('error', 'essay_id :' . $draft_dic['essay_id']);
+				if (strlen($submit_dic['done']) < 10) {
+					$json['status'] = false;
+					$this->output->set_content_type('application/json')->set_output(json_encode($json));
+					return;
+				}
+				log_message('error', 'essay_id :' . $submit_dic['essay_id']);
 
-				$rows = $this->service_list->get_one_essay_by_essayid('service',$draft_dic['essay_id']);
+				$rows = $this->service_list->get_one_essay_by_essayid('service',$submit_dic['essay_id']);
 
 				$filename = $rows->filename;
 				$fileNameParts   = explode( ".", $filename );
@@ -458,10 +424,10 @@ class Writing extends CI_Controller {
 				$email = $usr_info->email;
 
 				$data = array();
-				$data["id"] = $draft_dic['essay_id'];
+				$data["id"] = $submit_dic['essay_id'];
 				$data["file"] = $fileNameParts[0];
 				$data["editing"] = "";
-				$data["done"] = "";
+				$data["done"] = $done_str;
 				$data["critique"] = "";
 				$data["score"] = "";
 				$data["date"] = date("Y-m-d H:i:s", time());
@@ -477,14 +443,14 @@ class Writing extends CI_Controller {
 					$this->curl->ssl(FALSE);
 				}
 				$curl_options = array(CURLOPT_CONNECTTIMEOUT => 1, CURLOPT_TIMEOUT => 3);	
-				$access = $this->curl->simple_post(EDGE_WRITING_URL .'editor/editing/done_premium', array('token'=>WRITING_PREMIUM_SECRET_KET, 'id'=>$draft_dic['essay_id'], 'email'=>$email, 'data'=>$json_data));
+				$access = $this->curl->simple_post(EDGE_WRITING_URL .'editor/editing/done_premium', array('token'=>WRITING_PREMIUM_SECRET_KET, 'id'=>$submit_dic['essay_id'], 'email'=>$email, 'data'=>$json_data));
 
 				log_message('error', "[DEBUG] done_premium result : " . $access);
 
 				$access_status = json_decode($access, true);
 
 				if ($access_status['status']) {
-					$result = $this->service_list->update_service_data($draft_dic);
+					$result = $this->service_list->update_service_data($submit_dic);
 					log_message('error', 'assign_editor_to_premium :' . $result);
 					
 					$json['status'] = $result;
@@ -822,6 +788,8 @@ class Writing extends CI_Controller {
 		$convert = str_replace('”', '"',$convert);
 		$premium['raw_writing'] = $convert;
 		$premium['re_raw_writing'] = preg_replace("#(\\\r\\\n|\\\r|\\\n)#","<br>", $convert);
+
+		$premium['done'] = nl2br(str_replace('"', '&quot', $rows->done));
 
 		$premium['word_count'] = $rows->word_count;
 		$premium['type'] = $rows->type;

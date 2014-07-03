@@ -98,6 +98,18 @@
 			      </div>  <!-- col-md-12 -->
 			</td>
 		</tr>
+		<tr>
+			<td><b>Done</b></td>
+			<td colspan="5">
+			      <div class="col-md-12" style="margin-top:15px;">
+
+			        <div>
+			        <textarea class="border text_box" id="done" style="width:100%;" rows="5"><?=trim($premium['done']);?></textarea>   
+			        </div> 
+			        <br>      
+			      </div>  <!-- col-md-12 -->
+			</td>
+		</tr>
 		<?php if ($premium['re_submit'] == "Yes") { ?>
 		<tr>
 			<td><b>Reason</b></td>
@@ -273,8 +285,16 @@ $('button#draft').click(function(){
 });  
 
 $('button#submit').click(function(){ 
+	var done = $.trim($('textarea#done').val());
+
+	if (done.length < 10) {
+		alert('Done string length is too short.');
+		return;
+	}
+
   	data = {
 		essay_id : essay_id,
+		done : done,
 		service_id : service_id
 	}
 	console.log(data);

@@ -1975,6 +1975,13 @@ class Service_List extends CI_Model{
 	   			$is_first = 0;
 	   			$update_str .= "filename = '" . $dic['filename'] . "' ";
 	   		}
+	   		if ( isset($dic['done']) ) {
+	   			if ($is_first != 1) {
+	   				$update_str .= ", ";
+	   			}
+	   			$is_first = 0;
+	   			$update_str .= "done = " . $dic['done'] . " ";
+	   		}
 	   		
 	   		$sql = "UPDATE service_data " . $update_str . " WHERE essay_id=$essay_id and type=$service_id";
 	   		log_message('error', "debug : $sql");
