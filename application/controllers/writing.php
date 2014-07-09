@@ -291,6 +291,7 @@ class Writing extends CI_Controller {
 				log_message('error', "[DEBUG] start_premium result : " . $access);
 
 				$access_status = json_decode($access, true);
+				//$access_status['status'] = true;
 
 				if (!$access_status['status']) {
 					$json['status'] = $access_status['status'];
@@ -298,8 +299,9 @@ class Writing extends CI_Controller {
 
 					//$access_status['error']['message'];
 				} else {
-					//$result = $this->send_email_to_editor($email, $draft_dic);
-					$result = $this->send_email_to_editor("eric@akaon.com", $draft_dic);
+					$result = $this->send_email_to_editor($email, $draft_dic);
+					//$result = $this->send_email_to_editor("eric@akaon.com", $draft_dic);
+					//$result = $this->send_email_to_editor("bettychoi@akaprep.com", $draft_dic);
 					
 					log_message('error', '[DEBUG] assign_editor_to_premium send_mail result :' . $this->email->print_debugger());
 					log_message('error', '[DEBUG] assign_editor_to_premium send_mail result :' . $result);
@@ -497,7 +499,7 @@ class Writing extends CI_Controller {
 		$full_path = DOC_UPLOAD_PATH . $filename . ".". $fileNameParts[1];
 		$file_size = filesize($full_path);
 		//$encoded_filename = urlencode($full_path);
-		$download_fname = "EDGE_Writing_$essay_id.doc";
+		$download_fname = "EDGE_Writing_$essay_id.".$fileNameParts[1];
 
 		if (is_file("$full_path")) {
 			if(strstr($_SERVER['HTTP_USER_AGENT'], "MSIE 5.5")) {   
@@ -544,8 +546,8 @@ class Writing extends CI_Controller {
 			$premium['kind'] = strtoupper($rows->kind_name);
 			$premium['kind_name'] = strtoupper($rows->kind_name);
 		}
-		$premium['title'] = str_replace('"', '&quot', $rows->prompt);
-		$convert = str_replace('"', '&quot',$rows->raw_txt); 
+		$premium['title'] = str_replace('"', '&quot;', $rows->prompt);
+		$convert = str_replace('"', '&quot;',$rows->raw_txt); 
 		$convert = str_replace('’', "'",$convert);
 		$convert = str_replace('“', '"',$convert);
 		$convert = str_replace('”', '"',$convert);
@@ -577,7 +579,7 @@ class Writing extends CI_Controller {
 		$premium['price_kind'] = $rows->price_kind;
 		$premium['sub_date'] = $rows->sub_date;
 		$premium['start_date'] = $rows->start_date;
-		$premium['reason'] = str_replace('"', '&quot', $rows->reason);
+		$premium['reason'] = str_replace('"', '&quot;', $rows->reason);
 		$filename = explode( ".", $rows->filename);
 		$premium['filename'] = $filename[0];
 
@@ -623,8 +625,23 @@ class Writing extends CI_Controller {
 
 			$related_essay_list = $this->service_list->get_related_servicedata($service_id, $essay_id, $premium['orig_essay_id']);
 
+			$subject = "[" . $essay_id . "] EDGE Writings Premium Essay [Re-Submit]";
+			$re_submit_str = "<font color=blue>[Re-Submit]</font>";
+
+			$greeting_msg = 'Dear ' . $dic['name'] . ' <br><br>
+			Here is a RE-SUBMISSION request for a Premium service essay that you have previously corrected.<br><br>
+			Please read through the PREMIUM Editing Guidelines once again before proceeding onto the essay. If you want to see the original edited file, you may download it from the link provided further down in this email below “Original Essay”.<br><br>
+			Just as before, copy the essay on the .txt file onto the Microsoft Word template (please refrain from using any other word processor). <br><br>
+			Remember that you must send the essay with its corrections to the admin (reply to this email) within 40 hrs of the date in order to keep the deadline with our client. <br><br>';
 		} else {
 			$reason_str = "";
+			$subject = "[" . $essay_id . "] EDGE Writings Premium Essay";
+			$re_submit_str = "";
+
+			$greeting_msg = 'Dear ' . $dic['name'] . ' <br><br>
+			Here is a request for a Premium service essay.<br><br>
+			Please read through and follow the PREMIUM Editing Guidelines before proceeding onto the essay. Copy the essay on the .txt file onto the Microsoft Word template (please refrain from using any other word processor). <br><br>
+			Remember that you must send the essay with its corrections to the admin (reply to this email) within 40 hrs of the date in order to keep the deadline with our client. <br><br>';
 		}
 
 		$message = '
@@ -632,20 +649,27 @@ class Writing extends CI_Controller {
 		<tbody>
 		<tr>
 		<td style="margin-left:10px;">
-		<div style="margin-left: 30px; margin-top:-6px;"> 
+		<div style="margin-left: 30px; margin-top:-6px;">
 		<a href="'.$url.'"><img src="'.$url.'/images/logo_s.png"></a>
 
 		<p style="margin-top:30px; font-size:14px;">
-		Dear ' . $dic['name'] . ' <br>
-		Here is a request for a Premium service essay. <br>
-		Please read through and follow the PREMIUM Editing Guidelines before proceeding onto the essay. <br>
-		Remember that you must send the essay with its corrections to the admin within 40 hrs of the date in order to keep the deadline with our client. Thank you for your great work! <br>
+		' . $greeting_msg . '
+
+		Subject: Re: _____<br>
+		Message: <br>
+		-Please insert how much time it took to edit the essay in this part of the email NOT in the Word document. <br><br>
+
+		Thank you for your great work!<br>
 		</p>
 
-		<p style="margin-top:30px; font-size:18px;"><b>EDGE Writings Premium Essay</b></p>
+		<p style="margin-top:30px; font-size:18px;"><b>EDGE Writings Premium Essay ' . $re_submit_str  . '</b></p>
 
 		<table style="' . $table_style  . '">
 		<tbody>
+		<tr>
+			<td style="' . $td_style1  . '"><b>Essay ID</b></td>
+			<td style="' . $td_style2  . '">' . $essay_id . '</td>
+		</tr>
 		<tr>
 			<td style="' . $td_style1  . '"><b>Prompt</b></td>
 			<td style="' . $td_style2  . '">' . $premium['title'] . '</td>
@@ -675,10 +699,10 @@ class Writing extends CI_Controller {
 
 				$r_reason_str = "";
 				if ($r_premium['essay_id'] == $premium['orig_essay_id']) {
-					$r_title = "ORIGIN ESSEY";
+					$r_title = "ORIGINAL ESSAY";
 					$r_re_submit = "No";
 				} else {
-					$r_title = "RE-COMMITED ESSEY";
+					$r_title = "RE-SUBMITED ESSAY";
 					$r_re_submit = "Yes";
 
 					$r_reason_str = '<tr>
@@ -729,7 +753,7 @@ class Writing extends CI_Controller {
 		$message .= '
 		<p style="margin-top:60px; font-size:13px; color:#555; margin-bottom:3px;">CATEGORY</p>
 		<a class="cate_pointer" href="'.$url.'/cate/testprep" style="'.$style.'">TEST PREP</a><span style="'.$style.'">|</span><a class="cate_pointer" href="'.$url.'/cate/academic" style="'.$style.'">ACADEMIC</a><span style="'.$style.'">|</span><a class="cate_pointer" style="'.$style.'" href="'.$url.'/cate/admission">ADMISSION</a><span style="'.$style.'">|</span><a class="cate_pointer" style="'.$style.'" href="'.$url.'/cate/free">LIFE WRITING</a><span style="'.$style.'">|</span><a class="cate_pointer" style="'.$style.'" href="'.$url.'/cate/premium">PREMIUM</a>
-		<p class="text-muted credit" style="font-size:12px;">EDGE Writings &nbsp;<a href="http://akaon.com/">AKASTUDY limited</a> &nbsp;Copyright 2014</p>
+		<p class="text-muted credit" style="font-size:12px;">EDGE Writings &nbsp;AKASTUDY limited &nbsp;Copyright 2014</p>
 		</div>
 		</td>
 		</tr>
@@ -760,12 +784,13 @@ class Writing extends CI_Controller {
 		$style = 'font-size:14px; color:#777; margin-right: 13px; text-decoration:none;';  
 		$bg_imageUrl = "url('".$url."'/images/bar_email.png);"; 
 
-		$this->email->subject("EDGE Writings Premium Essay");
+		$this->email->subject($subject);
 		$this->email->message($message); 
 		$this->email->attach($filename1);
+		$this->email->attach('./downloads/EW_Premium_Essay.docx');
+		$this->email->attach('./downloads/Welcome_to_Edge_Writings_Editor_Guidelines.docx');
 		return $this->email->send();
 	}
-
 
 	/*************************/
 

@@ -301,7 +301,8 @@ class Service extends CI_Controller {
 			$token = $this->input->post('token');
 			$w_id = $this->input->post('w_id'); // Writing service data_id.
 			$title = $this->input->post('title');
-			$writing = $this->input->post('writing');			
+			$writing = $this->input->post('writing');	
+			log_message('error', '[DEBUG] writing -> writing : ' . $writing);		
 			$kind_id = $this->input->post('kind_id');			
 			$word_count = $this->input->post('word_count');
 			$start_date = $this->input->post('start_date');
@@ -391,10 +392,14 @@ class Service extends CI_Controller {
 				$data['score2'] = '';				
 
 				$data['title'] = $title;
+
+				$writing = $this->br2nl(strip_tags($writing, '<p><br>'));
+				$writing = $this->p2nl($writing);
+
 				$convert = str_replace('’', "'",$writing);
 				$convert = str_replace('“', '"',$convert);
 				$convert = str_replace('”', '"',$convert);
-				$convert = str_replace('"', '&quot',$convert); 
+				$convert = str_replace('"', '&quot;',$convert); 
 				$data['raw_writing'] = $convert;
 				//log_message('error', "[DEBUG] raw_writing = " . $data['raw_writing'] );
 				
@@ -418,7 +423,7 @@ class Service extends CI_Controller {
 				$data['cate'] = 'writing';
 				$data['word_count'] = $word_count;
 				$data['edit_writing'] = '';
-				$data['tagging'] = $writing;
+				$data['tagging'] = preg_replace("#(\\\r\\\n|\\\r|\\\n)#","<br>", $convert);
 				$data['start_date'] = $start_date;
 				$data['price_kind'] = $price_kind;
 				$data['orig_id'] = $orig_id;
@@ -937,6 +942,29 @@ class Service extends CI_Controller {
 		$this->output->set_content_type('application/json')->set_output(json_encode($json));
 	}
 
+	function br2nl($string) 
+	{ 
+	    //return preg_replace('/\<br(\s*)?\/?\>/i', "\n", $string); 
+	    return preg_replace(array("/\<br(\s*)?\/?\>/i","/\<\/br(\s*)?\/?\>/iU"), 
+	                        array("\n","\n"), 
+	                        $string); 
+	} 
+
+	// p 태그가 존재하면, p 태그 이외의 줄바꿈은 제거하고, paragraph 처리만 수행함.
+	function p2nl ($str) { 
+	    preg_match_all('#<p (.*?)>(.*?)</p>#is', $str, $p_matches);
+
+	    if (count($p_matches[0]) < 1) {
+	    	return $str;
+	    }
+
+	    $str = preg_replace("/[\n\r]/"," ", $str);
+
+	    return preg_replace(array("/<p[^>]*>/iU","/<\/p[^>]*>/iU"), 
+	                        array("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;","\n\n"), 
+	                        $str); 
+
+	}
 
 }
 ?>

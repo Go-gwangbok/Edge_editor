@@ -348,7 +348,9 @@ function ajaxPost(url,data){
 			var r_start_date = essay_list[i].start_date;
 			var r_word_count = essay_list[i].word_count;
 			var r_editor_name = essay_list[i].usr_name;
-			var r_filename = essay_list[i].filename;
+			var r_full_filename = essay_list[i].filename;
+			var t_name = r_full_filename.split('.');
+			var r_filename = t_name[0];
 			var r_draft = essay_list[i].draft;
 			var r_submit = essay_list[i].submit;
 			var r_status = "ToDo";
@@ -388,7 +390,7 @@ function ajaxPost(url,data){
 				    +'</tr>\n'
 				    +'<tr>\n'
 			             +'  <td><b>DocFile</b></td>\n'
-			 	    +'  <td  colspan="5">'  + r_filename + '</td>\n'
+			 	    +'  <td  colspan="5"><a href="/writing/download/<?=$service_id;?>/'+r_essay_id+'/'+r_filename+'/">'  + r_full_filename + '</a></td>\n'
 				    +'</tr>\n'
 				    +'<tr>\n'
 			             +'  <td><b>Writing</b></td>\n'

@@ -421,6 +421,30 @@ class All_list extends CI_Model{
 		return $this->db->query($query)->result();
    	}
 
+   	function export_musedata($pj_id, $start_id, $limit){
+   		$query = "SELECT adjust_data.*,usr.name,data_kind.kind as kind_name
+					FROM adjust_data
+					left join usr on usr.id = adjust_data.usr_id
+					LEFT JOIN data_kind ON data_kind.id = adjust_data.kind
+					WHERE adjust_data.id > $start_id
+					AND adjust_data.pj_id = $pj_id					
+					AND essay_id != 0
+					AND adjust_data.active = 0					
+					AND submit = 1
+					AND ex_editing != ''
+					ORDER BY adjust_data.id ASC";
+		if ($limit > 0) {
+			$query .= " LIMIT $limit";
+		}
+		log_message('error', '[DEBUG] export_musedata sql : ' . $query);
+					
+		return $this->db->query($query)->result();
+   	}
+
+   	function get_project_completed_count(){
+   		$query = "SELECT pj_id, count(distinct essay_id) as total_count, count(if(submit = 1 and ex_editing != \"\",1,null)) as completed FROM `adjust_data` WHERE essay_id > 0 and active = 0 group by pj_id order by pj_id asc";
+		return $this->db->query($query)->result();
+   	}
 
    	// Error Chk Sql
 	function ex_editing_update_service($essay_id,$replace_data,$before_editing, $type = 1){

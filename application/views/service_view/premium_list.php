@@ -99,7 +99,7 @@ function ajaxPost(url,data){
 			}
 			
 			$('tbody#list').append('<tr id='+i+' class="clickableRow" style="cursor:pointer;" href="/writing/view_premium/'+id+'/'+'"><td class="text-center">'+num+'</td><td>'																				 
-				+prompt.replace(/"/gi,'')+'</td><td class="text-center">'
+				+id+"::"+prompt.replace(/"/gi,'')+'</td><td class="text-center">'
 				+editor+'</td><td class="text-center">'
 				+word_count+'</td><td class="text-center">'
 				+kind.toUpperCase()+'</td><td class="text-center">'

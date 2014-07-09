@@ -178,16 +178,19 @@ $('ul.nav').delegate('li.tab_action', 'click', function(){
 $('tbody#newlist').delegate('tr.clickableRow', 'click', function()
 {		
 	console.log('a');
+	var re = new RegExp('"', 'g')
+
 	token = access['data']['token'];
 	w_id = result['data']['id'];
 	kind = result['data']['kind_id'];
-	title = result['data']['title'].replace('"','&quot');
-	writing = result['data']['writing'].replace('"','&quot');		
+	title = result['data']['title'].replace(re,'&quot;');
+	writing = result['data']['writing'].replace(re,'&quot;');
+	//alert(writing);		
 	word_count = result['data']['words'];
 	start_date = result['data']['date'];
 	price_kind = result['data']['price_kind'];
 	orig_id = result['data']['orig_id'];
-	reason = result['data']['reason'].replace('"','&quot');
+	reason = result['data']['reason'].replace(re,'&quot;');
 
 	var data = {
 		token: token,
