@@ -53,6 +53,38 @@ class Batch_Job extends CI_Model{
 
    		return true;
 	}
+
+      function make_sentence_count_musedata() {
+         $query = "SELECT * FROM adjust_data WHERE sentence_count = 0 limit 1000";
+
+         $source_data = $this->db->query($query);
+
+         $total_count = 0;
+         foreach ( $source_data->result() as $row) {
+            $id = mysql_real_escape_string($row->id);
+            $raw_txt = mysql_real_escape_string($row->raw_txt);
+            $sentences = explode(".", $raw_txt);
+
+            $sentence_count = 0;
+
+            foreach($sentences as $sentence) {
+                  if (strlen(trim($sentence)) > 7) {
+                     $sentence_count++;
+                  }
+            }
+            if ($sentence_count == 0) {
+               $sentence_count = -1;
+            }
+
+            $result = $this->db->query("UPDATE adjust_data SET sentence_count = $sentence_count WHERE id = $id");
+            if (!$result) {
+               return false;
+            }
+            $total_count++;
+         }
+
+         return $total_count;
+      }
 	
 }
 ?>

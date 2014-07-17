@@ -31,7 +31,7 @@ class Writing extends CI_Controller {
 		$curl_options = array(CURLOPT_CONNECTTIMEOUT => 1, CURLOPT_TIMEOUT => 3);
 		$access = $this->curl->simple_post(EDGE_WRITING_URL. 'editor/get_premium', array('token'=>WRITING_PREMIUM_SECRET_KET,'email'=>$email,'last_id'=>$last_id), $curl_options);
 		
-		log_message('error', '[DEBUG] get_premium result = ' . $access);
+		log_message('error', '[DEBUG] get_premium result = ' . $access . ' in file ' . __FILE__ . ' at line ' . __LINE__);
 		
 
 		$access_status = json_decode($access, true);		
@@ -273,7 +273,7 @@ class Writing extends CI_Controller {
 				$draft_dic['draft'] = 1;
 				$draft_dic['submit'] = 0;
 
-				log_message('error', '[DEBUG] assign_editor_to_premium essay_id :' . $draft_dic['essay_id']);
+				log_message('error', '[DEBUG] assign_editor_to_premium essay_id :' . $draft_dic['essay_id'].' in file ' . __FILE__ . ' at line ' . __LINE__);
 				log_message('error', '[DEBUG] assign_editor_to_premium usr_id :' . $draft_dic['usr_id']);
 
 				$usr_info = $this->all_list->get_user($draft_dic['usr_id']);
@@ -310,7 +310,7 @@ class Writing extends CI_Controller {
 						$json['error_msg'] = "send mail fail";
 					} else {
 						$result = $this->service_list->update_service_data($draft_dic);
-						log_message('error', '[DEBUG] assign_editor_to_premium :' . $result);
+						log_message('error', '[DEBUG] assign_editor_to_premium :' . $result.' in file ' . __FILE__ . ' at line ' . __LINE__);
 						$json['status'] = $result;
 						if (!$result) {
 							$json['error_msg'] = "DB Update fail";
@@ -382,7 +382,7 @@ class Writing extends CI_Controller {
 
 				if ($access_status['status']) {
 					$result = $this->service_list->update_service_data($submit_dic);
-					log_message('error', 'assign_editor_to_premium :' . $result);
+					log_message('error', 'assign_editor_to_premium :' . $result.' in file ' . __FILE__ . ' at line ' . __LINE__);
 					
 					$json['status'] = $result;
 				} else {
