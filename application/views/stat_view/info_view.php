@@ -16,7 +16,7 @@
 		  <li <?php if ($service_name == 'picto') { ?> class="active" <?php } ?> id="picto_title"><a href="#picto" data-toggle="tab">Picto</a></li>	  
 		  <li <?php if ($service_name == 'speaking') { ?> class="active" <?php } ?> id="speaking_title"><a href="#speaking" data-toggle="tab">Speaking</a></li>	  
 		  <li <?php if ($service_name == 'writing') { ?> class="active" <?php } ?> id="writing_title"><a href="#writing" data-toggle="tab">Writing</a></li>
-		  <li <?php if ($service_name == 'editor') { ?> class="active" <?php } ?> id="editor_title"><a href="#editor" data-toggle="tab">Editor</a></li>	  
+		  <li <?php if ($service_name == 'editor') { ?> class="active" <?php } ?> id="editor_title"><a href="#editer" data-toggle="tab">Editor</a></li>	
 		</ul>
 
 
@@ -66,8 +66,9 @@
 
 		  	<!-- Picto Stat -->
 		  	<div class="tab-pane <?php if ($service_name == 'picto') { ?> active <?php } ?>" id="picto">
-		  		<br>
+
 			  	<div class="row clearfix">
+
 					<div class="col-md-10 col-md-offset-1 column">
 						<div class="form-inline">
 							<div class="form-group" id="picto_gubun">
@@ -127,81 +128,131 @@
 				</div>
 			</div>	  
 
-			<div class="tab-pane" id="setting">
-				<br/><br/>
-				<div class="row">
-					<?php
-					foreach ($cateType as $rows) {
-						$type_id = $rows->id;
-						$name = $rows->name;
-						$type = $rows->type;
+			<!-- Writing Stat -->
+		  	<div class="tab-pane <?php if ($service_name == 'writing') { ?> active <?php } ?>" id="writing">
+		  		<br>
+			  	<div class="row clearfix">
+					<div class="col-md-10 col-md-offset-1 column">
+						<div class="form-inline">
+							<div class="form-group" id="writing_gubun">
+								<select class="form-control input-sm">
+							         <option value="daily">daily</option>
+							         <option value="monthly">monthly</option>
+							      </select>
+							</div>
+							<!--
+							<div class="form-group">
+								 <label for="exampleInputPassword1">Password</label><input type="password" class="form-control" id="exampleInputPassword1" />
+							</div>
+							-->
+							<div class="checkbox">
+								 <label><input type="checkbox" id="writing_cumm"  checked/> Cummulative</label>
+							</div> <button type="button" class="btn btn-primary btn-sm" id="writing_retrieve">Retrieve</button>
+						</div>
 
-						if($type == 'musedata'){
-						?>
-						<div class="col-md-3">						
-							<div class="col-md-8 line font-white" id="set_type" set="<?=$name?>" setid="<?=$type_id;?>" style="height:150px; margin-left:40px; background-color:#9FC93C; cursor:pointer;">
-								<br/>
-								<h1 class="text-center"><span class="glyphicon glyphicon-inbox"></span></h1>
-								<h4 class="text-center"><?=strtoupper($name);?></h4>
-							</div>
-						</div>
-						<?php
-						}else{
-						?>
-						<div class="col-md-3">						
-							<div class="col-md-8 line font-white" id="set_type" set="<?=$name?>" setid="<?=$type_id;?>" style="height:150px; margin-left:40px; background-color:#f15e22; cursor:pointer;">
-								<br/>
-								<h1 class="text-center"><span class="glyphicon glyphicon-globe"></span></h1>
-								<h4 class="text-center"><?=strtoupper($name);?></h4>
-							</div>
-						</div>
-						<?php
-						}
-					} ?>			  		
-				</div>
-				<br><br>
-				<!-- Add templete setting -->
-				<!-- <button id="w_addbtn" taskid='' class="btn btn-success pull-right" style="display:none; margin-right:100px;">Add Kind</button> -->
-				<br>
-				<div class="row">			  		
-					<div class="col-md-12" id="kind_list">						
 						<br>
-						<table class="table table-hover" id="table" style="width:953px; margin-left:90px;">
-						  	<thead>
-								<tr>
-									<th class="text-center" style="width:7%;">Num</th>
-									<th class="text-center">Kind</th>							
-									<th class="text-center" style="width:20%;">Action</th>
-								</tr>
-							</thead>
-							
-							<tbody id="set">												
-								<!-- Ajax -->
-							</tbody>
-						</table>
+
+
+
+   <table class="table table-bordered table-striped">
+      <th>Essay Count</th><th>Sentense Count</th>
+      <tr class="success"><td><div id='w_data1'>&nbsp;</div></td><td><div id='w_data2'></div></td></tr>
+   </table>
+
+
+
+
+		  		 			  		
+				<div id='writing_div' style='width: 1000px; height: 400px;'></div>
+					</div>
+				</div>
+		  	</div>
+		  	<!-- End of Writing Stat -->
+
+
+
+		  	<!-- Editor Stat -->
+		  	<div class="tab-pane <?php if ($service_name == 'editor') { ?> active <?php } ?>" id="editer">
+		  		<br>
+			  	<div class="row clearfix">
+			  		
+					<div class="col-md-10 col-md-offset-1 column">
+						<?php 
+				  		if ( isset($summary_stat) ) {
+				  			$old_gubun = "";
+
+				  			$books_data = array();
+
+				  			foreach ($summary_stat as $rows) {
+				  				$gubun = $rows['gubun'];
+				  				if ($gubun != $old_gubun) {
+				  					if ($old_gubun != "") {
+				  		?>
+				  						<h4><?=$old_gubun;?></h4>";
+				  						<table class="table table-bordered table-striped">
+				  							<?=$th_str; ?>
+				  							<tr class="success"><?=$td_str;?></tr>
+				  						</table>
+				  						<br>
+				  		<?php
+				  					}
+				  					$th_str = "";
+				  					$td_str = "";
+				  				}
+				  				$th_str .= '<th>' . $rows['item'] . '</th>';
+				  				$td_str .= '<td>' . number_format($rows['value']) . '</td>';
+				  				$old_gubun = $gubun;
+
+				  				if ($gubun == "Google Books Corpus") {
+				  					$books_data[$rows['item']] = $rows['value'];
+				  				}
+				  			}
+
+				  			if ($td_str != "") {
+				  		?>
+		  						<h4><?=$old_gubun;?></h4>
+		  						<table class="table table-bordered table-striped">
+		  							<?=$th_str; ?>
+		  							<tr class="success"><?=$td_str;?></tr>
+		  						</table>
+				  		<?php				  				
+				  			}
+				  		} 
+				  		?>
+
+				<div id='google_books_div' style='width: 1000px; height: 400px;'></div>
+
+				  		<br>
+						<div class="form-inline">
+							<div class="form-group" id="editor_gubun">
+								<select class="form-control input-sm">
+							         <option value="daily">daily</option>
+							         <option value="monthly">monthly</option>
+							      </select>
+							</div>
+		
+							<div class="checkbox">
+								 <label><input type="checkbox" id="editor_cumm"  checked/> Cummulative</label>
+							</div> <button type="button" class="btn btn-primary btn-sm" id="editor_retrieve">Retrieve</button>
+						</div>
+
+		  		<br>	  			
+
+    <table class="table table-bordered table-striped">
+      <th>Essay Count</th><th>Sentense Count</th>
+      <tr class="success"><td><div id='e_data1'>&nbsp;</div></td><td><div id='e_data2'></div></td></tr>
+   </table>
+
+				<div id='editor_div' style='width: 1000px; height: 400px;'></div>
 					</div>
 				</div>
 			</div>	  
-			<!-- Tap setting End.-->
+			<!-- End of Editor Stat -->
 
-			<!-- Rubric setting -->
-		  	<div class="tab-pane" id="tagscore">		  		
-		  		<br>
-				<table class="table table-hover">
-				  	<thead>
-						<tr>
-							<th class="text-center">Num</th>
-							<th class="text-center">Kind</th>							
-							<th class="text-center">Action</th>
-						</tr>
-					</thead>
-					
-					<tbody id="tagscore_list">						
-						<!-- Ajax -->
-					</tbody>
-				</table>
-			</div>	
-			<!-- Rubric setting End.-->
+
+
+
+
 		</div>
 	</div> <!-- col-md-12 -->
   </div> <!-- Row End -->
@@ -321,8 +372,12 @@ $('li#speaking_title').click(function(){
 	window.location = "/stat/info/spekaing/";
 });
 
-$('li#rubric_title').click(function(){
-	$('#title').html('Rubric Setting');
+$('li#writing_title').click(function(){
+	window.location = "/stat/info/writing/";
+});
+
+$('li#editor_title').click(function(){
+	window.location = "/stat/info/editor/";
 });
 
 
@@ -354,7 +409,21 @@ function init_chart() {
 	else if (service_name == 'speaking') {
 		var url = '/stat/info/get_speakingdata/';
 		chart = new google.visualization.AnnotatedTimeLine(document.getElementById('speaking_div'));
-	} else {
+	}
+	else if (service_name == 'writing') {
+		var url = '/stat/info/get_writingdata/';
+		chart = new google.visualization.AnnotatedTimeLine(document.getElementById('writing_div'));
+	} 
+	else if (service_name == 'editor') {
+		drawGoogleBookChart();
+
+		var url = '/stat/info/get_editordata/';
+		chart = new google.visualization.AnnotatedTimeLine(document.getElementById('editor_div'));
+
+		
+
+	} 
+	else {
 		var url = '/stat/info/get_musedata/';
 		chart = new google.visualization.AnnotatedTimeLine(document.getElementById('musedata_div'));
 	}
@@ -364,6 +433,31 @@ function init_chart() {
 	};
 
 	ajaxMuseDataPost(data, url, chartdata,  chart, true);
+}
+
+
+function drawGoogleBookChart() {
+
+	book_chart = new google.visualization.BarChart(document.getElementById('google_books_div'));
+
+	var book_options = {
+		title: 'Google Books Curpus',
+		titleTextStyle : {fontSize: 18}
+	};
+
+	var bookdata = google.visualization.arrayToDataTable([
+				['Element', 'Count(k)'],
+		<?php
+			if ( isset ($books_data) ) {
+				foreach ($books_data as $key => $value) {
+					$k_val = (int)($value/1000);
+					echo "['$key', $k_val],";
+				}
+			}
+		?>
+		]);
+
+	drawChart(bookdata, book_chart, book_options);	
 }
 
 
@@ -442,6 +536,12 @@ function ajaxMuseDataPost(data, url, chartdata, chart, cumm){
 			document.getElementById('s_data1').innerHTML = commify(essay_sum);
 			document.getElementById('s_data2').innerHTML = commify(sentence_sum);
 			document.getElementById('s_data3').innerHTML = commify(parseInt(audio_duration_sum/60));
+		} else if (service_name == 'writing') {
+			document.getElementById('w_data1').innerHTML = commify(essay_sum);
+			document.getElementById('w_data2').innerHTML = commify(sentence_sum);
+		} else if (service_name == 'editor') {
+			document.getElementById('e_data1').innerHTML = commify(essay_sum);
+			document.getElementById('e_data2').innerHTML = commify(sentence_sum);
 		} else {
 			document.getElementById('m_data1').innerHTML = commify(essay_sum);
 			document.getElementById('m_data2').innerHTML = commify(sentence_sum);
@@ -464,6 +564,8 @@ function drawChart(chartdata, chart, options) {
 
 //google.load('visualization', '1.1', {'packages':['annotationchart']});
 google.load('visualization', '1', {'packages':['annotatedtimeline']});
+google.load("visualization", "1", {packages:["corechart"]});
+
 google.setOnLoadCallback(init_chart);
 	
 /***
@@ -542,6 +644,31 @@ $('button#speaking_retrieve').click(function(){
 	//google.load('visualization', '1.1', {'packages':['annotationchart']});
 
 	var url = '/stat/info/get_speakingdata/';
+
+	ajaxMuseDataPost(data, url, chartdata,  chart, cumm);
+
+
+//google.setOnLoadCallback(function() { ajaxMuseDataPost(url, data); });
+});
+
+$('button#editor_retrieve').click(function(){ 
+
+	var gubun = $("#editor_gubun option:selected").val();
+
+	if ($("input:checkbox[id='editor_cumm']").is(":checked")) {
+		var cumm = true;
+	} else {
+		var cumm = false;
+	}
+
+	data = {
+		gubun : gubun
+	}
+
+
+	//google.load('visualization', '1.1', {'packages':['annotationchart']});
+
+	var url = '/stat/info/get_editordata/';
 
 	ajaxMuseDataPost(data, url, chartdata,  chart, cumm);
 

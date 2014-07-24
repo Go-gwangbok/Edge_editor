@@ -309,6 +309,7 @@ class Service extends CI_Controller {
 			$price_kind = $this->input->post('price_kind');
 			$orig_id = $this->input->post('orig_id');
 			$reason = $this->input->post('reason');
+			$user_file = $this->input->post('user_file');
 
 
 			$data['tag_templet'] = $this->all_list->get_tag($kind_id);
@@ -381,9 +382,60 @@ class Service extends CI_Controller {
 				$convert = str_replace('“', '"',$convert);
 				$convert = str_replace('”', '"',$convert);
 				$data['reason'] = $convert;
+				$data['user_file'] = $essay->user_file;
+				$data['download_link'] = EDGE_WRITING_URL . "download/file/" . $user_file;
+				$data['filename'] = $essay->filename;
 			}
 			else
 			{
+				/***
+				$type = $row->id;  // get service_id
+
+				$token = $this->input->post('token');
+				$w_id = $this->input->post('w_id'); // Writing service data_id.
+				$title = $this->input->post('title');
+				$writing = $this->input->post('writing');	
+				log_message('error', '[DEBUG] writing -> writing : ' . $writing);		
+				$kind_id = $this->input->post('kind_id');			
+				$word_count = $this->input->post('word_count');
+				$start_date = $this->input->post('start_date');
+				$price_kind = $this->input->post('price_kind');
+				$orig_id = $this->input->post('orig_id');
+				$reason = $this->input->post('reason');
+				$user_file = $this->input->post('user_file');
+				***/
+
+				$dic = array();
+				$dic['usr_id']		= $this->session->userdata('id');
+				$dic['w_id']			= $w_id;
+				$dic['title']			= $this->db->escape($title);
+
+				$writing = $this->br2nl(strip_tags($writing, '<p><br>'));
+				$writing = $this->p2nl($writing);
+
+				$dic['raw_writing']		= $this->db->escape($writing);
+				$dic['editing']		= $this->db->escape($writing);
+				$dic['tagging']		= $this->db->escape($writing);
+				$dic['critique']		= "''";
+				$dic['score1']		= "''";
+				$dic['score2']		= "''";
+				$dic['word_count']		= $word_count;
+				$dic['time']			= 0;
+				$dic['kind']			= $kind_id;
+				$dic['type']			= $type;
+				$dic['start_date']		= $start_date;
+				$dic['price_kind']		= $this->db->escape($price_kind);
+				$dic['orig_essay_id']	= $orig_id;
+				$dic['reason']		= $this->db->escape($reason);
+				$dic['user_file']		= $user_file;
+				$dic['draft'] = 1;
+				$dic['submit'] = 0;
+
+				$result = $this->service_list->insert_service_data($dic);
+			
+
+
+
 				//log_message('error', 'ccccccccccccccccccccccccccccccccc');
 				//$score1 = $this->score_pattern_replace($scoring);			
 				$data['score1'] = '';	
@@ -393,8 +445,8 @@ class Service extends CI_Controller {
 
 				$data['title'] = $title;
 
-				$writing = $this->br2nl(strip_tags($writing, '<p><br>'));
-				$writing = $this->p2nl($writing);
+				//$writing = $this->br2nl(strip_tags($writing, '<p><br>'));
+				//$writing = $this->p2nl($writing);
 
 				$convert = str_replace('’', "'",$writing);
 				$convert = str_replace('“', '"',$convert);
@@ -428,6 +480,9 @@ class Service extends CI_Controller {
 				$data['price_kind'] = $price_kind;
 				$data['orig_id'] = $orig_id;
 				$data['reason'] = $reason;
+				$data['user_file'] = $user_file;
+				$data['download_link'] = EDGE_WRITING_URL . "download/file/" . $user_file;
+				$data['filename'] = "";
 				//$data['classify'] = 'new';				
 			}
 
@@ -472,6 +527,8 @@ class Service extends CI_Controller {
 		$price_kind = $this->db->escape($this->input->POST('price_kind') );
 		$orig_id = $this->input->POST('orig_id');
 		$reason = $this->db->escape($this->input->POST('reason'));
+		$user_file = $this->input->POST('user_file');
+
 
 		log_message('error', 'price_kind = ' . $price_kind);
 
@@ -494,6 +551,7 @@ class Service extends CI_Controller {
 		$dic['price_kind']		= $price_kind;
 		$dic['orig_essay_id']	= $orig_id;
 		$dic['reason']		= $reason;
+		$dic['user_file']		= $user_file;
 
 		return $dic;
 	} 
@@ -639,7 +697,7 @@ class Service extends CI_Controller {
 					$data["critique"] = $essays[0]->critique;
 					$data["score"] = $essays[0]->scoring;
 					$data["date"] = date("Y-m-d H:i:s", time());
-					$data["file"] = "";
+					$data["file"] = $essays[0]->filename;
 
 					$sending_data["status"]	= true;
 					$sending_data["data"] = $data;

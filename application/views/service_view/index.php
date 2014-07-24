@@ -18,9 +18,12 @@
 			  	<thead>
 					<tr id="head" class="service_headlight">
 						<th class="text-center" style="width:140px;"></th>										
-						<th class="text-center">Prompt</th>																
-						<th class="text-center" style="width:200px;">Re-Submit</th>									
-						<th class="text-center" style="width:140px;">Service Type</th>			
+						<th class="text-center">Prompt</th>
+																					
+						<th class="text-center" style="width:140px;">Re-Submit</th>									
+						<th class="text-center" style="width:140px;">Service Type</th>
+
+						<th class="text-center" style="width:140px;">Doc File</th>				
 					</tr>
 				</thead>		
 				<tbody id="newlist">
@@ -93,12 +96,12 @@ function ajaxPostNew(){
             $('tr#new').addClass('clickableRow');            
             if(result['status']){            
                 $('li#service_chk').html('<a href="/service"><font color=red>Service</font></a>');
-                $('tr#new').append('<td style="width:80px;"><h2><span class="label label-primary">'+result['data']['id']+'</span></h2></div></td>');
+                $('tr#new').append('<td style="width:80px;"><div class="parent" style="height:50px;"><div class="child" style="margin-top:-32px;margin-left:15px;"><h2><span class="label label-primary">'+result['data']['id']+'</span></h2></div></div></td>');
 
                 if(result['data']['title'].length > 240){
-                    $('tr#new').append('<td><div class="parent" style="height:80px;"><div class="child" style="margin-top:-19px;margin-left:15px;"><h5>'+result['data']['title'].substr(0,100)+'...'+'</h5></div></div></td>');                
+                    $('tr#new').append('<td><div class="parent" style="height:50px;"><div class="child" style="margin-top:-19px;margin-left:15px;"><h5>'+result['data']['title'].substr(0,100)+'...'+'</h5></div></div></td>');                
                 }else{
-                    $('tr#new').append('<td><div class="parent" style="height:80px;"><div class="child" style="margin-top:-19px;margin-left:15px;"><h5>'+result['data']['title']+'</h5></div></div></td>');                
+                    $('tr#new').append('<td><div class="parent" style="height:50px;"><div class="child" style="margin-top:-19px;margin-left:15px;"><h5>'+result['data']['title']+'</h5></div></div></td>');                
                 }                    
                 var db_date = result['data']['date'];
                 // 2013-11-10 03:11:03
@@ -127,12 +130,20 @@ function ajaxPostNew(){
                 //$("tr#new").append('<td><div class="text-center" id="timer" style="height:80px; margin-top:33px;"></div></td>');
                 //$('tr#new').append('<td><div class="text-center" style="height:80px; margin-top:25px;"><button class="btn btn-danger" id="adjust">Adjust</button></div></td>');
 
+
                 var re_submit = 'No';
                 if(result['data']['orig_id'] != 0 && result['data']['id'] != result['data']['orig_id']) {
                 	re_submit = 'Yes';
                 }
-                $("tr#new").append('<td><div class="text-center" style="height:80px; margin-top:25px;">'+re_submit+'</div></td>');
-                $("tr#new").append('<td><div class="text-center" style="height:80px; margin-top:25px;">'+result['data']['price_kind']+'</div></td>');
+                $("tr#new").append('<td><div class="text-center" style="height:50px; margin-top:15px;">'+re_submit+'</div></td>');
+                $("tr#new").append('<td><div class="text-center" style="height:50px; margin-top:15px;">'+result['data']['price_kind']+'</div></td>');
+
+                var upload_file = result['data']['upload_file'];
+                var exist_file = "No";
+                if( upload_file != null && upload_file.length > 5) {
+                	exist_file = "Yes";
+                }
+                $("tr#new").append('<td><div class="text-center" style="height:50px; margin-top:15px;">'+exist_file +'</div></td>');
                 
                 //date: "November 7, 2013 16:03:26"
                 $('div#timer').countdown({date: countdate}); // 24시간 타이머.
@@ -180,17 +191,29 @@ $('tbody#newlist').delegate('tr.clickableRow', 'click', function()
 	console.log('a');
 	var re = new RegExp('"', 'g')
 
+	upload_file = result['data']['upload_file'];
+
 	token = access['data']['token'];
 	w_id = result['data']['id'];
 	kind = result['data']['kind_id'];
 	title = result['data']['title'].replace(re,'&quot;');
-	writing = result['data']['writing'].replace(re,'&quot;');
-	//alert(writing);		
+	if( upload_file != null && upload_file.length > 5) {
+		writing = "";
+		reason = result['data']['writing'].replace(re,'&quot;');
+	} else {
+		upload_file = "";
+		writing = result['data']['writing'].replace(re,'&quot;');
+		if (result['data']['reason'] != null) {
+			reason = result['data']['reason'].replace(re,'&quot;');
+		} else {
+			reason = "";
+		}
+		
+	}
 	word_count = result['data']['words'];
 	start_date = result['data']['date'];
 	price_kind = result['data']['price_kind'];
 	orig_id = result['data']['orig_id'];
-	reason = result['data']['reason'].replace(re,'&quot;');
 
 	var data = {
 		token: token,
@@ -219,6 +242,7 @@ $('tbody#newlist').delegate('tr.clickableRow', 'click', function()
 		        .append($('<input type="hidden" name="price_kind" value="' + price_kind + '">'))
 		        .append($('<input type="hidden" name="orig_id" value="' + orig_id + '">'))
 		        .append($('<input type="hidden" name="reason" value="' + reason + '">'))
+		        .append($('<input type="hidden" name="user_file" value="' + upload_file + '">'))
 		        .appendTo($(document.body)) //it has to be added somewhere into the <body>
 		        .submit();
 			}else{

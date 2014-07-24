@@ -69,8 +69,13 @@ class Writing extends CI_Controller {
 				} else {
 					$service_dic['orig_essay_id']	= $premium['orig_id'];
 				}
-				$service_dic['reason']		= $this->db->escape($premium['reason']);
+				$service_dic['reason']		= $this->db->escape($premium['reason'])	;
+				if ($service_dic['reason'] == 'NULL') {
+					$service_dic['reason'] = "''";
+				}
+
 				$service_dic['start_date']		= $premium['date'];
+				$service_dic['user_file']		= $premium['upload_file'];
 				$service_dic['draft']		= 0;
 				$service_dic['submit']		= 0;
 
@@ -79,6 +84,46 @@ class Writing extends CI_Controller {
 				if (!$query_res) {
 					$access_status['status'] = false;
 					break;
+				}
+
+				// if user's doc is exists, copy the file to local system.
+				if ($premium['upload_file'] != "") {
+					$remote_file = EDGE_WRITING_URL . "download/file/" . $premium['upload_file'];
+					$local_file = USER_DOC_PATH . $premium['upload_file'];
+
+					log_message ('error', '[DEBUG] remote copy [from]: ' . $remote_file);
+
+					//$result = file_put_contents($local_file, file_get_contents($remote_file));
+
+					$this->curl->create($remote_file);
+					if (IS_SSL) {
+						$this->curl->ssl(FALSE);
+					}
+
+					//$fp = fopen($local_file, 'w+b');					
+					//$this->curl->option(CURLOPT_FILE, $fp);
+					//$this->curl->option(CURLOPT_FOLLOWLOCATION, true);
+
+					$this->curl->option('connecttimeout', 10);
+					$this->curl->option(CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']);
+
+					$result = $this->curl->execute();
+
+					file_put_contents($local_file, $result);
+
+					//echo "result : ";
+					//var_dump($result);
+					//$info = $this->curl->info;
+					//echo "info : ";
+					//var_dump($info);
+ 					//$this->curl->debug();
+					$this->curl->close();
+					//fclose($fp); 
+
+					if ($result === false) {
+						log_message ('error', '[ERROR] remote copy fail [from]: ' . $remote_file);
+						log_message ('error', '[ERROR] remote copy fail [to]: ' . $local_file);
+					}
 				}
 			}
 		}
@@ -299,11 +344,11 @@ class Writing extends CI_Controller {
 
 					//$access_status['error']['message'];
 				} else {
-					$result = $this->send_email_to_editor($email, $draft_dic);
+					//$result = $this->send_email_to_editor($email, $draft_dic);
 					//$result = $this->send_email_to_editor("eric@akaon.com", $draft_dic);
-					//$result = $this->send_email_to_editor("bettychoi@akaprep.com", $draft_dic);
+					$result = $this->send_email_to_editor("bettychoi@akaprep.com", $draft_dic);
 					
-					log_message('error', '[DEBUG] assign_editor_to_premium send_mail result :' . $this->email->print_debugger());
+					//log_message('error', '[DEBUG] assign_editor_to_premium send_mail result :' . $this->email->print_debugger());
 					log_message('error', '[DEBUG] assign_editor_to_premium send_mail result :' . $result);
 					if (!$result) {
 						$json['status'] = false;
@@ -499,7 +544,8 @@ class Writing extends CI_Controller {
 		$full_path = DOC_UPLOAD_PATH . $filename . ".". $fileNameParts[1];
 		$file_size = filesize($full_path);
 		//$encoded_filename = urlencode($full_path);
-		$download_fname = "EDGE_Writing_$essay_id.".$fileNameParts[1];
+		//$download_fname = "EDGE_Writing_$essay_id.".$fileNameParts[1];
+		$download_fname = "EDGEWritings_" . date("Ymd") .".".$fileNameParts[1];
 
 		if (is_file("$full_path")) {
 			if(strstr($_SERVER['HTTP_USER_AGENT'], "MSIE 5.5")) {   
@@ -583,6 +629,9 @@ class Writing extends CI_Controller {
 		$filename = explode( ".", $rows->filename);
 		$premium['filename'] = $filename[0];
 
+		$premium['user_file'] = $rows->user_file;
+		$premium['download_link'] = EDGE_WRITING_URL . "download/file/" . $rows->user_file;
+
 		return $premium;
 	}
 
@@ -598,17 +647,9 @@ class Writing extends CI_Controller {
 		}
 
 
-
 		$premium = $this->pretreatment_premium($essay);
 		log_message('error', '[DEBUG] premium name : ' . $dic['name'] . '###');
-
-		$filename1 = "./uploads/premium_essay_$essay_id.txt";
-		$fp = fopen($filename1, "w");
-		if ($fp) {
-			fputs($fp, $premium['raw_writing']);
-			fclose($fp);
-		}
-		
+	
 
 		$url = 'https://edgewritings.com';
 		$style = 'font-size:14px; color:#777; margin-right: 13px; text-decoration:none;'; 
@@ -642,6 +683,29 @@ class Writing extends CI_Controller {
 			Here is a request for a Premium service essay.<br><br>
 			Please read through and follow the PREMIUM Editing Guidelines before proceeding onto the essay. Copy the essay on the .txt file onto the Microsoft Word template (please refrain from using any other word processor). <br><br>
 			Remember that you must send the essay with its corrections to the admin (reply to this email) within 40 hrs of the date in order to keep the deadline with our client. <br><br>';
+		}
+
+		if (strlen($premium['user_file']) > 10) {
+			$writing_str = '<tr>
+						<td style="' . $td_style1  . '"><b>User\'s Doc</b></td>
+						<td style="' . $td_style2  . '"><a href="'. $premium['download_link'] .'">' . $premium['user_file'] . '</td>
+					</tr>';
+			$writing_str .= '<tr>
+						<td style="' . $td_style1  . '"><b>Comment</b></td>
+						<td style="' . $td_style2  . '">' . $premium['reason'] . '</td>
+					</tr>';
+		} else {
+			$writing_str = '<tr>
+						<td style="' . $td_style1  . '"><b>Writing</b></td>
+						<td style="' . $td_style2  . '">' . $premium['re_raw_writing'] . '</td>
+					</tr>';
+
+			$filename1 = USER_TXT_PATH. "premium_essay_$essay_id.txt";
+			$fp = fopen($filename1, "w");
+			if ($fp) {
+				fputs($fp, $premium['raw_writing']);
+				fclose($fp);
+			}
 		}
 
 		$message = '
@@ -682,11 +746,7 @@ class Writing extends CI_Controller {
 			<td style="' . $td_style1  . '"><b>Date</b></td>
 			<td style="' . $td_style2  . '">' . $premium['start_date'] . '</td>
 		</tr>
-		<tr>
-			<td style="' . $td_style1  . '"><b>Writing</b></td>
-			<td style="' . $td_style2  . '">' . $premium['re_raw_writing'] . '</td>
-		</tr>
-		' . $reason_str . '
+		' . $writing_str . $reason_str . '
 		</tbody>
 		</table>';
 
@@ -761,6 +821,8 @@ class Writing extends CI_Controller {
 		</table>
 		';
 
+		
+
 		$email_setting = Array(
 		    'protocol' => 'smtp',
 		    'smtp_host' => 'ssl://smtp.gmail.com',
@@ -785,8 +847,14 @@ class Writing extends CI_Controller {
 		$bg_imageUrl = "url('".$url."'/images/bar_email.png);"; 
 
 		$this->email->subject($subject);
-		$this->email->message($message); 
-		$this->email->attach($filename1);
+		$this->email->message($message);
+
+		log_message('error', '[DEBUG] subject : ' . $subject);
+		log_message('error', '[DEBUG] message : ' . $message);
+
+		if (strlen($premium['user_file']) < 10) {
+			$this->email->attach($filename1);
+		}
 		$this->email->attach('./downloads/EW_Premium_Essay.docx');
 		$this->email->attach('./downloads/Welcome_to_Edge_Writings_Editor_Guidelines.docx');
 		return $this->email->send();

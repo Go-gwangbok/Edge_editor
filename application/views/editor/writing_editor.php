@@ -1,3 +1,4 @@
+<script src="/public/js/jquery.form.min.js"></script> 
 <div class="container" style="margin-top:-15px;">
   <div class="row">   
     <ol class="breadcrumb" style="background:white;">
@@ -6,28 +7,6 @@
             <li class="akacolor">Writing</li>          
       </ol> <!-- Navi end -->
   </div>  
-
-<table class="table table-bordered">          
-    <tbody>
-    <tr>
-      <td width="100" style="background-color:rgb(249,249,249)"><b>KIND</b></td>
-      <td width="200"><?=$kind_name?></td>
-      <td width="120" style="background-color:rgb(249,249,249)"><b>Re-Submit</b></td>
-      <td><?php if ($re_submit == 'Yes') { ?> <a href="/writing/view_essay/<?=$orig_id?>/"><?=$re_submit?></a><?php } else { ?> <?=$re_submit?> <?php } ?> </td>
-      <td width="100" style="background-color:rgb(249,249,249)"><b>Date</b></td>
-      <td><?=$start_date?></td>
-    </tr>
-    <?php
-       if ($re_submit == 'Yes') {
-    ?>
-    <tr>
-      <td width="100" style="background-color:rgb(249,249,249)"><b>Reason</b></td>
-      <td colspan="5" id=reason><?=$reason?></td>
-    </tr>
-    <?php
-       }
-    ?>
-  </table>
 
     <!-- <h2 style="margin-top:-10px;">Title</h2>  -->
   <div class="div-box-line-promp">
@@ -47,6 +26,70 @@
     </dl>       
   </div>    
   <br>
+
+<table class="table table-bordered">          
+    <tbody>
+    <tr>
+      <td width="100" style="background-color:rgb(249,249,249)"><b>KIND</b></td>
+      <td width="200"><?=$kind_name?></td>
+      <td width="120" style="background-color:rgb(249,249,249)"><b>Re-Submit</b></td>
+      <td><?php if ($re_submit == 'Yes') { ?> <a href="/writing/view_essay/<?=$orig_id?>/"><?=$re_submit?></a><?php } else { ?> <?=$re_submit?> <?php } ?> </td>
+      <td width="100" style="background-color:rgb(249,249,249)"><b>Date</b></td>
+      <td><?=$start_date?></td>
+    </tr>
+
+    <?php if ($user_file != "") { ?>
+    <tr>
+      <td width="100" style="background-color:rgb(255,255,0)"><b>User's File</b></td>
+      <td><?php if ($user_file != "") { ?> <a href="<?=$download_link?>"><?=$user_file;?></a><?php } else { ?> No <?php } ?> </td>
+      <td width="120" style="background-color:rgb(255,255,0)"><b>Editor's File</b></td>
+      <td colspan="3" >
+        <div id='editor_file'>
+        <?php
+           if ($filename != "") {
+            $tmp = explode (".", $filename);
+            $f_name = $tmp[0];
+        ?>
+            <a href="/writing/download/<?=$type;?>/<?=$id;?>/<?=$f_name;?>/"><?=$filename;?></a>
+       <?php
+          }             
+        ?>
+      </div>
+
+        <form id="uploadForm" action="/upload/upload_docfile" method="post" enctype="multipart/form-data">
+        <input type="file" name="userfile" id="userfile" size="20" />
+        <input type="hidden" name="essay_id" id="essay_id" value="<?=$id;?>">
+        <input type="hidden" name="kind" id="kind" value="<?=$type;?>">
+        <button class="btn btn-danger btn-xs" type="button" value="upload" id="upload" onclick="javacript:Upload(); " style="margin-top:5px;"/>Upload</button>       
+        <span class="text-danger" style="margin-left:10px;"></span>     
+      </form>
+
+      </td>
+    </tr>
+    <?php
+       }
+    ?>
+
+    <?php
+       if ($re_submit == 'Yes') {
+    ?>
+    <tr>
+      <td width="100" style="background-color:rgb(249,249,249)"><b>Reason</b></td>
+      <td colspan="5" id=reason><?=$reason?></td>
+    </tr>
+    <?php
+       } else if ($user_file != "") {
+    ?>
+    <tr>
+      <td width="100" style="background-color:rgb(249,249,249)"><b>Comment</b></td>
+      <td colspan="5" id=reason><?=$reason?></td>
+    </tr>
+    <?php
+       }
+    ?>
+  </table>
+
+
 
   <div id = "error"></div>
 
@@ -106,7 +149,7 @@
         <button class="btn btn-warning pull-right" id="discuss" style="margin-right:10px;">T.B.D</button>
       <?php
       }      
-    } else { // writing service
+    } else if  ($user_file == "") { // writing service
     ?>
       <button class="btn btn-warning pull-right" id="w_discuss" style="margin-right:10px;">T.B.D</button>
     <?php
@@ -355,6 +398,10 @@ var chk_structure = '<?=$chk_structure;?>';
 var chk_sco1 = '<?=$chk_sco1;?>';
 var chk_sco2 = '<?=$chk_sco2;?>';
 
+var user_file = '<?=$user_file;?>';
+var editors_file = '<?=$filename;?>';
+
+
 var cate = '<?=$cate;?>';
 var draft_time = <?=$time;?>;
 var score = '<?=$score1;?>';
@@ -367,7 +414,7 @@ function getAnchorOffset() {
      var anchorOffsetProp = selection.anchorOffset;   //get the offset
      console.log( "Anchor Offset: \n" + anchorOffsetProp.toString());                                 
      }
-} 
+}
 
 (function($) { 
   // Define the hello button
@@ -424,7 +471,7 @@ function getAnchorOffset() {
 //     .selection('insert', {text: '</strong>', mode: 'after'});
 // });
 var tagging_action_array = new Array();  
-$(document).ready(function(){      
+$(document).ready(function(){
   var active_ele = '<?=$active_ele;?>';
   $('div#'+active_ele).addClass('active');
   
@@ -503,12 +550,70 @@ $(document).ready(function(){
     }
   }
 
+  <?php if ($user_file != "") { ?>
+  $("#uploadForm").ajaxForm();
+
+  checkSubmittable();
+  <? } ?>
+
 }); // Ready end.
+
+function checkSubmittable() {
+  if (user_file == "") {
+    var charLimit = 10;
+    var critique = $('textarea#critique').val();  
+    var remaining = charLimit - $(this).val().replace(/\s+/g," ").length;
+  
+    if (remaining < charLimit && remaining > 0) {       
+       $('#w_submit').prop('disabled', true);                  
+
+    } else if (remaining < 0) {        
+        $('#w_submit').prop('disabled', false);               
+    } 
+  } else {
+    if (editors_file != "") {
+      $('#w_submit').prop('disabled', false); 
+    }
+  }
+}
+
 
 if(cate == 'writing'){
   clearInterval(service_chk); //realtime service chk clear.  
   console.log('stop');
 }
+
+function Upload() {
+
+    $("#uploadForm").ajaxSubmit({
+      statusCode: {
+          400: function() {
+            alert("File upload failed");
+          },            
+          500: function() {
+            alert("File upload failed");
+          }
+        },                      
+        success: function(data) { 
+          alert(data['message']);
+
+          if(data['status'])
+          {
+            $('#uploadForm').clearForm();
+
+            editor_file = document.getElementById('editor_file');
+            editor_file.innerHTML= '<a href="/writing/download/<?=$type;?>/<?=$id;?>/' + data['enc_filename'] + '/">' + data['filename'] + '</a>';
+
+            $('#w_submit').prop('disabled', false); 
+            editors_file = data['filename'];
+
+            //alert(editor_file.innerHTML);
+          }
+        }
+    });
+}
+
+
 
 // Timer
 function formatTime(time) {
@@ -536,6 +641,7 @@ function pad(number, length) {
 
 var Example1 = new (function() {
 
+  /***
     if(cate == 'draft'){
       var currentTime = draft_time; // Current time in hundredths of a second 100 == 1  
           incrementTime = 70; // Timer speed in milliseconds      
@@ -545,7 +651,11 @@ var Example1 = new (function() {
     }else{      
       var currentTime = 0; // Current time in hundredths of a second 100 == 1  
       incrementTime = 70; // Timer speed in milliseconds      
-    }    
+    }
+    ****/
+    var currentTime = draft_time; // Current time in hundredths of a second 100 == 1  
+          incrementTime = 70; // Timer speed in milliseconds      
+   
 
     var $stopwatch, // Stopwatch element on the page            
         updateTimer = function() {            
@@ -1046,6 +1156,7 @@ $('button#w_draft').click(function(){
   data['raw_writing'] = $('input#raw_writing').val();
   data['title'] = $('input#h_title').val();
   data['word_count'] = '<?=$word_count?>';
+  data['user_file'] = '<?=$user_file?>';
   console.log(data);
   
   $.ajax(
@@ -1061,6 +1172,7 @@ $('button#w_draft').click(function(){
       {
         // 정상적으로 처리됨
         alert('It’s been successfully processed!');
+        window.location.replace('/service'); // 리다이렉트할 주소
         //window.history.back();
         //location.reload();
         //window.location.replace('/essaylist'); // 리다이렉트할 주소
@@ -1086,6 +1198,7 @@ $("button#w_submit").click(function(){
   data['orig_id'] = '<?=$orig_id?>';
   data['reason'] = $('td#reason').val();;
   data['price_kind'] = '<?=$price_kind?>';
+  data['user_file'] = '<?=$user_file?>';
   console.log(data);
 
   $.ajax({    
@@ -1143,6 +1256,7 @@ $('button#w_discuss').click(function(){
   data['raw_writing'] = $('input#raw_writing').val();
   data['title'] = $('input#h_title').val();
   data['word_count'] = '<?=$word_count?>';
+  data['user_file'] = '<?=$user_file?>';
 
   console.log(data);
   $.post('/service/discuss',data,function(json){          
@@ -1222,4 +1336,5 @@ $('button#w_discuss').click(function(){
   }
 }
 (document,"script","twitter-wjs");
+
 </script>                   

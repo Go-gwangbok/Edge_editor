@@ -67,6 +67,8 @@
 				<input type="file" name="userfile" id="input" size="20" />
 				<input type="hidden" name="essay_id" id="essay_id" value="<?=$premium['essay_id'];?>">
 				<input type="hidden" name="kind" id="kind" value="<?=$service_id;?>">
+				<input type="hidden" name="redirect_url" id="redirect_url" value="/writing/view_premium/<?=$premium['essay_id'];?>/">
+				
 				<button class="btn btn-danger btn-xs" type="submit" value="upload" id="upload" " style="margin-top:5px;"/>Upload</button>				
 				<span class="text-danger" style="margin-left:10px;"></span>			
 			</form>
@@ -84,6 +86,26 @@
 			</td>
 		</tr>
 		<?php } ?>
+		<?php if ($premium['user_file'] != "") { ?>
+		<tr>
+			<td><b>User's File</b></td>
+			<td colspan="5">
+			        <a href="<?=$premium['download_link'];?>"><?=$premium['user_file'];?></a>     
+			</td>
+		</tr>
+		<td><b>Comment</b></td>
+			<td colspan="5">
+			      <div class="col-md-12" style="margin-top:15px;">                
+			        
+			        <div>          
+			          <?php
+			            echo trim($premium['reason']);             
+			          ?>      
+			        </div> 
+			        <br>      
+			      </div>  <!-- col-md-12 -->
+			</td>
+		<?php } else { ?>
 		<tr>
 			<td><b>Writing</b></td>
 			<td colspan="5">
@@ -98,6 +120,7 @@
 			      </div>  <!-- col-md-12 -->
 			</td>
 		</tr>
+		<?php } ?>
 		<tr>
 			<td><b>Done</b></td>
 			<td colspan="5">

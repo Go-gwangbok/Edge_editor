@@ -16,9 +16,18 @@ class Project_Manage extends CI_Controller {
 		$this->output->set_content_type('application/json')->set_output(json_encode($json));
 	}
 
-	public function make_sentence_count($service_id){
-		if ($service_id == 1) {
+	public function make_sentence_count($service_name){
+		if ($service_name == 'musedata') {
 			$result = $this->batch_job->make_sentence_count_musedata();
+		} else if ($service_name == 'writing') {
+			$result = $this->batch_job->make_sentence_count_writing();
+		} else if ($service_name == 'grammar') {
+			$result = $this->batch_job->make_sentence_count_grammar();
+		} else {
+			$json['status'] = fail;
+			$json['message'] = "invalid service name"; 
+			$this->output->set_content_type('application/json')->set_output(json_encode($json));
+			return;
 		}
 
 		if (!$result) {
@@ -123,6 +132,66 @@ class Project_Manage extends CI_Controller {
 
 		echo "success count : $count\n";
 	}
+
+	public function get_grammar_data(){
+
+		$before_day = date("Ymd", strtotime("-1 day"));
+		echo "before_day : $before_day\n";
+
+		//$url = "http://ec2-54-244-190-156.us-west-2.compute.amazonaws.com:8080/logs/muse.20140717.log";
+		$url = "http://ec2-54-244-190-156.us-west-2.compute.amazonaws.com:8080/logs/muse.$before_day.log";
+
+		$this->load->model('grammar_model');
+
+		echo date("Ymd") . "\n";
+		echo $url . "\n";
+
+		$result = $this->curl->simple_get($url);
+		
+		$grammar_list = explode("\n", $result);
+
+		$count = 0;
+		foreach($grammar_list as $json) {
+			//echo "$count : $grammar\n";
+
+			$grammar = json_decode($json, true);
+
+			if ( !isset($grammar['sentences'][0]['sentence']) ) {
+				break;
+			}
+
+			$created = str_replace (" UTC", "", $grammar['utctime']);
+
+
+			//echo $grammar['utctime'] . "\n";
+			//echo "[$created]\n\n";
+			//echo $grammar['sentences'][0]['sentence'] . "\n";
+			//echo count($grammar['sentences'][0]['words']) . "\n";
+			//echo $grammar['error_counts'] . "\n";
+			//echo $grammar['proctime'] . "\n";
+			//echo $grammar['sentences'][0]['sentence'] . "\n";
+
+			$grammar_model = new Grammar_model();
+
+			$grammar_list = json_decode($result, true);
+
+			$grammar_model->sentence 	= $grammar['sentences'][0]['sentence'];
+			$grammar_model->json 		= $json;
+			$grammar_model->word_count 	= count($grammar['sentences'][0]['words']);
+			$grammar_model->error_count 	= $grammar['error_counts'];
+			$grammar_model->proc_time 	= $grammar['proctime'];
+			$grammar_model->created 	= str_replace (" UTC", "", $grammar['utctime']);
+
+			if (!$grammar_model->insert()) {
+				echo "fail";
+				break;
+			}
+			$count++;
+		}
+
+		echo "success count : $count\n";
+	}
+
 
 	public function make_daily_stat($service){
 		$this->load->model('stat');

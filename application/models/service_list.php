@@ -1860,6 +1860,8 @@ class Service_List extends CI_Model{
 		$time = $dic['time'];
 		$kind = $dic['kind'];
 		$type = $dic['type'];
+		$user_file = $dic['user_file'];
+
 		if ($dic['draft'] != "" && $dic['draft'] == 1) 
 			$draft = 1;
 		else
@@ -1905,12 +1907,12 @@ class Service_List extends CI_Model{
 
 	   		$sql = "INSERT INTO service_data(
 				usr_id, essay_id, prompt, raw_txt, editing, tagging,
-				critique, scoring, score2, word_count, draft, submit,
-				time, kind, type, start_date, price_kind, orig_essay_id, reason
+				critique, scoring, score2, word_count, draft, submit, time,
+				kind, type, start_date, price_kind, orig_essay_id, reason, user_file
 				) VALUES (
 				'$usr_id','$w_id',$title,$raw_writing,$editing,$tagging,
-				$critique,$score1,$score2,$word_count,$draft,$submit,
-				$time,$kind,$type,'$start_date', $price_kind, $orig_essay_id, $reason)";
+				$critique,$score1,$score2,$word_count,$draft,$submit, $time, 
+				$kind,$type,'$start_date', $price_kind, $orig_essay_id, $reason, '$user_file')";
 
 			$flag = "insert";
 	   	}

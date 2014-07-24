@@ -38,13 +38,20 @@ define('FOPEN_READ_WRITE_CREATE_STRICT',		'x+b');
 
 
 
-define('IS_SSL', true);
-define('EDGE_WRITING_URL',	'https://edgewritings.com/');
-#define('EDGE_WRITING_URL',	'http://192.168.219.144/');
+#define('IS_SSL', true);
 #define('EDGE_WRITING_URL',	'https://edgewritings.com/');
+define('IS_SSL', false);
+define('EDGE_WRITING_URL',	'http://192.168.219.144/');
 define('WRITING_PREMIUM_SECRET_KET', 'isdyf3584MjAI419BPuJ5V6X3YT3rU3C');
 
 define('DOC_UPLOAD_PATH', './uploads/tmp/');
+define('USER_DOC_PATH', './uploads/user_doc/');
+define('USER_TXT_PATH', './uploads/user_txt/');
+#define('DOC_UPLOAD_PATH', '/var/www/uploads/editor_doc/');
+#define('USER_DOC_PATH', '/var/www/uploads/user_doc/');
+#define('USER_TXT_PATH', '/var/www/uploads/user_txt/');
+
+
 //define('DOC_UPLOAD_PATH', 'C:/uploads/');
 
 define('MY_DOMAIN', 'http://ec2-54-199-7-211.ap-northeast-1.compute.amazonaws.com/');

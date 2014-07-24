@@ -190,6 +190,7 @@ class Upload extends CI_Controller {
 		$files = $this->input->post('userfile');
 		$essay_id = $this->input->post('essay_id');
 		$service_id = $this->input->post('kind');
+		$redirect_url = $this->input->post('redirect_url');
 		//echo "essay_id : $essay_id<br>";
 		//echo "service_id : $service_id<br>";
 		//$pj_kind = strtolower($this->input->post('kind'));
@@ -209,6 +210,7 @@ class Upload extends CI_Controller {
 		$fileExtension   = end( $fileNameParts ); // give extension
 		$fileExtension   = strtolower( $fileExtension ); // convert to lower case
 		$filename = "${service_id}_${essay_id}";
+		$enc_filename = md5($filename);
 		$encripted_pic_name   = md5($filename).".".$fileExtension;  // new file name
 		$config['file_name'] = $encripted_pic_name; //set file name
 
@@ -226,6 +228,8 @@ class Upload extends CI_Controller {
 			//$data['error'] = 'Please select a file';						
 			//$data['error'] = $this->upload->display_errors();
 			$message = $this->upload->display_errors();
+			$json['status'] = fail;
+			$json['message'] = $message;
 		}else{
 			$file_data = $this->upload->data();
 			//echo var_dump($file_data);
@@ -245,16 +249,17 @@ class Upload extends CI_Controller {
 			
 			
 			$message = "file upload success!!!";
-			
+			$json['status'] = true;
+			$json['message'] = $message;
+			$json['filename'] = $draft_dic['filename'];
+			$json['enc_filename'] = $enc_filename;
 		}
 
-		echo '<script> alert("'.$message.'"); window.location = "/writing/view_premium/'.$essay_id.'/";</script>';
-		//echo ('/writing/view_premium/'.$essay_id.'/');
-
-		//redirect('/writing/view_premium/'.$essay_id.'/');
-
-		//$this->load->view('import',$data);
-		//$this->load->view('footer');
+		if ($redirect_url != "") {
+			echo '<script> alert("'.$message.'"); window.location = "'.$redirect_url.'";</script>';
+		} else {
+			$this->output->set_content_type('application/json')->set_output(json_encode($json));
+		}
 	}	
 
 
