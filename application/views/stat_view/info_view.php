@@ -15,7 +15,7 @@
 		  <li <?php if ($service_name == 'musedata') { ?> class="active" <?php } ?> id="musedata_title"><a href="#musedata" data-toggle="tab">Muse Data</a></li>
 		  <li <?php if ($service_name == 'picto') { ?> class="active" <?php } ?> id="picto_title"><a href="#picto" data-toggle="tab">Picto</a></li>	  
 		  <li <?php if ($service_name == 'speaking') { ?> class="active" <?php } ?> id="speaking_title"><a href="#speaking" data-toggle="tab">Speaking</a></li>	  
-		  <li <?php if ($service_name == 'writing') { ?> class="active" <?php } ?> id="writing_title"><a href="#writing" data-toggle="tab">Writing</a></li>
+		  <li <?php if ($service_name == 'writing') { ?> class="active" <?php } ?> id="writing_title"><a href="#writing" data-toggle="tab">Writings</a></li>
 		  <li <?php if ($service_name == 'editor') { ?> class="active" <?php } ?> id="editor_title"><a href="#editer" data-toggle="tab">Editor</a></li>	
 		</ul>
 
@@ -66,9 +66,8 @@
 
 		  	<!-- Picto Stat -->
 		  	<div class="tab-pane <?php if ($service_name == 'picto') { ?> active <?php } ?>" id="picto">
-
+		  		<br>
 			  	<div class="row clearfix">
-
 					<div class="col-md-10 col-md-offset-1 column">
 						<div class="form-inline">
 							<div class="form-group" id="picto_gubun">
@@ -90,7 +89,7 @@
 		  		<br>	  			
 
     <table class="table table-bordered table-striped">
-      <th>Essay Count</th><th>Sentense Count</th>
+      <th>Picto Count</th><th>Sentense Count</th>
       <tr class="success"><td><div id='p_data1'>&nbsp;</div></td><td><div id='p_data2'></div></td></tr>
    </table>
 
@@ -119,7 +118,7 @@
 
 
     <table class="table table-bordered table-striped">
-      <th>Essay Count</th><th>Sentense Count</th><th>Aduio Duration(Minute)</th>
+      <th>Audio Count</th><th>Sentense Count</th><th>Aduio Duration(Minute)</th>
       <tr class="success"><td><div id='s_data1'>&nbsp;</div></td><td><div id='s_data2'></div></td><td><div id='s_data3'></div></td></tr>
    </table>
   			  		
@@ -155,7 +154,7 @@
 
 
    <table class="table table-bordered table-striped">
-      <th>Essay Count</th><th>Sentense Count</th>
+      <th>Request Count</th><th>Sentense Count</th>
       <tr class="success"><td><div id='w_data1'>&nbsp;</div></td><td><div id='w_data2'></div></td></tr>
    </table>
 
@@ -203,7 +202,7 @@
 				  				$td_str .= '<td>' . number_format($rows['value']) . '</td>';
 				  				$old_gubun = $gubun;
 
-				  				if ($gubun == "Google Books Corpus") {
+				  				if ($gubun == "Crawling Data") {
 				  					$books_data[$rows['item']] = $rows['value'];
 				  				}
 				  			}
@@ -239,7 +238,7 @@
 		  		<br>	  			
 
     <table class="table table-bordered table-striped">
-      <th>Essay Count</th><th>Sentense Count</th>
+      <th>Request Count</th><th>Sentense Count</th>
       <tr class="success"><td><div id='e_data1'>&nbsp;</div></td><td><div id='e_data2'></div></td></tr>
    </table>
 
@@ -396,34 +395,45 @@ function init_chart() {
 	chartdata = new google.visualization.DataTable();
 
 	chartdata.addColumn('date', 'Date');
-	chartdata.addColumn('number', 'Essay Count');
-	chartdata.addColumn('number', 'Sentence Count');
+
+	/**
 	if (service_name == 'speaking') {
+		chartdata.addColumn('number', 'Essay Count');
+		chartdata.addColumn('number', 'Sentence Count');
 		chartdata.addColumn('number', 'Audio Duration(Minute)');
 	}
+	**/
 
 	if (service_name == 'picto') {
+		chartdata.addColumn('number', 'Picto Count');
+		chartdata.addColumn('number', 'Sentence Count');
 		var url = '/stat/info/get_pictodata/';
 		chart = new google.visualization.AnnotatedTimeLine(document.getElementById('picto_div'));
 	}
 	else if (service_name == 'speaking') {
+		chartdata.addColumn('number', 'Audio Count');
+		chartdata.addColumn('number', 'Sentence Count');
+		chartdata.addColumn('number', 'Audio Duration(Minute)');
 		var url = '/stat/info/get_speakingdata/';
 		chart = new google.visualization.AnnotatedTimeLine(document.getElementById('speaking_div'));
 	}
 	else if (service_name == 'writing') {
+		chartdata.addColumn('number', 'Request Count');
+		chartdata.addColumn('number', 'Sentence Count');
 		var url = '/stat/info/get_writingdata/';
 		chart = new google.visualization.AnnotatedTimeLine(document.getElementById('writing_div'));
 	} 
 	else if (service_name == 'editor') {
 		drawGoogleBookChart();
 
+		chartdata.addColumn('number', 'Request Count');
+		chartdata.addColumn('number', 'Sentence Count');
 		var url = '/stat/info/get_editordata/';
 		chart = new google.visualization.AnnotatedTimeLine(document.getElementById('editor_div'));
-
-		
-
 	} 
 	else {
+		chartdata.addColumn('number', 'Essay Count');
+		chartdata.addColumn('number', 'Sentence Count');
 		var url = '/stat/info/get_musedata/';
 		chart = new google.visualization.AnnotatedTimeLine(document.getElementById('musedata_div'));
 	}
@@ -441,7 +451,7 @@ function drawGoogleBookChart() {
 	book_chart = new google.visualization.BarChart(document.getElementById('google_books_div'));
 
 	var book_options = {
-		title: 'Google Books Curpus',
+		title: 'Crawling Data',
 		titleTextStyle : {fontSize: 18}
 	};
 

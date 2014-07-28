@@ -697,7 +697,11 @@ class Service extends CI_Controller {
 					$data["critique"] = $essays[0]->critique;
 					$data["score"] = $essays[0]->scoring;
 					$data["date"] = date("Y-m-d H:i:s", time());
-					$data["file"] = $essays[0]->filename;
+					
+					$filename = $essays[0]->filename;
+					$fileNameParts   = explode( ".", $filename );
+
+					$data["file"] = $fileNameParts[0];
 
 					$sending_data["status"]	= true;
 					$sending_data["data"] = $data;

@@ -23,6 +23,8 @@ class Project_Manage extends CI_Controller {
 			$result = $this->batch_job->make_sentence_count_writing();
 		} else if ($service_name == 'grammar') {
 			$result = $this->batch_job->make_sentence_count_grammar();
+		} else if ($service_name == 'bbs') {
+			$result = $this->batch_job->make_sentence_count_bbs();
 		} else {
 			$json['status'] = fail;
 			$json['message'] = "invalid service name"; 

@@ -12,7 +12,7 @@ class Stat extends CI_Model{
       $query = "SELECT date_format(created, '$d_format') AS regdate, 
             sum(data1) AS essay_count, sum(data2) AS w_count, sum(data3) AS s_count 
             FROM `stat_daily` 
-            WHERE service = 'musedata' 
+            WHERE service in ('bbs', 'musedata') 
             GROUP BY regdate 
             ORDER BY regdate asc ";
             log_message('error', '[debug] sql : '. $query);
@@ -298,8 +298,18 @@ class Stat extends CI_Model{
                GROUP BY regdate 
                ORDER BY regdate asc "; 
             break;
+         case 'bbs':  
+            $query = "SELECT date_format(created, '%Y-%m-%d') AS regdate, 
+               count(*) AS bbs_count, sum(sentence_count) AS s_count 
+               FROM `bbs_refine_data` 
+               WHERE answer_md5 != ''
+               GROUP BY regdate 
+               ORDER BY regdate asc "; 
+            break;
          default : return false;
       }
+
+      echo $query;
 
       $del = $this->db->query("DELETE FROM stat_daily WHERE service = '$service'");
 
@@ -334,6 +344,13 @@ class Stat extends CI_Model{
                $data4 = 0;
                $data5 = 0;
                break;
+            case 'bbs':  
+               $data1 = $row->bbs_count;
+               $data2 = $row->s_count;
+               $data3 = $row->s_count;
+               $data4 = 0;
+               $data5 = 0;
+               break;
             default : return false;
          }
 
@@ -346,6 +363,7 @@ class Stat extends CI_Model{
          $count++;
       } // foreach end.
 
+      echo $count;
       return $count;
    }
 

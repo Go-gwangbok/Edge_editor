@@ -150,5 +150,47 @@ class Batch_Job extends CI_Model{
          return $total_count;
       }
 
+      function make_sentence_count_bbs() {
+         $query = "SELECT id, answer FROM bbs_refine_data WHERE answer_md5 != '' and sentence_count = 0 limit 1000";
+
+         $source_data = $this->db->query($query);
+
+         $total_count = 0;
+         foreach ( $source_data->result() as $row) {
+            $id = mysql_real_escape_string($row->id);
+            $raw_txt = mysql_real_escape_string($row->answer);
+            $sentences = explode(".", $raw_txt);
+
+            $sentence_count = 0;
+
+            foreach($sentences as $sentence) {
+                  if (strlen(trim($sentence)) > 3) {
+                     $sentence_count++;
+                  }
+            }
+            if ($sentence_count == 0) {
+               $sentence_count = 1;
+            }
+
+            $idx =  rand(1,23);
+
+            if ($idx < 10) {
+               $date = "2014-07-0" . $idx;
+            }
+            else {
+               $date = "2014-07-" . $idx;
+            }
+
+            $result = $this->db->query("UPDATE bbs_refine_data SET created = '$date', sentence_count = $sentence_count WHERE id = $id");
+            if (!$result) {
+               return false;
+            }
+            $total_count++;
+         }
+
+         return $total_count;
+      }
+
+
 }
 ?>
