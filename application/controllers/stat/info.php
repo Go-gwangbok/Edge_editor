@@ -147,5 +147,20 @@ class Info extends CI_Controller {
         }
         $this->output->set_content_type('application/json')->set_output(json_encode($json));
     }
+
+    function get_editor_proctime_data(){
+        if($this->session->userdata('is_login')){            
+            $from = $this->input->post('from');
+            $to = $this->input->post('to');
+            //$from = "2014-07-01 00:00:00";
+            //$to = "2014-10-01 00:00:00";
+            log_message('error', 'get_editor_proctime_data::from : ' . $from);
+            log_message('error', 'get_editor_proctime_data::to : ' . $to);
+            $json['stat_list'] = $this->stat->get_editor_proctime_data($from, $to);
+        }else{
+            redirect('/');
+        }
+        $this->output->set_content_type('application/json')->set_output(json_encode($json));
+    }
 }
 

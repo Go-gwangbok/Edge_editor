@@ -243,6 +243,11 @@
    </table>
 
 				<div id='editor_div' style='width: 1000px; height: 400px;'></div>
+				<br>
+
+				<div id='editor_scatter_div' style='width: 1000px; height: 400px;'></div>
+
+
 					</div>
 				</div>
 			</div>	  
@@ -425,6 +430,7 @@ function init_chart() {
 	} 
 	else if (service_name == 'editor') {
 		drawGoogleBookChart();
+		drawEditorScatterChart();
 
 		chartdata.addColumn('number', 'Request Count');
 		chartdata.addColumn('number', 'Sentence Count');
@@ -469,6 +475,55 @@ function drawGoogleBookChart() {
 
 	drawChart(bookdata, book_chart, book_options);	
 }
+
+function drawEditorScatterChart() {
+
+	scatter_chart = new google.visualization.ScatterChart(document.getElementById('editor_scatter_div'));
+
+	var scatter_param = {
+		from: '2014-07-01 00:00:00',
+		to : '2014-07-20 00:00:00'
+	};
+
+	var url = '/stat/info/get_editor_proctime_data/';
+
+	$.post(url,scatter_param,function(json) {
+		var stat_list = json['stat_list'];
+
+		if (stat_list.length < 1) {
+			alert('no stat info!!!');
+			return false;
+		}
+
+		//scatter_chart.removeRows(0, scatter_chart.getNumberOfRows());
+
+		var scatter_data = new google.visualization.DataTable();
+		scatter_data.addColumn('number', 'Word Count');
+		scatter_data.addColumn('number', 'Proc Time');
+
+		$.each(stat_list,function(i,values){
+			//var error_count = parseInt(values['error_count']);
+			var word_count = parseInt(values['word_count']);
+			var proc_time = parseInt(values['proc_time']);
+
+			scatter_data.addRows([
+						[word_count, proc_time/1000] ]);
+		});
+
+		var scatter_options = {
+	          title: 'Word Count vs. Proc Time',
+	          vAxis: {title: 'Proc Time'},
+     		 hAxis: {title: 'Word Count'},
+	          legend: 'none'
+	        };
+
+		drawChart(scatter_data, scatter_chart, scatter_options);
+
+	});
+
+	
+}
+
 
 
 function ajaxMuseDataPost(data, url, chartdata, chart, cumm){

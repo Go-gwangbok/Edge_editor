@@ -11,6 +11,8 @@
 	    <div id="error">	 
 	    	<a href="/errordata/export_error/<?=$pj_id;?>"><button class="btn btn-danger pull-left" id="errorbtn" style="margin-top:-10px; margin-left:15px;">Problem Log<span class="badge" style="background-color:transparent;"><?=$total_count-$export_count;?></span></button></a>
 			<button class="btn btn-danger pull-right" id="allexport" style="margin-top:-10px; margin-right:15px;"> Export <span class="badge" id="allcount" style="background-color:transparent;"><?=$export_count;?></span><span class="glyphicon glyphicon-download"></span>				
+			</button>
+			<button class="btn btn-danger pull-right" id="jsonexport" style="margin-top:-10px; margin-right:15px;"> Export Json 
 			</button> 										
 		</div>				
 	</div> <!-- Div row -->
@@ -92,7 +94,8 @@ function ajaxPost(url,data){
 			$('div#pageblock').children().remove();
 			//var pj_id = json['pj_id'];
 			$('span#allcount').remove();	
-			$('button#allexport').remove();								
+			$('button#allexport').remove();	
+			$('button#jsonexport').remove();
 
 			history_list = json['history_totalcount'];
 			$('tbody#list').children().remove();
@@ -342,6 +345,10 @@ $('button#allexport').click(function(){
 			alert('This file is not available for download.');
 		}				
 	});	
+});
+
+$('button#jsonexport').click(function(){		
+	window.location = '/export/musedata?pj_id='+pj_id;			
 });
 
 

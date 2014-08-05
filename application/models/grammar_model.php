@@ -12,6 +12,7 @@ class Grammar_model extends CI_Model
     public $word_count;
     public $error_count;
     public $proc_time;
+    public $category;
     public $created;
 
     public function getAll()

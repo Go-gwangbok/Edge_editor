@@ -175,6 +175,29 @@ class Stat extends CI_Model{
       return $stat_list;
    }
 
+   function get_editor_proctime_data($from, $to) {
+      $query = "SELECT id, word_count, error_count, proc_time
+            FROM `grammar_data` 
+            WHERE created > '$from' AND created <= '$to' AND proc_time > 0 AND word_count < 15  
+            ";
+         log_message('error', '[debug] sql : '. $query);
+
+      $source_data = $this->db->query($query);
+
+      $stat_list = array();
+
+      foreach ( $source_data->result() as $row) {
+         $stat_info = array();
+         $stat_info['id'] = $row->id;
+         $stat_info['word_count'] = $row->word_count;
+         $stat_info['error_count'] = $row->error_count;
+         $stat_info['proc_time'] = $row->proc_time;
+         $stat_list[] = $stat_info;
+      } // foreach end.
+
+      return $stat_list;
+   }
+
    function get_summary_stat($service, $gubun = "") {
 
       if ($service != "") {

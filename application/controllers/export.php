@@ -69,6 +69,9 @@ class Export extends CI_Controller {
 		}
 		$json['data'] = $data_list;
 
+		$download_fname = "musedata_$pj_id.json";
+
+		$this->output->set_header('Content-disposition: attachment; filename='.$download_fname);
 		$this->output->set_content_type('application/json')->set_output(json_encode($json));		
 	}
 

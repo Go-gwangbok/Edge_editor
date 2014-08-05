@@ -182,6 +182,11 @@ class Project_Manage extends CI_Controller {
 			$grammar_model->word_count 	= count($grammar['sentences'][0]['words']);
 			$grammar_model->error_count 	= $grammar['error_counts'];
 			$grammar_model->proc_time 	= $grammar['proctime'];
+			if  (strpos ($grammar['input_category'], '2014') === 0 ) {
+				$grammar_model->category 	= "-";
+			} else {
+				$grammar_model->category 	= $grammar['input_category'];
+			}
 			$grammar_model->created 	= str_replace (" UTC", "", $grammar['utctime']);
 
 			if (!$grammar_model->insert()) {
