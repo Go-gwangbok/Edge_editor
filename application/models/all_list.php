@@ -593,6 +593,22 @@ class All_list extends CI_Model{
 		return $this->db->query($query)->result();
 	}
 
+	function new_admin_pjlist(){
+		$query = "SELECT connect_usr_pj.pj_id, project.name, project.disc, project.add_date, data_kind.kind,data_kind.id as kind_id,
+					project.total_count,
+					project.completed,
+					project.todo
+					FROM connect_usr_pj
+					LEFT JOIN adjust_data ON adjust_data.pj_id = connect_usr_pj.pj_id
+					LEFT JOIN usr ON usr.id = connect_usr_pj.usr_id
+					LEFT JOIN project ON project.id = connect_usr_pj.pj_id
+					LEFT JOIN data_kind ON data_kind.id = connect_usr_pj.kind_id
+					WHERE connect_usr_pj.active = 0
+					GROUP BY connect_usr_pj.pj_id
+					ORDER BY project.add_date DESC";		
+		return $this->db->query($query)->result();
+	}
+
 	function get_service_export_count($service_id, $year,$month){
 		$query = "SELECT count(*) as count 
 					FROM service_data
@@ -888,7 +904,18 @@ class All_list extends CI_Model{
 									WHERE data_kind.id = '$kind'
 									AND task.id = '$type'
 									AND connect_templet.active = 0")->result();
-	}   	
+	}
+
+	// for admin :: can see all templates
+	function get_admin_templet_ele($type,$kind){
+   		return $this->db->query("SELECT templet_ele.element, templet_ele.view_ele, data_kind.id AS kind_id
+									FROM connect_templet
+									LEFT JOIN templet_ele ON templet_ele.id = connect_templet.templet_ele_id
+									LEFT JOIN data_kind ON data_kind.id = connect_templet.data_kind_id
+									LEFT JOIN task ON task.id = connect_templet.task_id
+									WHERE data_kind.id = '$kind'
+									AND task.id = '$type'")->result();
+	}
 
    	function saveSetting($type_id,$kind_id,$tabs_val){   		
    		//Tab Save   		
@@ -964,7 +991,6 @@ class All_list extends CI_Model{
    		return $this->db->query("SELECT data_kind.* 
 									FROM connect_templet
 									LEFT JOIN data_kind ON data_kind.id = connect_templet.data_kind_id
-									LEFT JOIN task ON task.id = connect_templet.id
 									WHERE connect_templet.task_id = '$task_id'
 									group by data_kind.id")->result();
     }
@@ -2382,6 +2408,31 @@ class All_list extends CI_Model{
 
    		}
    		return true;
+   	}
+
+   	// essay id를 가지고 기존 프로젝트의 에디터 아이디를 구함
+   	function get_old_usr_id_by_essayid($essay_id, $pj_id) {
+   		$select = $this->db->query("SELECT usr_id FROM adjust_data WHERE essay_id = $essay_id and pj_id != '$pj_id'");
+
+   		if($select->num_rows() > 0){
+   			$row = $select->row();
+   			log_message('error', '[DEBUG] ' . $essay_id . ' old_usr_id = ' . $row->usr_id);
+   			return $row->usr_id;
+   		} else {
+   			log_message('error', '[DEBUG] ' . $essay_id . ' old_usr_id = null');
+   			return 0;
+   		}
+   	}
+
+   	function make_project_summary($pj_id, $total_count, $completed, $todo) {
+   		$update = $this->db->query("UPDATE project SET total_count = $total_count, 
+   						completed = $completed, todo = $todo 
+   						WHERE id = '$pj_id' ");
+		if(!$update){
+			return false;
+		}
+
+		return true;
    	}
 }
 ?>

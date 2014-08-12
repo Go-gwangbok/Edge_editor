@@ -276,7 +276,8 @@ class Text_editor extends CI_Controller {
 			$data['tag_templet'] = $this->all_list->get_tag($kind);
 			$data['score_templet'] = $this->all_list->get_scores_temp($kind);		
 
-			$data['templet'] = $this->get_templet_ele($type,$kind);
+			//$data['templet'] = $this->get_templet_ele($type,$kind);
+			$data['templet'] = $this->all_list->get_admin_templet_ele($type,$kind);
 			$score1 = $this->score_pattern_replace($scoring);			
 			$data['score1'] = $score1;	
 
@@ -319,7 +320,21 @@ class Text_editor extends CI_Controller {
 			$data['type'] = $rows->type;
 
 			if($cate != 'service'){
-				$data['pj_id'] = $rows->pj_id;	
+				$data['pj_id'] = $rows->pj_id;
+				$usr_info = $this->all_list->get_user($rows->usr_id);
+				$data['editor_name'] = $usr_info->name;
+				if ($rows->pj_id == 27) {
+					$old_usr_id = $this->all_list->get_old_usr_id_by_essayid($data['essay_id'], $data['pj_id']);
+					if ($old_usr_id > 0) {	
+						if ($old_usr_id == 1) {
+							$data['old_editor_name'] = 'admin';
+						} else {
+							$old_usr_info = $this->all_list->get_user($old_usr_id);
+							$data['old_editor_name'] = $old_usr_info->name;
+						}
+						
+					}
+				}
 			}
 			
 			$data['time'] = $rows->time;

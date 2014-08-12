@@ -48,7 +48,7 @@ class Project extends CI_Controller {
 
 	function admin_get_project(){
 		if($this->session->userdata('is_login')){			
-			$json['data'] = $this->all_list->admin_pjlist();					
+			$json['data'] = $this->all_list->new_admin_pjlist();					
 		}else{
 			redirect('/');
 		}	

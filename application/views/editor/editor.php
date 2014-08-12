@@ -40,7 +40,7 @@
     <!-- <h2 style="margin-top:-10px;">Title</h2>  -->
   <div class="div-box-line-promp">
     <dl>
-        <dt style="margin:0 10px 0 10px">Prompt</dt>
+        <dt style="margin:0 10px 0 10px">Prompt [<?=$id;?>]</dt>
         <?php
           if($cate == 'todo' || $cate == 'draft'){
         ?>

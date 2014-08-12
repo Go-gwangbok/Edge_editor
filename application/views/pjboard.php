@@ -141,7 +141,7 @@ function ajaxPost(url,data){
 				}					
 			}
 						
-			$('tbody#list').append('<tr id='+i+' style="cursor:pointer;" class="clickableRow" href="'+href+id+'/'+task+'/'+pj_id+'"><td class="text-center">'+num+'</td><td>'
+			$('tbody#list').append('<tr id='+i+' style="cursor:pointer;" class="clickableRow" href="'+href+id+'/'+task+'/'+pj_id+'"><td class="text-center">'+data_list[i]['id']+'</td><td>'
 				+prompt.replace(/"/gi,'')+'</td><td class="text-center">'
 				+kind_name.toUpperCase()+'</td><td style="width:90px;">'
 				+date+'</td><td class="text-center">'				

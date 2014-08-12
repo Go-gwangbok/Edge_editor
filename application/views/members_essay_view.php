@@ -96,7 +96,7 @@ function ajaxPost(url,data){
 					var date = data_list[i]['sub_date'];
 				}
 				
-				$('tbody#list').append('<tr id='+i+' class="clickableRow" style="cursor:pointer;" href="/text_editor/essays/tbd/'+id+'/'+kind+'"><td class="text-center">'+num+'</td><td>'																				 
+				$('tbody#list').append('<tr id='+i+' class="clickableRow" style="cursor:pointer;" href="/text_editor/essays/tbd/'+id+'/'+kind+'"><td class="text-center">'+data_list[i]['id']+'</td><td>'																				 
 					+prompt.replace(/"/gi,'')+'</td><td class="text-center">'
 					+kind_name.toUpperCase()+'</td><td class="text-center">'
 					+date+'</td>'
@@ -122,7 +122,7 @@ function ajaxPost(url,data){
 					var date = data_list[i]['sub_date'];
 				}
 				
-				$('tbody#list').append('<tr id='+i+' class="clickableRow" style="cursor:pointer;" href="/text_editor/essays/history/'+id+'"><td class="text-center">'+num+'</td><td>'																				 
+				$('tbody#list').append('<tr id='+i+' class="clickableRow" style="cursor:pointer;" href="/text_editor/essays/history/'+id+'"><td class="text-center">'+data_list[i]['id']+'</td><td>'																				 
 					+prompt.replace(/"/gi,'')+'</td><td class="text-center">'
 					+kind_name.toUpperCase()+'</td><td class="text-center">'
 					+date+'</td>');						

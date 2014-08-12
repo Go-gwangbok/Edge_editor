@@ -14,13 +14,13 @@
 	    <div class="col-sm-3">
 	      <select class="form-control input-sm" id="selectBox">
 	      	<option>Null</option>
-	      	<?
+	      	<?php
 	      	foreach ($data_type as $value) {
 	      		$kind = $value->kind;
 	      		$kind_id = $value->id;
 	      	?>
 	      	<option id="<?=$kind_id;?>"><?=strtoupper($kind);?></option>
-	      	<? } ?>
+	      	<?php } ?>
 	      </select>
 	    </div>
     </div>    
@@ -42,13 +42,13 @@
     <div class="row" style="margin-bottom:10px;">  
 	    <label for="inputPassword3" class="col-sm-2 control-label">Members</label>
 	    <div class="col-sm-9">
-	     <?
+	     <?php
 	     foreach ($mem_list as $rows) {
 	     	$name = $rows->name;
 	     	$id = $rows->id;
 	     ?>
 	     <input type="checkbox" class="mem_check" value="<?=$id;?>"> <?=$name;?>
-	     <?
+	     <?php
 	     }
 	     ?>
 	     </div>

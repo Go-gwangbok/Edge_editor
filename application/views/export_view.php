@@ -118,7 +118,7 @@ function ajaxPost(url,data){
 					var date = history_list[i]['sub_date'];
 				}
 				
-				$('tbody#list').append('<tr id='+i+'><td>'+(i+1)+'</td><td>'																				 
+				$('tbody#list').append('<tr id='+i+'><td>'+history_list[i]['id']+'</td><td>'																				 
 						+prompt.replace(/"/gi,'')+'</td><td>'
 						+history_list[i]['name']+'</td><td>'
 						+kind_name.toUpperCase()+'</td><td>'
@@ -152,7 +152,7 @@ function ajaxPost(url,data){
 					var date = history_list[i]['sub_date'];
 				}
 				
-				$('tbody#list').append('<tr class="com" style="cursor:pointer;" id='+i+' href="/text_editor/comp/'+id+'/'+task+'"><td>'+num+'</td><td>'																				 
+				$('tbody#list').append('<tr class="com" style="cursor:pointer;" id='+i+' href="/text_editor/comp/'+id+'/'+task+'"><td>'+history_list[i]['id']+'</td><td>'																				 
 						+prompt.replace(/"/gi,'')+'</td><td>'
 						+history_list[i]['name']+'</td><td>'
 						+kind_name.toUpperCase()+'</td><td>'

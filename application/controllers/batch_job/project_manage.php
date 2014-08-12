@@ -210,5 +210,26 @@ class Project_Manage extends CI_Controller {
 		}
 	}
 
+	public function make_project_summary() {
+		$this->load->model('all_list');
+
+		$pj_list = $this->all_list->admin_pjlist();
+
+		foreach($pj_list as $pj) {
+			echo "project_name : " . $pj->name . "<br>";
+			echo "total_count : " . $pj->total_count . "<br>";
+			echo "completed : " . $pj->completed . "<br>";
+			echo "todo : " . $pj->todo . "<br><br>";
+
+			$result = $this->all_list->make_project_summary($pj->pj_id, $pj->total_count, $pj->completed, $pj->todo);
+			if (!$result) {
+				echo "make_project_summary fail";
+				return;
+			}
+		}
+
+		echo "make_project_summary success1!!";
+	}
+
 }
 ?>

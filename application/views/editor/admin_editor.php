@@ -33,7 +33,7 @@
   </div> <!-- Navi end -->      
   <div class="div-box-line-promp">
     <dl>
-        <dt style="margin:0 10px 0 10px">Prompt</dt>              
+        <dt style="margin:0 10px 0 10px">Prompt [<?=$id;?>]</dt>              
         <dd style="margin:0 15px 0 25px" id="prompt"><?=trim($title);?></dd>
     </dl>       
   </div>    
@@ -77,7 +77,10 @@
     ?>
     <!-- Default -->    
     <div id="stopwatch" class="btn btn-default pull-right" disabled>Timer : 00:00</div>       
-    <div class="btn btn-default pull-right" style="margin-right:3px;" disabled>Word count : <?=$word_count?></div>       
+    <div class="btn btn-default pull-right" style="margin-right:3px;" disabled>Word count : <?=$word_count?></div>
+    <?php if ( !empty($editor_name) ) { ?>
+    <div class="btn btn-default pull-right" style="margin-right:3px;" disabled><?php if ( !empty($old_editor_name) ) { ?><?=$old_editor_name?> / <?php } ?><?=$editor_name?></div>
+    <?php } ?>
     <?php
     if($cate == 'error'){
     ?>
