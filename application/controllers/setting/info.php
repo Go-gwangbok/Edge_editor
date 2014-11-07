@@ -183,19 +183,34 @@ class Info extends CI_Controller {
             $result = $this->all_list->member_edit_save($usr_id,$task_ids,$type,$start,$end,$pay,$editor_desc,$email);
 
             if($result){
-                $this->load->library('curl');
-                //$curl_result = $this->curl->simple_post('http://54.248.103.31/editor/editordesc', array('email'=>$email,'desc'=>$editor_desc));
-
-                if (IS_SSL) {
-                    $this->curl->ssl(FALSE);
+                // check if there is writing service in task_ids
+                $is_writing = false;
+                $tasks = explode(',',$task_ids); 
+                if($tasks){ 
+                    if (in_array(2, $tasks)) {
+                        $is_writing = true;
+                    }
+                } else if ($task_ids == 2) {
+                    $is_writing = true;
                 }
-                $curl_options = array(CURLOPT_CONNECTTIMEOUT => 1, CURLOPT_TIMEOUT => 3);
-                log_message('error', "[DEBUG] editordesc email : " . $email);
-                $curl_result = $this->curl->simple_post(EDGE_WRITING_URL. 'editor/editordesc', array('email'=>$email,'desc'=>$editor_desc), $curl_options);
-                log_message('error', "[DEBUG] editordesc result : " . $curl_result);
-                
-                $access_status = json_decode($curl_result, true);       
-                $json['result'] = $access_status['status'];                
+
+                if ($is_writing) {
+                    $this->load->library('curl');
+                    //$curl_result = $this->curl->simple_post('http://54.248.103.31/editor/editordesc', array('email'=>$email,'desc'=>$editor_desc));
+
+                    if (IS_SSL) {
+                        $this->curl->ssl(FALSE);
+                    }
+                    $curl_options = array(CURLOPT_CONNECTTIMEOUT => 1, CURLOPT_TIMEOUT => 3);
+                    log_message('error', "[DEBUG] editordesc email : " . $email);
+                    $curl_result = $this->curl->simple_post(EDGE_WRITING_URL. 'editor/editordesc', array('email'=>$email,'desc'=>$editor_desc), $curl_options);
+                    log_message('error', "[DEBUG] editordesc result : " . $curl_result);
+                    
+                    $access_status = json_decode($curl_result, true);       
+                    $json['result'] = $access_status['status'];
+                } else {
+                    $json['result'] = true;
+                }
             }else{
                 $json['result'] = false;
             }

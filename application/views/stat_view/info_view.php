@@ -285,6 +285,7 @@
 	
 </div>
 
+<link rel="stylesheet" type="text/css" href="/public/css/flip-counter.css">
 <script src="/public/js/Chart.js"></script>
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 <script type="text/javascript">
@@ -598,6 +599,8 @@ function ajaxMuseDataPost(data, url, chartdata, chart, cumm){
 			document.getElementById('p_data1').innerHTML = commify(essay_sum);
 			document.getElementById('p_data2').innerHTML = commify(sentence_sum);
 		} else if (service_name == 'speaking') {
+			//alert(essay_sum);
+			//drawCounter('s_data1', essay_sum);
 			document.getElementById('s_data1').innerHTML = commify(essay_sum);
 			document.getElementById('s_data2').innerHTML = commify(sentence_sum);
 			document.getElementById('s_data3').innerHTML = commify(parseInt(audio_duration_sum/60));
@@ -716,6 +719,31 @@ $('button#speaking_retrieve').click(function(){
 //google.setOnLoadCallback(function() { ajaxMuseDataPost(url, data); });
 });
 
+$('button#writing_retrieve').click(function(){ 
+
+	var gubun = $("#writing_gubun option:selected").val();
+
+	if ($("input:checkbox[id='writing_cumm']").is(":checked")) {
+		var cumm = true;
+	} else {
+		var cumm = false;
+	}
+
+	data = {
+		gubun : gubun
+	}
+
+
+	//google.load('visualization', '1.1', {'packages':['annotationchart']});
+
+	var url = '/stat/info/get_writingdata/';
+
+	ajaxMuseDataPost(data, url, chartdata,  chart, cumm);
+
+
+//google.setOnLoadCallback(function() { ajaxMuseDataPost(url, data); });
+});
+
 $('button#editor_retrieve').click(function(){ 
 
 	var gubun = $("#editor_gubun option:selected").val();
@@ -780,5 +808,41 @@ $(document).delegate('button#decline','click',function(){
 		location.reload();
 	});
 });
+
+  function drawCounter(d, num){
+    var digitNum = num.toString().split('').reverse();
+    
+    var bit = 1, html = '', dNum;
+    for (var i = 0, count = digitNum.length; i < count; i++){
+      dNum = _isNumber(digitNum[i]) ? digitNum[i] : '';
+      html += '<li class="digit" id="'+d+'-digit-a'+i+'">'+
+        '<div class="line"></div>'+
+        '<span class="front">'+dNum+'</span>'+
+        '<span class="back">'+0+'</span>'+
+		'<div class="hinge-wrap"><div class="hinge">'+
+        '<span class="front">'+0+'</span>'+
+        '<span class="back">'+dNum+'</span>'+
+        '</div></div>'+
+        '</li>';
+      if (bit !== count && bit % 3 === 0){
+        html += '<li class="digit-delimiter">,</li>';
+      }
+      bit++;
+    }
+	
+	var div = window.document.getElementById(d);
+	div.innerHTML = html;
+	
+	setTimeout(function(){
+      for (var i = 0; i < bit-1; i++){
+          var a = window.document.getElementById(d+'-digit-a'+i);
+          a.className = a.className+' animate';
+      }
+    }, 20)
+  }
+  
+  function _isNumber(n){
+    return !isNaN(parseFloat(n)) && isFinite(n);
+  }
 
 </script>

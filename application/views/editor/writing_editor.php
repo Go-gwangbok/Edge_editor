@@ -3,12 +3,37 @@
   <div class="row">   
     <ol class="breadcrumb" style="background:white;">
           <li><a href="/">Home</a></li>                   
-            <li><a href="/service">Service</a></li>                         
+            <li><a href="/service">Service</a></li>
+            <?php if ($service_name == 'writing') { ?>                         
             <li class="akacolor">Writing</li>          
+            <?php } else if ($service_name == 'museprep') { ?>
+            <li class="akacolor">Museprep</li>
+            <?php } ?>
       </ol> <!-- Navi end -->
   </div>  
 
+<?php if ($service_name == 'museprep') { ?> 
+  <div class="div-box-line-promp">
+    <dl>
+        <dt style="margin:0 10px 0 10px">Question</dt>
+          <dd style="margin:0 15px 0 25px" id="prompt"><?=trim($question);?></dd>
+    </dl>       
+  </div>    
+  <br>
+
+  <?php if ($passage != '') { ?> 
+  <div class="div-box-line-promp">
+    <dl>
+        <dt style="margin:0 10px 0 10px">Passage</dt>
+          <dd style="margin:0 15px 0 25px" id="prompt"><?=trim($passage);?></dd>
+    </dl>       
+  </div>    
+  <br>
+  <?php } ?>
+<?php } ?>
+
     <!-- <h2 style="margin-top:-10px;">Title</h2>  -->
+<?php if ($service_name == 'writing') { ?> 
   <div class="div-box-line-promp">
     <dl>
         <dt style="margin:0 10px 0 10px">Prompt</dt>
@@ -26,6 +51,7 @@
     </dl>       
   </div>    
   <br>
+
 
 <table class="table table-bordered">          
     <tbody>
@@ -88,6 +114,7 @@
        }
     ?>
   </table>
+  <?php } ?>
 
 
 
@@ -322,7 +349,13 @@
             <input type="text" class="form-control score_val1" id="<?=strtolower($score_name);?>1" placeholder="0">
           </div>
         </div>
-        <?php } ?>                 
+        <?php } ?>
+        <div class="row" style="margin-bottom:10px;">  
+          <label for="inputEmail3" class="col-md-2 text-danger">Total Score</label>
+          <div class="col-md-2">
+            <input type="text" class="form-control score_val1" id="total_score1" placeholder="0">
+          </div>
+        </div>                      
         </div>
       </div>
     </div>              
@@ -351,7 +384,13 @@
             <input type="text" class="form-control score_val2" id="<?=strtolower($score_name);?>2" placeholder="0">
           </div>
         </div>
-        <?php } ?>                 
+        <?php } ?>   
+        <div class="row" style="margin-bottom:10px;">  
+          <label for="inputEmail3" class="col-md-2 text-danger">Total Score</label>
+          <div class="col-md-2">
+            <input type="text" class="form-control score_val2" id="total_score2" placeholder="0">
+          </div>
+        </div>               
         </div>
       </div>
     </div>              
@@ -552,9 +591,9 @@ $(document).ready(function(){
 
   <?php if ($user_file != "") { ?>
   $("#uploadForm").ajaxForm();
+  <?php } ?>
 
   checkSubmittable();
-  <? } ?>
 
 }); // Ready end.
 
@@ -562,7 +601,7 @@ function checkSubmittable() {
   if (user_file == "") {
     var charLimit = 10;
     var critique = $('textarea#critique').val();  
-    var remaining = charLimit - $(this).val().replace(/\s+/g," ").length;
+    var remaining = charLimit - critique.replace(/\s+/g," ").length;
   
     if (remaining < charLimit && remaining > 0) {       
        $('#w_submit').prop('disabled', true);                  
@@ -641,7 +680,6 @@ function pad(number, length) {
 
 var Example1 = new (function() {
 
-  /***
     if(cate == 'draft'){
       var currentTime = draft_time; // Current time in hundredths of a second 100 == 1  
           incrementTime = 70; // Timer speed in milliseconds      
@@ -651,10 +689,11 @@ var Example1 = new (function() {
     }else{      
       var currentTime = 0; // Current time in hundredths of a second 100 == 1  
       incrementTime = 70; // Timer speed in milliseconds      
-    }
-    ****/
+    }    
+    /****
     var currentTime = draft_time; // Current time in hundredths of a second 100 == 1  
           incrementTime = 70; // Timer speed in milliseconds      
+    ****/
    
 
     var $stopwatch, // Stopwatch element on the page            
@@ -1202,7 +1241,7 @@ $("button#w_submit").click(function(){
   console.log(data);
 
   $.ajax({    
-    url: '/service/w_submit',
+    url: '/service/w_submit/<?=$service_name?>/',
     type: 'POST',         
     data: data,
     dataType: 'json',
@@ -1259,7 +1298,7 @@ $('button#w_discuss').click(function(){
   data['user_file'] = '<?=$user_file?>';
 
   console.log(data);
-  $.post('/service/discuss',data,function(json){          
+  $.post('/service/discuss/<?=$service_name?>/',data,function(json){          
     if(json['result']){
         alert("T.B.D Success ");        
         window.location = "/service"

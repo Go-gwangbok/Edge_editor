@@ -65,7 +65,9 @@
             <li id="service_chk"><a href="/service">Service</a></li>            
             <li><a href="/setting/info">Setting</a></li>
             <li><a href="/stat/info">Stat</a></li>
-            <li><a href="/notice">Notice</a></li>            
+            <li><a href="/training">Training</a></li>
+            <li><a href="/notice">Notice</a></li> 
+                      
           <?php
           }else{
             if($this->session->userdata('musedata') == 'true'){
@@ -79,8 +81,13 @@
             <li id="service_chk"><a href="/service">Service</a></li>
           <?php
             }
+            if($this->session->userdata('training') == 'true'){
+          ?>
+            <li><a href="/training">Training</a></li> 
+          <?php
+            }
           ?>         
-            <li><a href="/notice">Notice</a></li>            
+            <li><a href="/notice">Notice</a></li>        
           <?php
           }               
         }elseif($cate == 'service'){        
@@ -90,6 +97,7 @@
           <li class="active" id="service_chk"><a href="/service">Service</a></li>              
           <li><a href="/setting/info">Setting</a></li>
           <li><a href="/stat/info">Stat</a></li>
+          <li><a href="/training">Training</a></li>  
           <li><a href="/notice">Notice</a></li>            
           <?php
           }else{ // Editor
@@ -101,6 +109,11 @@
             if($this->session->userdata('service') == 'true'){
             ?>
               <li class="active" id="service_chk"><a href="/service">Service</a></li>
+            <?php
+              }
+              if($this->session->userdata('training') == 'true'){
+            ?>
+              <li><a href="/training">Training</a></li> 
             <?php
             }
             ?>            
@@ -114,6 +127,7 @@
           <li><a href="/service">Service</a></li>              
           <li class="active"><a href="/setting/info">Setting</a></li>
           <li><a href="/stat/info">Stat</a></li>
+          <li><a href="/training">Training</a></li>
           <li><a href="/notice">Notice</a></li>            
           <?php
           }
@@ -124,16 +138,49 @@
           <li><a href="/service">Service</a></li>              
           <li><a href="/setting/info">Setting</a></li>
           <li class="active"><a href="/stat/info">Stat</a></li>
+          <li><a href="/training">Training</a></li>
           <li><a href="/notice">Notice</a></li>            
           <?php
           }                      
-        }else if($cate == 'notice'){ // Notice head
+        }
+        else if($cate == 'training'){ // Notice head
           if($this->session->userdata('classify') == 0){ // Admin
           ?>
             <li><a href="/musedata/project">Data</a></li>
             <li><a href="/service">Service</a></li>              
             <li><a href="/setting/info">Setting</a></li>
             <li><a href="/stat/info">Stat</a></li>
+            <li class="active"><a href="/training">Training</a></li>
+            <li><a href="/notice">Notice</a></li>            
+          <?php
+          }else{ // Editor
+            if($this->session->userdata('musedata') == 'true'){
+          ?>
+            <li><a href="/musedata/project">Data</a></li>
+          <?php
+            }
+            if($this->session->userdata('service') == 'true'){
+          ?>
+            <li id="service_chk"><a href="/service">Service</a></li>
+            <?php
+              }
+              if($this->session->userdata('training') == 'true'){
+            ?>
+              <li class="active"><a href="/training">Training</a></li> 
+          <?php
+            }
+          ?>
+            <li><a href="/notice">Notice</a></li>            
+          <?php
+         }
+       } else if($cate == 'notice'){ // Notice head
+          if($this->session->userdata('classify') == 0){ // Admin
+          ?>
+            <li><a href="/musedata/project">Data</a></li>
+            <li><a href="/service">Service</a></li>              
+            <li><a href="/setting/info">Setting</a></li>
+            <li><a href="/stat/info">Stat</a></li>
+            <li><a href="/training">Training</a></li>
             <li class="active"><a href="/notice">Notice</a></li>            
           <?php
           }else{ // Editor
@@ -145,6 +192,11 @@
             if($this->session->userdata('service') == 'true'){
           ?>
             <li id="service_chk"><a href="/service">Service</a></li>
+            <?php
+              }
+              if($this->session->userdata('training') == 'true'){
+            ?>
+              <li><a href="/training">Training</a></li> 
           <?php
             }
           ?>
@@ -158,6 +210,7 @@
             <li id="service_chk"><a href="/service">Service</a></li>            
             <li><a href="/setting/info">Setting</a></li>
             <li><a href="/stat/info">Stat</a></li>
+            <li><a href="/training">Training</a></li>
             <li><a href="/notice">Notice</a></li>  
             <!-- <li><a href="/pay/pay">Pay</a></li>           -->
           <?php
@@ -170,6 +223,11 @@
             if($this->session->userdata('service') == 'true'){
             ?>
               <li id="service_chk"><a href="/service">Service</a></li>            
+            <?php
+              }
+              if($this->session->userdata('training') == 'true'){
+            ?>
+              <li><a href="/training">Training</a></li> 
             <?php
             }
           ?>                     

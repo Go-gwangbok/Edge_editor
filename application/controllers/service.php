@@ -48,10 +48,15 @@ class Service extends CI_Controller {
 				$cate['cate'] = 'service';
 				$this->load->view('head',$cate);
 
-				$usr_id = $this->session->userdata('id');								
+				$usr_id = $this->session->userdata('id');	
+
+				$services = $this->all_list->active_task($usr_id);
+				//var_dump($services);
+
 				$data['all_usr'] = '';
 				$data['cate'] = 'service';
 				$data['usr_id'] = $usr_id;
+				$data['services'] = $services;
 				$this->load->view('/service_view/index',$data);		
 					
 			}	
@@ -142,7 +147,7 @@ class Service extends CI_Controller {
 	}
 
 	// first draft_save and do discss
-	public function discuss(){ //error 신고 입력! DB--> error_essay //0
+	public function discuss($service_name = 'writing'){ //error 신고 입력! DB--> error_essay //0
 		if($this->session->userdata('is_login')){
 			$token = $this->input->POST('token');			
 			$essay_id 	 = $this->input->POST('data_id');
@@ -157,14 +162,24 @@ class Service extends CI_Controller {
 			
 			log_message('error', 'discuss -> draft_save :' . $result);
 			
-			if (IS_SSL) {
-				$this->curl->ssl(FALSE);
+			if ($service_name == 'museprep') {
+				$curl_options = array(CURLOPT_CONNECTTIMEOUT => 1, CURLOPT_TIMEOUT => 3);
+				log_message('error', "[DEBUG] musebase w_discuss editing/discuss id : " . $essay_id);
+				$access = $this->curl->simple_post(MUSE_PREP_URL. 'editor/editing/discuss', array('token'=>$token, 'id'=>$essay_id), $curl_options);
+				log_message('error', "[DEBUG] musebase w_discuss result : " . $access);
+			} else {
+				if (IS_SSL) {
+					$this->curl->ssl(FALSE);
+				}
+				$curl_options = array(CURLOPT_CONNECTTIMEOUT => 1, CURLOPT_TIMEOUT => 3);
+				log_message('error', "[DEBUG] w_discuss editing/discuss id : " . $essay_id);
+				$access = $this->curl->simple_post(EDGE_WRITING_URL. 'editor/editing/discuss', array('token'=>$token, 'id'=>$essay_id), $curl_options);
+				log_message('error', "[DEBUG] w_discuss result : " . $access);
 			}
-			$curl_options = array(CURLOPT_CONNECTTIMEOUT => 1, CURLOPT_TIMEOUT => 3);
-			log_message('error', "[DEBUG] w_discuss editing/discuss id : " . $essay_id);
-			$access = $this->curl->simple_post(EDGE_WRITING_URL. 'editor/editing/discuss', array('token'=>$token, 'id'=>$essay_id), $curl_options);
-			log_message('error', "[DEBUG] w_discuss result : " . $access);
 
+
+
+			
 
 			$result = $this->all_list->discuss_service_proc($essay_id);
 			$json['result'] = $access;
@@ -245,9 +260,85 @@ class Service extends CI_Controller {
 		$this->output->set_content_type('application/json')->set_output(json_encode($json));
 	}	
 
+	public function get_museprep()
+	{
+		$secret = 'isdyf3584MjAI419BPuJ5V6X3YT3rU3C';
+		$email = $this->session->userdata('email');
+
+		$curl_options = array(CURLOPT_CONNECTTIMEOUT => 1, CURLOPT_TIMEOUT => 3);
+
+		/***
+		if (IS_SSL) {
+			$this->curl->ssl(FALSE);
+		}
+		***/		
+		$access = $this->curl->simple_post(MUSE_PREP_URL. 'editor/auth', array('secret'=>$secret,'email'=>$email), $curl_options);
+
+		log_message('error', '[DEBUG] museprep :: editor/auth result = ' . $access);
+
+		// $access = '{
+		// 		    "status": true,
+		// 		    "data": {
+		// 		        "token": "~~~"
+		// 		    }
+		// 		}';		
+
+		$access_status = json_decode($access, true);		
+		
+		if($access_status['status']){
+			
+			// success -> token
+			$token = $access_status['data']['token'];
+
+			log_message('error', "token : $token");
+			
+			// re_curl
+			//$this->curl->ssl(FALSE);
+			/***
+			if (IS_SSL) {
+				$this->curl->ssl(FALSE);
+			}
+			***/
+			$curl_options = array(CURLOPT_CONNECTTIMEOUT => 1, CURLOPT_TIMEOUT => 3);
+			log_message('error', '[DEBUG] museprep :: editor/get token = ' . $token);
+			$result_data = $this->curl->simple_post(MUSE_PREP_URL . 'editor/get', array('token'=>$token), $curl_options);
+
+			log_message('error', '[DEBUG] museprep :: editor/get result_data = ' . $result_data);
+
+
+			//log_message('error', "result_data : $result_data");
+			/** "is_24hr":"1" == true  "0" == 'false'   "is_critique":"1" == true  "0" == 'false' **/
+			
+			// $result_data = '{
+			// 			    "status": true,
+			// 			    "data": 
+			// 		        {
+			// 		            "id": 1,
+			// 		            "kind": "essay",
+			// 		            "is_24hr":"1",
+			// 		            "is_critique": "0",
+			// 		            "title": "Which is better for children to grow up in the countryside or in a big city.personally disagree with the former idea since children in the urban area can acquire the better educational conditions as well as improve their capability through positive competition",
+			// 		            "writing": " personally disagree with the former idea since children in the urban area can acquire the better educational conditions as well as improve their capability through positive competition",					            
+			// 		            "date": "2014-03-12 15:06:03"
+			// 		        }						   
+			// 			}';		
+			
+			$json['result'] = $result_data;	
+			$json['access'] = $access;
+
+		}else{ //status = false
+			$json['result'] = $access;
+			$json['access'] = $access;
+
+		}		
+		$this->output->set_content_type('application/json')->set_output(json_encode($json));
+	}
+
+
 	public function auth(){
 		$token = $this->input->post('token');
-		$w_id = $this->input->post('w_id');	
+		$w_id = $this->input->post('w_id');
+		$service_name = $this->input->post('service_name');
 
 		if (IS_SSL) {
 			$this->curl->ssl(FALSE);
@@ -278,6 +369,22 @@ class Service extends CI_Controller {
 		$this->output->set_content_type('application/json')->set_output(json_encode($json));
 	}
 
+	public function auth_museprep(){
+		$token = $this->input->post('token');
+		$w_id = $this->input->post('w_id');
+
+		$curl_options = array(CURLOPT_CONNECTTIMEOUT => 1, CURLOPT_TIMEOUT => 3);
+		log_message('error', '[DEBUG] museprep editing/start token = ' . $token);
+		log_message('error', '[DEBUG] museprep editing/start id = ' . $w_id);
+		$access = $this->curl->simple_post(MUSE_PREP_URL . 'editor/editing/start', array('token'=>$token,'id'=>$w_id), $curl_options);
+
+		log_message('error', '[DEBUG] museprep editing/start result : ' . $access);
+
+		$json['result'] = $access;						
+
+		$this->output->set_content_type('application/json')->set_output(json_encode($json));
+	}
+
 	function get_templet_ele($kind){
 		return $this->all_list->get_templet_ele(2, $kind);
 	}
@@ -288,12 +395,50 @@ class Service extends CI_Controller {
 		return preg_replace($pattern, $replace, $data_obj);			
 	}
 
-	public function writing(){
+	public function writing()
+	{			
+		if($this->session->userdata('is_login')){
+			$cate['cate'] = 'service';
+			$this->load->view('head',$cate);
+
+			$usr_id = $this->session->userdata('id');	
+
+			$data['all_usr'] = '';
+			$data['cate'] = 'service';
+			$data['usr_id'] = $usr_id;
+			$this->load->view('/service_view/writing',$data);		
+					
+			$this->load->view('footer');					
+		}else{
+			redirect('/');
+		}		
+	}
+
+	public function museprep()
+	{			
+		if($this->session->userdata('is_login')){
+			$cate['cate'] = 'service';
+			$this->load->view('head',$cate);
+
+			$usr_id = $this->session->userdata('id');	
+
+			$data['all_usr'] = '';
+			$data['cate'] = 'service';
+			$data['usr_id'] = $usr_id;
+			$this->load->view('/service_view/museprep',$data);		
+					
+			$this->load->view('footer');					
+		}else{
+			redirect('/');
+		}		
+	}	
+
+	public function service_editor($service_name = 'writing'){
 		if($this->session->userdata('is_login')){
 			$data['cate'] = 'service';
 			$this->load->view('head',$data);
 
-			$service_name = "writing";
+			//$service_name = "writing";
 			$row = $this->all_list->get_serviceId_num($service_name);
 			$type = $row->id;  // get service_id
 
@@ -313,9 +458,11 @@ class Service extends CI_Controller {
 
 
 			$data['tag_templet'] = $this->all_list->get_tag($kind_id);
-			$data['score_templet'] = $this->all_list->get_scores_temp($kind_id);		
+			$data['score_templet'] = $this->all_list->get_scores_temp($kind_id);
+			//var_dump($data['score_templet']);		
 
 			$data['templet'] = $this->get_templet_ele($kind_id);
+			
 
 			$essay = $this->service_list->get_one_essay_by_essayid('service', $w_id, $type);
 
@@ -486,18 +633,32 @@ class Service extends CI_Controller {
 				//$data['classify'] = 'new';				
 			}
 
+			if ($service_name == 'museprep') {
+				$temp = explode("|||", $data['title']);
+				if (count($temp) == 2) {
+					$data['question'] = $temp[0];
+					$data['passage'] = $temp[1];
+				} else {
+					$data['question'] = $data['title'];
+					$data['passage'] = "";
+				}
+			}
+
 			$data['token'] = $token;
 			$data['id'] = $w_id; // Writing service data_id.			
 			$data['type'] = $type;
 			$data['pj_id'] = '';
+			$data['service_name'] = $service_name;
 			if ($data['orig_id'] == 0 || $data['id'] == $data['orig_id']) {
 				$data['re_submit'] = 'No';
 			} else {
 				$data['re_submit'] = 'Yes';
 			}
 
-			if ($service_name = "writing") {
+			if ($service_name == "writing") {
 				$this->load->view('/editor/writing_editor',$data);
+			} else if ($service_name == "museprep") {
+				$this->load->view('/editor/writing_editor',$data);					
 			} else {
 				$this->load->view('/editor/editor',$data);
 			}		
@@ -587,7 +748,7 @@ class Service extends CI_Controller {
 		$this->output->set_content_type('application/json')->set_output(json_encode($json));	
 	}
 
-	public function w_submit(){
+	public function w_submit($service_name = 'writing'){
 		if($this->session->userdata('is_login')){
 			//log_message('error', "w_submit called!!!");
 
@@ -663,11 +824,16 @@ class Service extends CI_Controller {
 				}
 				else
 				{
-					$submit_dic['editing'] = $errorchk_class->garbageTag_replace($submit_dic['editing']);
+					//$submit_dic['editing'] = mysql_real_escape_string($errorchk_class->garbageTag_replace($submit_dic['editing']) );
 					
 					// finally, if no error is dectected, submit save
-					$submit_dic['submit']	= 1;
-					$query_res = $this->service_list->insert_service_data($submit_dic);
+					//$submit_dic['submit']	= 1;
+					//$query_res = $this->service_list->insert_service_data($submit_dic);
+					$update_dic = array();
+					$update_dic['essay_id'] = $submit_dic['w_id'];
+					$update_dic['service_id'] = $submit_dic['type'];
+					$update_dic['submit'] = 1;
+					$query_res = $this->service_list->update_service_data($update_dic);
 		 
 					$essays = $this->service_list->get_essay($data_id, $submit_dic['type']);
 
@@ -695,8 +861,13 @@ class Service extends CI_Controller {
 						$data["done"] = $submit_dic['editing'];
 					}
 					$data["critique"] = $essays[0]->critique;
-					$data["score"] = $essays[0]->scoring;
 					$data["date"] = date("Y-m-d H:i:s", time());
+
+					if ($service_name == 'museprep') {
+						$data["score"] = json_decode($essays[0]->scoring, true);
+					} else {
+						$data["score"] = $essays[0]->scoring;
+					}
 					
 					$filename = $essays[0]->filename;
 					$fileNameParts   = explode( ".", $filename );
@@ -712,14 +883,23 @@ class Service extends CI_Controller {
 					//$access = $this->curl->simple_post('https://edgewriting.net/editor/editing/done', array('token'=>$token, 'id'=>$w_id, 'editing'=>$this->input->POST('editing'), 'critique'=>$this->input->POST('critique')));
 					//log_message('error', $json_data);
 					//log_message('error', "token : $token");
-					if (IS_SSL) {
-						$this->curl->ssl(FALSE);
+					if ($service_name == 'museprep') {
+						$curl_options = array(CURLOPT_CONNECTTIMEOUT => 1, CURLOPT_TIMEOUT => 3);
+						log_message('error', '[DEBUG] museprep edtiting/done token : ' . $token);
+						log_message('error', '[DEBUG] museprep edtiting/done id : ' . $submit_dic['w_id']);
+						$access = $this->curl->simple_post(MUSE_PREP_URL . 'editor/editing/done', array('token'=>$token, 'id'=>$submit_dic['w_id'], 'data'=>$json_data), $curl_options);
+						log_message('error', '[DEBUG] museprep edtiting/done result : ' . $access);
+					} else {
+						if (IS_SSL) {
+							$this->curl->ssl(FALSE);
+						}
+						$curl_options = array(CURLOPT_CONNECTTIMEOUT => 1, CURLOPT_TIMEOUT => 3);
+						log_message('error', '[DEBUG] edtiting/done token : ' . $token);
+						log_message('error', '[DEBUG] edtiting/done id : ' . $submit_dic['w_id']);
+						$access = $this->curl->simple_post(EDGE_WRITING_URL . 'editor/editing/done', array('token'=>$token, 'id'=>$submit_dic['w_id'], 'data'=>$json_data), $curl_options);
+						log_message('error', '[DEBUG] edtiting/done result : ' . $access);
 					}
-					$curl_options = array(CURLOPT_CONNECTTIMEOUT => 1, CURLOPT_TIMEOUT => 3);
-					log_message('error', '[DEBUG] edtiting/done token : ' . $token);
-					log_message('error', '[DEBUG] edtiting/done id : ' . $submit_dic['w_id']);
-					$access = $this->curl->simple_post(EDGE_WRITING_URL . 'editor/editing/done', array('token'=>$token, 'id'=>$submit_dic['w_id'], 'data'=>$json_data), $curl_options);
-					log_message('error', '[DEBUG] edtiting/done result : ' . $access);
+
 
 					// $access = '{
 					// 		    "status": true,
@@ -735,6 +915,7 @@ class Service extends CI_Controller {
 					}else{			
 						$json['result'] = 'curl';							
 					}
+
 				}
 
 				//$json['error_chk'] = $error_chk;	
@@ -843,9 +1024,9 @@ class Service extends CI_Controller {
 			$page_list = 20;			
 			$limit = ($page - 1) * $page_list;					
 
-			$totalcount = $this->all_list->get_service_export_count($service_id,$year,$month);
+			$totalcount = $this->service_list->get_service_export_count($service_id,$year,$month);
 			$json['data_count'] = $totalcount->count;
-			$json['data_list'] = $this->all_list->get_service_export_data($service_id,$year,$month,$limit,$page_list);
+			$json['data_list'] = $this->service_list->get_service_export_data($service_id,$year,$month,$limit,$page_list);
 			
 			$json['page'] = $page;
 			$json['page_list'] = $page_list;			

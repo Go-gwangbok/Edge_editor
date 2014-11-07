@@ -45,6 +45,7 @@ class Upload extends CI_Controller {
 				$data = explode(',//', $file);
 				$data_cou = count($data);
 				$result = true;
+				echo "data_count : $data_cou<br>\n";
 
 				$classify = explode('::', $data[0]);
 				$kind = strtolower(trim(mysql_real_escape_string(substr($classify[0],0,-1))));
@@ -52,7 +53,10 @@ class Upload extends CI_Controller {
 				$find_kind = $this->all_list->find_kind($kind);
 				$kind_id = $find_kind->id;
 
+				echo "kind_id : $kind_id<br>\n";
+
 				if($kind == 'toefl' && $pj_kind == 'toefl'){ // 종류가 에세이 일경우!
+					echo "kind : $kind<br>\n";
 
 					for($i = 1; $i < $data_cou; $i++){									
 						$data_replace = $data[$i];						

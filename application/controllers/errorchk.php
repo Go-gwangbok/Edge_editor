@@ -111,7 +111,7 @@ class Errorchk extends CI_Controller {
 								$value = str_replace(">", "&gt", $value); 
 								array_push($error_array_temp, $value);
 							}else if(count($b_count[0]) > 0){
-								$bin_data = $this->getTextBetweenTags('cou','b',$value);
+								//$bin_data = $this->getTextBetweenTags('cou','b',$value);
 								//array_push($error_array_temp, '&ltu&gt&ltb&gt'.$bin_data[0].'&lt/b&gt&lt/u&gt');
 								$value = str_replace("<", "&lt", $value); 
 								$value = str_replace(">", "&gt", $value); 

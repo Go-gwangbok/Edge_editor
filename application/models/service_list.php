@@ -501,6 +501,7 @@ class Service_List extends CI_Model{
 					AND  '$end'					
 					AND active = 0
 					AND type = '$type_id'
+					AND price_kind != 'premium'
 					group BY month DESC";					
 		/***
 		$query = "SELECT DISTINCT DATE_FORMAT( sub_date,  '%Y-%m' ) AS month , 
@@ -598,15 +599,16 @@ class Service_List extends CI_Model{
 					and service_data.type = '$service_id'
 					and service_data.active = 0
 					AND service_data.submit = 1
-					and service_data.ex_editing != ''
 					ORDER BY sub_date DESC
 					LIMIT $limit,$page_list";
+					//and service_data.ex_editing != ''
 		log_message('error', $query);
 		return $this->db->query($query)->result();
 	}
 
 	function service_export_total_count($service_id, $month,$year){
-		$query = "SELECT count(*) as count, count(if(ex_editing != '',1,null)) as export_count
+		//$query = "SELECT count(*) as count, count(if(ex_editing != '',1,null)) as export_count
+		$query = "SELECT count(*) as count, count(*) as export_count
 					FROM service_data
 					WHERE sub_date
 					BETWEEN  '".$year."-".$month."-01 00:00:00'
@@ -1846,7 +1848,7 @@ class Service_List extends CI_Model{
 	   	}
 	}
 
-	public function insert_service_data($dic) {
+	public function insert_service_data($dic, $update = true) {
 		$usr_id = $dic['usr_id'];
 		$w_id = $dic['w_id'];
 		$title = trim($dic['title']);
@@ -1896,6 +1898,11 @@ class Service_List extends CI_Model{
 
 	   		$sql = "UPDATE service_data SET prompt = $title, editing = $editing, critique = $critique, tagging = $tagging, scoring = $score1, score2 = $score2, word_count = $word_count, draft = $draft, submit = $submit, time = $time, sub_date = now() WHERE essay_id=$w_id and type=$type";
 	   		$flag = "update";
+
+	   		// 기존에 존재하는 경우, 업데이트하지 않고 리턴함. 
+	   		if ($update != true) {
+	   			return $data_id;
+	   		}
 	   	}
 	   	else
 	   	{

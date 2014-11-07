@@ -38,11 +38,16 @@ define('FOPEN_READ_WRITE_CREATE_STRICT',		'x+b');
 
 
 
-#define('IS_SSL', true);
-#define('EDGE_WRITING_URL',	'https://edgewritings.com/');
-define('IS_SSL', false);
-define('EDGE_WRITING_URL',	'http://192.168.219.144/');
+define('IS_SSL', true);
+define('EDGE_WRITING_URL',	'https://www.edgewritings.com/');
+#define('IS_SSL', false);
+#define('EDGE_WRITING_URL',	'http://192.168.219.144/');
 define('WRITING_PREMIUM_SECRET_KET', 'isdyf3584MjAI419BPuJ5V6X3YT3rU3C');
+
+#define('MUSE_PREP_URL',	'http://museprep.com/');
+define('MUSE_PREP_URL',	'http://jake4.iptime.org:9000/');
+#define('MUSE_PREP_URL',	'http://192.168.123.131:9000/');
+
 
 define('DOC_UPLOAD_PATH', './uploads/tmp/');
 define('USER_DOC_PATH', './uploads/user_doc/');

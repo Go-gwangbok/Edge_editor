@@ -34,8 +34,10 @@ class Sign extends CI_Controller {
 						$cate = $value->type;
 						if($cate == 'musedata'){
 							$this->session->set_userdata('musedata','true');
-						}else{
+						} else if($cate == 'service'){
 							$this->session->set_userdata('service','true');
+						} else if($cate == 'training'){
+							$this->session->set_userdata('training','true');
 						}
 					}
 					$this->session->set_userdata('is_login',true);

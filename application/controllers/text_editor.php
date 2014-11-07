@@ -66,8 +66,12 @@ class Text_editor extends CI_Controller {
 
 		$convert = str_replace('"', '&quot',$datas->raw_txt); 
 		$convert = str_replace('’', "'",$convert);
+		/****
 		$convert = str_replace('“', '"',$convert);
 		$convert = str_replace('”', '"',$convert);
+		****/
+		$convert = str_replace('“', '&quot',$convert);
+		$convert = str_replace('”', '&quot',$convert);
 		$data['raw_writing'] = $convert;
 		$data['re_raw_writing'] = preg_replace("#(\\\r\\\n|\\\r|\\\n)#","<br>", $convert);
 		$data['discuss'] = $datas->discuss;
@@ -297,15 +301,21 @@ class Text_editor extends CI_Controller {
 				$editing = substr($editing, 0,-1);
 			}
 			$editing = str_replace('"', '&quot',$editing); 
+			//echo $editing . "<br><br>";
 
 			$data['edit_writing'] = preg_replace("#(\\\r\\\n|\\\r|\\\n)#","<br>",$editing);			
 
 			$convert = str_replace('"', '&quot',$rows->raw_txt); 
+			//echo "===========================================<br>";
+			//echo $convert . "<br><br>";
+
 			$convert = str_replace('’', "'",$convert);
-			$convert = str_replace('“', '"',$convert);
-			$convert = str_replace('”', '"',$convert);
+			$convert = str_replace('“', '&quot',$convert);
+			$convert = str_replace('”', '&quot',$convert);
 			//”
-			$convert = str_replace('”', '"',$convert);
+			$convert = str_replace('”', '&quot',$convert);
+			//echo "===========================================<br>";
+			//echo $convert . "<br><br>";
 			$data['raw_writing'] = preg_replace("#(\\\r\\\n|\\\r|\\\n)#","<br>", $convert);			
 			$data['word_count'] = $rows->word_count;
 			$data['re_raw_writing'] = preg_replace("#(\\\r\\\n|\\\r|\\\n)#","<br>", $convert);			
@@ -344,7 +354,8 @@ class Text_editor extends CI_Controller {
 				} else if ($rows->ex_editing == "" ) {
 					$data['cate'] = 'error';
 				} else {
-					$data['cate'] = $cate;
+					//$data['cate'] = $cate;
+					$data['cate'] = 'admin_export';
 				}
 			} else {
 				$data['cate'] = $cate;

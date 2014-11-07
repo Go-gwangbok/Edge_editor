@@ -112,6 +112,16 @@ class All_list extends CI_Model{
 									ORDER BY connect_usr_pj.joindate DESC")->result();		
 	}
 
+	// return just editor info
+	function pj_ineditors_list($pj_id){ // pj_id
+   		return $this->db->query("SELECT usr.id AS usr_id, usr.name
+									FROM connect_usr_pj
+									LEFT JOIN project ON project.id = connect_usr_pj.pj_id
+									LEFT JOIN usr ON usr.id = connect_usr_pj.usr_id
+									WHERE connect_usr_pj.active =0
+									AND connect_usr_pj.pj_id = '$pj_id'")->result();		
+	}
+
 	function service_inmembers_list(){ // pj_id
 		return $this->db->query("SELECT usr.id AS usr_id, usr.name, usr.date,
 									COUNT(IF(adjust_data.essay_id !=0, 1, NULL ) ) AS count, 
@@ -132,6 +142,7 @@ class All_list extends CI_Model{
 									LEFT JOIN usr ON usr.id = service_data.usr_id									
 									WHERE service_data.type = '$service_id'
 									AND service_data.sub_date BETWEEN  '".$year."-".$month."-01 00:00:00' AND '".$year."-".$month."-31 23:59:59'
+									AND service_data.price_kind != 'premium'
 									GROUP BY service_data.usr_id
 									ORDER BY service_data.usr_id")->result();
 	}
@@ -700,7 +711,7 @@ class All_list extends CI_Model{
 	}
 
 	function active_task($usr_id){
-		return $this->db->query("SELECT connect_usr_task.*,task.name
+		return $this->db->query("SELECT connect_usr_task.*,task.name,task.type
 									FROM connect_usr_task
 									LEFT JOIN task ON task.id = connect_usr_task.task_id
 									WHERE connect_usr_task.usr_id = '$usr_id'
@@ -2434,5 +2445,52 @@ class All_list extends CI_Model{
 
 		return true;
    	}
+
+   	function get_score_stats($pj1, $pj2, $editor1, $editor2) {
+   		if ($editor1 != 0 && $editor2 != 0) {
+   			$essay_id_list = $this->db->query("select essay_id, count(essay_id) as cnt from adjust_data where pj_id in ($pj1,$pj2) and usr_id in ($editor1,$editor2) and  submit = 1 group by essay_id having cnt > 1 order by id asc");
+   		} else {
+   			$essay_id_list = $this->db->query("select essay_id, count(essay_id) as cnt from adjust_data where pj_id in ($pj1,$pj2) and  submit = 1 group by essay_id having cnt > 1 order by id asc");
+   		}
+
+   		$pattern = array('({)','(})','(")');
+   		$replace = array('','','');
+
+   		$stat_list = array();
+
+		foreach ( $essay_id_list->result() as $row) {
+			$stat_info = array();
+
+			$essay_id = $row->essay_id;
+			$stat_info['essay_id'] = $essay_id;
+
+			$select = $this->db->query("SELECT a.id, a.pj_id, a.usr_id, a.scoring, a.prompt, a.raw_txt, b.name 
+							FROM adjust_data a, usr b 
+							WHERE essay_id = $essay_id AND 
+								pj_id IN ($pj1,$pj2) AND
+								a.usr_id = b.id
+								");
+
+			$idx = 0;
+			foreach( $select->result() as $row_2) {
+				$idx++;
+				if ($idx == 1) {
+					$stat_info['prompt'] = $row_2->prompt;
+					$stat_info['raw_txt'] = $row_2->raw_txt;
+				}
+				$stat_info['id'.$idx] = $row_2->id;
+				$stat_info['pj_id'.$idx] = $row_2->pj_id;
+				$stat_info['usr_id'.$idx] = $row_2->usr_id;
+				$stat_info['usr_name'.$idx] = $row_2->name;
+				//$stat_info['scoring'.$idx] = preg_replace($pattern, $replace, $row_2->scoring);
+				$stat_info['scoring'.$idx] = $row_2->scoring;
+			}
+
+			$stat_list[] = $stat_info;
+		}
+
+		return $stat_list;
+   	}
+
 }
 ?>

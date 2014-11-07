@@ -14,6 +14,7 @@
         ?>
           <a class="btn btn-default btn-sm pull-right" href="/musedata/project/new_pj" id="new_pj" role="button" style="border-color:#6799FF; color:#6799FF; margin-right:15px;"><span class="glyphicon glyphicon-plus"></span> New Project</a>
         <?php } ?>       
+        <a class="btn btn-default btn-sm pull-right" href="/musedata/project/score_stats" id="new_pj" role="button" style="border-color:#6799FF; color:#6799FF; margin-right:15px;">Score Stats</a>
       </h3>  
   </div>  <!-- Nav or Head title End -->
   <br>    

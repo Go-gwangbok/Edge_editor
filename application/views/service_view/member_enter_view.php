@@ -92,7 +92,7 @@ function ajaxPost(url,data){
 			var id = data_list[i]['id'];
 			var price_kind = data_list[i]['price_kind'];
 			
-			$('tbody#list').append('<tr id='+i+'  style="cursor:pointer;" class="rowbtn" href="/text_editor/service_comp/'+service_name+'/'+id+'/'+month+'/'+year+'"><td class="text-center">'+num+'</td><td>'																				 
+			$('tbody#list').append('<tr id='+i+'  style="cursor:pointer;" class="rowbtn" href="/text_editor/service_comp/'+service_name+'/'+essay_id+'/'+month+'/'+year+'"><td class="text-center">'+num+'</td><td>'																				 
 				+essay_id+"::"+data_list[i]['prompt'].replace(/"/gi,'')+'</td><td class="text-center">'				
 				+kind.toUpperCase()+'</td><td class="text-center">'				
 				+price_kind+'</td><td style="width:95px;" class="text-center">'

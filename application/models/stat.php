@@ -272,7 +272,7 @@ class Stat extends CI_Model{
    function make_daily_stat($service) {
       switch ($service) {
          case 'musedata':  
-            $query = "SELECT date_format(sub_date, '%Y-%m-%d') AS regdate, 
+            $query = "SELECT date_format(start_date, '%Y-%m-%d') AS regdate, 
                count(*) AS essay_count, sum(word_count) AS w_count, sum(sentence_count) AS s_count 
                FROM `adjust_data` 
                WHERE pj_active = 0

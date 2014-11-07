@@ -79,7 +79,7 @@ class Writing extends CI_Controller {
 				$service_dic['draft']		= 0;
 				$service_dic['submit']		= 0;
 
-				$query_res = $this->service_list->insert_service_data($service_dic);
+				$query_res = $this->service_list->insert_service_data($service_dic, false);
 
 				if (!$query_res) {
 					$access_status['status'] = false;
@@ -251,11 +251,11 @@ class Writing extends CI_Controller {
 			$this->load->view('head',$data);
 
 			$service_name = "writing";
-			$data['service_name'] = $service_name;
+			
 
 			$row = $this->all_list->get_serviceId_num($service_name);
 			$service_id = $row->id;
-			$data['service_id'] = $service_id;
+			
 
 			$rows = $this->service_list->get_one_essay_by_essayid($data['cate'],$data_id);
 
@@ -281,7 +281,12 @@ class Writing extends CI_Controller {
 				if($end_doubble_quotationConfirm == '"'){
 					$editing = substr($editing, 0,-1);
 				}
-				$editing = str_replace('"', '&quot',$editing); 
+				$editing = str_replace('"', '&quot',$editing);
+				$editing = str_replace('’', "'",$editing);
+
+				$editing = str_replace('“', '&quot',$editing);
+				$editing = str_replace('”', '&quot',$editing);
+
 				$data['edit_writing'] = preg_replace("#(\\\r\\\n|\\\r|\\\n)#","<br>",$editing);
 				$data['writing'] =  $data['edit_writing'];
 				$tagging = str_replace('"','',preg_replace("#(\\\r\\\n|\\\r|\\\n)#","<br>", $rows->tagging));
@@ -298,6 +303,9 @@ class Writing extends CI_Controller {
 
 
 			}
+
+			$data['service_name'] = $service_name;
+			$data['service_id'] = $service_id;
 
 			$this->load->view('/editor/writing_editor',$data);
 			$this->load->view('footer');
@@ -344,9 +352,9 @@ class Writing extends CI_Controller {
 
 					//$access_status['error']['message'];
 				} else {
-					//$result = $this->send_email_to_editor($email, $draft_dic);
+					$result = $this->send_email_to_editor($email, $draft_dic);
 					//$result = $this->send_email_to_editor("eric@akaon.com", $draft_dic);
-					$result = $this->send_email_to_editor("bettychoi@akaprep.com", $draft_dic);
+					//$result = $this->send_email_to_editor("bettychoi@akaprep.com", $draft_dic);
 					
 					//log_message('error', '[DEBUG] assign_editor_to_premium send_mail result :' . $this->email->print_debugger());
 					log_message('error', '[DEBUG] assign_editor_to_premium send_mail result :' . $result);
@@ -593,12 +601,19 @@ class Writing extends CI_Controller {
 			$premium['kind_name'] = strtoupper($rows->kind_name);
 		}
 		$premium['title'] = str_replace('"', '&quot;', $rows->prompt);
-		$convert = str_replace('"', '&quot;',$rows->raw_txt); 
+		$raw_txt = $this->br2nl(strip_tags($rows->raw_txt, '<p><br>'));
+		$raw_txt = $this->p2nl($raw_txt);
+
+		$convert = str_replace('"', '&quot;',$raw_txt); 
 		$convert = str_replace('’', "'",$convert);
+		/***
 		$convert = str_replace('“', '"',$convert);
 		$convert = str_replace('”', '"',$convert);
+		***/
+		$convert = str_replace('“', '&quot;',$convert);
+		$convert = str_replace('”', '&quot;',$convert);
 		//”
-		$convert = str_replace('”', '"',$convert);
+		//$convert = str_replace('”', '"',$convert);
 		$premium['raw_writing'] = $convert;
 		$premium['re_raw_writing'] = preg_replace("#(\\\r\\\n|\\\r|\\\n)#","<br>", $convert);
 
@@ -1018,8 +1033,12 @@ class Writing extends CI_Controller {
 
 				$convert = str_replace('"', '&quot',$essay->raw_txt); 
 				$convert = str_replace('’', "'",$convert);
+				/***
 				$convert = str_replace('“', '"',$convert);
 				$convert = str_replace('”', '"',$convert);
+				***/
+				$convert = str_replace('“', '&quot',$convert);
+				$convert = str_replace('”', '&quot',$convert);
 				$data['raw_writing'] = $convert;
 				$data['re_raw_writing'] = preg_replace("/[\n\r]/","<br>", $convert);
 				$data['discuss'] = $essay->discuss;
@@ -1526,6 +1545,30 @@ class Writing extends CI_Controller {
 			redirect('/');
 		}	
 		$this->output->set_content_type('application/json')->set_output(json_encode($json));
+	}
+
+	function br2nl($string) 
+	{ 
+	    //return preg_replace('/\<br(\s*)?\/?\>/i', "\n", $string); 
+	    return preg_replace(array("/\<br(\s*)?\/?\>/i","/\<\/br(\s*)?\/?\>/iU"), 
+	                        array("\n","\n"), 
+	                        $string); 
+	} 
+
+	// p 태그가 존재하면, p 태그 이외의 줄바꿈은 제거하고, paragraph 처리만 수행함.
+	function p2nl ($str) { 
+	    preg_match_all('#<p (.*?)>(.*?)</p>#is', $str, $p_matches);
+
+	    if (count($p_matches[0]) < 1) {
+	    	return $str;
+	    }
+
+	    $str = preg_replace("/[\n\r]/"," ", $str);
+
+	    return preg_replace(array("/<p[^>]*>/iU","/<\/p[^>]*>/iU"), 
+	                        array("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;","\n\n"), 
+	                        $str); 
+
 	}
 
 

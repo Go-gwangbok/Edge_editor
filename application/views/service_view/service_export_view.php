@@ -7,8 +7,8 @@
 	    </ol>	    
 	    <label class="pull-right" style="margin-right:10px;" id="total">Total : <?=$total;?>&nbsp;&nbsp;</label>				
 	    <h3 class="text-center"><?=$str_month;?></h3>	    
-	    <a href="/errordata/service_export_error/<?=$service_id;?>/<?=$month;?>/<?=$year;?>"><button class="btn btn-danger pull-left" id="errorbtn" style="margin-top:-10px; margin-left:15px;">Error List<span class="badge" style="background-color:transparent;"><?=$total-$export_count;?></span></button></a>
-		<button class="btn btn-danger pull-right" id="allexport" style="margin-top:-10px; margin-right:15px;"> Export <span class="badge" id="allcount" style="background-color:transparent;"><?=$export_count;?></span><span class="glyphicon glyphicon-download"></span></button>		
+	    <!--a href="/errordata/service_export_error/<?=$service_id;?>/<?=$month;?>/<?=$year;?>"><button class="btn btn-danger pull-left" id="errorbtn" style="margin-top:-10px; margin-left:15px;">Error List<span class="badge" style="background-color:transparent;"><?=$total-$export_count;?></span></button></a-->
+		<!--button class="btn btn-danger pull-right" id="allexport" style="margin-top:-10px; margin-right:15px;"> Export <span class="badge" id="allcount" style="background-color:transparent;"><?=$export_count;?></span><span class="glyphicon glyphicon-download"></span></button-->		
 	</div> <!-- Div row -->
 	<br>
 
@@ -25,8 +25,9 @@
 			<tr>
 				<th class="text-center"><span></span>No.</th>								
 				<th class="text-center">Prompt</th>				
-				<th class="text-center" width="85px;">Editor</th>				
-				<th class="text-center">Price Kind</th>				
+				<th class="text-center" width="100px;">Editor</th>				
+				<th class="text-center">Price Kind</th>	
+				<th class="text-center">Time</th>				
 				<th class="text-center" width="105px;">Date</th>				
 				<th class="text-center">Status</th>			
 			</tr>
@@ -82,12 +83,13 @@ function ajaxPost(url,data){
 				var date = data_list[i]['sub_date'];
 			}
 			
-			$('tbody#list').append('<tr class="com" id='+i+' style="cursor:pointer;" href="/text_editor/service_comp/'+service_name+'/'+essay_id+'/'+task+'/'+month+'/'+year+'"><td>'+num+'</td><td>'																				 
-					+essay_id+"::"+data_list[i]['prompt'].replace(/"/gi,'')+'</td><td>'
-					+data_list[i]['name']+'</td><td>'
-					+data_list[i]['price_kind']+'</td><td>'
+			$('tbody#list').append('<tr class="com" id='+i+' style="cursor:pointer;" href="/text_editor/service_comp/'+service_name+'/'+essay_id+'/'+task+'/'+month+'/'+year+'"><td  class="text-center">'+num+'</td><td>'																				 
+					+essay_id+"::"+data_list[i]['prompt'].replace(/"/gi,'')+'</td><td class="text-center">'
+					+data_list[i]['name']+'</td><td class="text-center">'
+					+data_list[i]['price_kind']+'</td><td class="text-center">'
+					+formatTime(data_list[i]['time'])+'</td><td class="text-center">'
 					+date+'</td>');						
-			$('tbody#list tr#'+i).last().append('<td><button class="btn btn-success btn-sm">Completed</button></td>');								
+			$('tbody#list tr#'+i).last().append('<td class="text-center"><button class="btn btn-success btn-sm">Completed</button></td>');								
 			num++;				
 			$('div#pageblock').children().remove();
 		
@@ -276,5 +278,21 @@ $('button#allexport').click(function(){
 $('tbody#list').delegate('tr.com', 'click', function(){		      
     window.document.location = $(this).attr("href");      
 });
+
+// Timer
+function formatTime(time) {
+    var min = parseInt(time / 6000),
+        sec = parseInt(time / 100) - (min * 60),
+        hundredths = pad(time - (sec * 100) - (min * 6000), 2);
+    //return (min > 0 ? pad(min, 2) : "00") + ":" + pad(sec, 2) + ":" + hundredths;
+    return (min > 0 ? pad(min, 2) : "00") + ":" + pad(sec, 2);
+}
+
+// Common functions
+function pad(number, length) {
+    var str = '' + number;
+    while (str.length < length) {str = '0' + str;}
+    return str;
+}
 
 </script>

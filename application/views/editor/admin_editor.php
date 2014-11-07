@@ -249,7 +249,13 @@
               <input type="text" class="form-control score_val1" id="<?=strtolower($score_name);?>1" placeholder="0">
             </div>
           </div>
-          <?php } ?>                                  
+          <?php } ?>
+          <div class="row" style="margin-bottom:10px;">  
+          <label for="inputEmail3" class="col-md-2 text-danger">Total Score</label>
+          <div class="col-md-2">
+            <input type="text" class="form-control score_val1" id="total_score1" placeholder="0">
+          </div>
+        </div>
         </div>
       </div>
     </div>               
@@ -277,7 +283,13 @@
             <input type="text" class="form-control score_val2" id="<?=strtolower($score_name);?>2" placeholder="0">
           </div>
         </div>
-        <?php } ?>                 
+        <?php } ?>
+        <div class="row" style="margin-bottom:10px;">  
+          <label for="inputEmail3" class="col-md-2 text-danger">Total Score</label>
+          <div class="col-md-2">
+            <input type="text" class="form-control score_val2" id="total_score2" placeholder="0">
+          </div>
+        </div> 
         </div>
       </div>
     </div>              

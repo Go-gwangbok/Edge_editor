@@ -963,5 +963,66 @@ class Project extends CI_Controller {
 		$json['result'] = $result;
 		$this->output->set_content_type('application/json')->set_output(json_encode($json));
 	}
+
+	function score_stats()
+	{			
+		if($this->session->userdata('is_login')){
+			$classify = $this->session->userdata('classify');
+			$data['cate'] = 'musedata';
+			$this->load->view('head',$data);							
+			if($classify == 0){ // Admin			
+				$data['all_usr'] = $this->all_list->all_usr();
+				$data['pjlist'] = $this->all_list->new_admin_pjlist();
+				$data['pj1'] = "";
+				$data['pj2'] = "";
+				$data['cate'] = 'admin';
+				//var_dump($data);
+				$this->load->view('/musedata_view/score_stats',$data);		
+				$this->load->view('footer');					
+				
+			}else{	// Editor				
+				$usr_id = $this->session->userdata('id');								
+				//$data['cate'] = 'editor';
+				$this->load->view('/musedata_view/index',$data);		
+				$this->load->view('footer');					
+			}	
+		}else{
+			redirect('/');
+		}		
+	}	
+	
+	public function get_editors_list(){
+		$pj_id = $this->input->get_post('pj_id');
+		$result = $this->all_list->pj_ineditors_list($pj_id);
+		$json['result'] = $result;
+		$this->output->set_content_type('application/json')->set_output(json_encode($json));
+	}
+
+	public function get_score_stats(){
+		$pj1 = $this->input->get_post('pj1_id');
+		$pj2 = $this->input->get_post('pj2_id');
+		$editor1 = $this->input->get_post('editor1_id');
+		$editor2 = $this->input->get_post('editor2_id');
+		//$data['result'] = $this->all_list->get_score_stats($pj1, $pj2, $editor1, $editor2);
+		//var_dump($data);
+		//$this->load->view('/musedata_view/score_stats_result',$data);
+		$json['result'] = $this->all_list->get_score_stats($pj1, $pj2, $editor1, $editor2);
+		$this->output->set_content_type('application/json')->set_output(json_encode($json));
+	}
+
+	public function export_score_stats($pj1, $pj2, $editor1, $editor2){
+		/***
+		$pj1 = $this->input->get_post('pj1');
+		$pj2 = $this->input->get_post('pj2');
+		$editor1 = $this->input->get_post('editor1');
+		$editor2 = $this->input->get_post('editor2');
+		***/
+		$json['result'] = $this->all_list->get_score_stats($pj1, $pj2, $editor1, $editor2);
+
+		$download_fname = "musedata_${pj1}_${pj2}.json";
+
+		$this->output->set_header('Content-disposition: attachment; filename='.$download_fname);
+		$this->output->set_content_type('application/json')->set_output(json_encode($json));
+	}
 }
 ?>
