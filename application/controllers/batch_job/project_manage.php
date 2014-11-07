@@ -47,13 +47,46 @@ class Project_Manage extends CI_Controller {
 			}
 			fclose($fp);
 		}
+	}
 
-		/***
-		$result = $this->batch_job->copy_project_data($source_pj_id, $dest_pj_id);
+	public function import_museprep_data2($new_pj_id) {
+		$filename = "./uploads/essay-sampling1000.txt";
 
-		$json['status'] = $result;
-		$this->output->set_content_type('application/json')->set_output(json_encode($json));
-		***/
+		$id_list = array();
+		$fp = @fopen($filename, "r");
+		if ($fp) {
+			$cnt = 0;
+			while (($buffer = fgets($fp, 100)) !== false) {
+				$buffer = str_replace("\r", "", $buffer);
+				$buffer = str_replace("\n", "", $buffer);
+				//echo $buffer;
+				$token = explode("/", $buffer);
+				if (count($token) != 3) continue;
+				$id = $token[1];
+
+				echo $id . " ";
+
+				$id_list[] =  $id;
+				
+				$cnt++;
+			}
+			fclose($fp);
+		}
+
+		echo count($id_list);
+		if (count($id_list) < 1000) return;
+
+		$new_pj_id = 31;
+		$count = 1000;
+		$min_id = 10158;
+		$result = $this->batch_job->import_museprep_data2($new_pj_id, $count, $id_list, $min_id);
+
+		if ($result == false) {
+			echo "dbinsert fail!!!";
+			return;
+		}
+
+		//echo $result;
 	}
 
 	public function dump_import_data(){

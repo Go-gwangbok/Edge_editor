@@ -134,6 +134,96 @@ class Batch_Job extends CI_Model{
          return true;
    }
 
+   function import_museprep_data2($new_pj_id, $count, $id_list, $min_id) {
+      $query = "SELECT * FROM adjust_data WHERE pj_id <= 24 and pj_id != 20 and id > $min_id and pj_active = 0 and active = 0 and CHAR_LENGTH(prompt) > 10 and CHAR_LENGTH(raw_txt) > 800 ORDER BY id ASC limit 3000";
+
+      $source_data = $this->db->query($query);
+
+      $user_list = array(5, 14);
+
+      echo "import_museprep_data :: $new_pj_id || $count\n";
+
+      $filename = "./uploads/essay-sampling2000.txt";
+      $fp2 = @fopen($filename, "w");
+
+      $cnt = 1;
+      foreach ( $source_data->result() as $row) {
+         if ($cnt > 1000) break;
+         $id = $row->id;
+         echo $id;
+         if ( in_array($id, $id_list) ) {
+            echo " id is duplicated<br>\n";
+            continue;
+         }
+         echo "<br>\n";
+         fprintf($fp2, "%d\n", $id);
+         $cnt++;
+
+         $idx = $cnt % 2;
+
+         $new_usr_id = $user_list[$idx];
+
+         echo "usr_id : $new_usr_id\n";
+          
+            $essay_id = $row->essay_id;
+            
+            $prompt = mysql_real_escape_string($row->prompt);
+
+            //echo "prompt : $prompt\n";
+
+            $start_doubble_quotationConfirm = substr($prompt, 0, 2);
+            $end_doubble_quotationConfirm = substr($prompt, -2);
+
+            if ($start_doubble_quotationConfirm == '\"') {
+               $prompt = substr($prompt, 2);
+            }
+
+            if ($start_doubble_quotationConfirm == '\r') {
+               $prompt = substr($prompt, 2);
+            }
+
+            if ($end_doubble_quotationConfirm == '\"') {
+               $prompt = substr($prompt, 0, -2);
+            }
+
+            $prompt = preg_replace("#^(\d+)&#", "", $prompt);
+
+            //echo "prompt : $prompt\n";
+
+            $raw_txt = mysql_real_escape_string($row->raw_txt);
+            $editing = mysql_real_escape_string($row->editing);
+            $ex_editing = mysql_real_escape_string($row->ex_editing);
+            $tagging = mysql_real_escape_string($row->tagging);
+            $critique = mysql_real_escape_string($row->critique);
+            $word_count = $row->word_count;
+            //$org_tag = $row->org_tag;
+            //$replace_tag = $row->replace_tag;
+            //$discuss = $row->discuss;
+            //$draft = $row->draft;
+            //$submit = $row->submit;
+            //$time = $row->time;
+            $kind = $row->kind;
+            $type = $row->type;
+            //$pj_active = $row->pj_active;
+            $active = $row->active;
+            //$start_date = $row->start_date;
+            //$sub_date = $row->sub_date;
+
+            $ins = $this->db->query("INSERT INTO adjust_data(usr_id,essay_id,prompt,raw_txt,kind,type,start_date,pj_id,editing,ex_editing, critique,tagging,draft,word_count) 
+                                    VALUES('$new_usr_id','$essay_id','$prompt','$raw_txt','$kind',1,now(),'$new_pj_id','$editing','$ex_editing','$critique','$tagging','1','$word_count')");
+
+            if(!$ins){
+               fclose($fp2);
+               return false;
+            }
+
+         } // foreach end.
+
+         fclose($fp2);
+
+         return true;
+   }
+
       function make_sentence_count_musedata() {
          $query = "SELECT * FROM adjust_data WHERE sentence_count = 0 limit 1000";
 
