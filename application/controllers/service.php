@@ -163,6 +163,7 @@ class Service extends CI_Controller {
 			log_message('error', 'discuss -> draft_save :' . $result);
 			
 			if ($service_name == 'museprep') {
+				$this->curl->ssl(FALSE);
 				$curl_options = array(CURLOPT_CONNECTTIMEOUT => 1, CURLOPT_TIMEOUT => 3);
 				log_message('error', "[DEBUG] musebase w_discuss editing/discuss id : " . $essay_id);
 				$access = $this->curl->simple_post(MUSE_PREP_URL. 'editor/editing/discuss', array('token'=>$token, 'id'=>$essay_id), $curl_options);
@@ -176,10 +177,6 @@ class Service extends CI_Controller {
 				$access = $this->curl->simple_post(EDGE_WRITING_URL. 'editor/editing/discuss', array('token'=>$token, 'id'=>$essay_id), $curl_options);
 				log_message('error', "[DEBUG] w_discuss result : " . $access);
 			}
-
-
-
-			
 
 			$result = $this->all_list->discuss_service_proc($essay_id);
 			$json['result'] = $access;
@@ -265,6 +262,7 @@ class Service extends CI_Controller {
 		$secret = 'isdyf3584MjAI419BPuJ5V6X3YT3rU3C';
 		$email = $this->session->userdata('email');
 
+		$this->curl->ssl(FALSE);
 		$curl_options = array(CURLOPT_CONNECTTIMEOUT => 1, CURLOPT_TIMEOUT => 3);
 
 		/***
@@ -293,7 +291,7 @@ class Service extends CI_Controller {
 			log_message('error', "token : $token");
 			
 			// re_curl
-			//$this->curl->ssl(FALSE);
+			$this->curl->ssl(FALSE);
 			/***
 			if (IS_SSL) {
 				$this->curl->ssl(FALSE);
@@ -372,6 +370,8 @@ class Service extends CI_Controller {
 	public function auth_museprep(){
 		$token = $this->input->post('token');
 		$w_id = $this->input->post('w_id');
+
+		$this->curl->ssl(FALSE);
 
 		$curl_options = array(CURLOPT_CONNECTTIMEOUT => 1, CURLOPT_TIMEOUT => 3);
 		log_message('error', '[DEBUG] museprep editing/start token = ' . $token);
@@ -884,6 +884,7 @@ class Service extends CI_Controller {
 					//log_message('error', $json_data);
 					//log_message('error', "token : $token");
 					if ($service_name == 'museprep') {
+						$this->curl->ssl(FALSE);
 						$curl_options = array(CURLOPT_CONNECTTIMEOUT => 1, CURLOPT_TIMEOUT => 3);
 						log_message('error', '[DEBUG] museprep edtiting/done token : ' . $token);
 						log_message('error', '[DEBUG] museprep edtiting/done id : ' . $submit_dic['w_id']);

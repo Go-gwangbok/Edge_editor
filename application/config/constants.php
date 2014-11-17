@@ -44,8 +44,8 @@ define('EDGE_WRITING_URL',	'https://www.edgewritings.com/');
 #define('EDGE_WRITING_URL',	'http://192.168.219.144/');
 define('WRITING_PREMIUM_SECRET_KET', 'isdyf3584MjAI419BPuJ5V6X3YT3rU3C');
 
-#define('MUSE_PREP_URL',	'http://museprep.com/');
-define('MUSE_PREP_URL',	'http://jake4.iptime.org:9000/');
+define('MUSE_PREP_URL',	'https://www.museprep.com/');
+#define('MUSE_PREP_URL',	'http://jake4.iptime.org:9000/');
 #define('MUSE_PREP_URL',	'http://192.168.123.131:9000/');
 
 
